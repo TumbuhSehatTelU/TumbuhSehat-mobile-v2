@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
 import 'core/network/network_info.dart';
+import 'core/utils/constants.dart';
 
 final sl = GetIt.instance;
 
@@ -14,9 +15,14 @@ Future<void> init() async {
   // EXTERNAL
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton(() => sharedPreferences);
-  // POSTPONE BE URL
-  sl.registerLazySingleton(
-    () => Dio(BaseOptions(baseUrl: 'https://tumbuhsehat.com')),
-  );
+  sl.registerLazySingleton(() {
+    final options = BaseOptions(
+      baseUrl: AppConstants.BASE_URL,
+      connectTimeout: const Duration(seconds: 10),
+      receiveTimeout: const Duration(seconds: 10),
+      headers: {'Content-Type': 'application/json'},
+    );
+    return Dio(options);
+  });
   sl.registerLazySingleton(() => Connectivity());
 }
