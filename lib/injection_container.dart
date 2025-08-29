@@ -5,10 +5,36 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 
 import 'core/network/network_info.dart';
 import 'core/utils/constants.dart';
+import 'data/datasources/local/onboarding_local_data_source.dart';
+import 'data/datasources/remote/onboarding_remote_data_source.dart';
+import 'data/repositories/onboarding_repository_impl.dart';
+import 'domain/repositories/onboarding_repository.dart';
+import 'presentation/cubit/splash/splash_cubit.dart';
 
 final sl = GetIt.instance;
 
 Future<void> init() async {
+  // FEATURES
+  // Cubit
+  sl.registerFactory(() => SplashCubit(onboardingRepository: sl()));
+
+  // Repository
+  sl.registerLazySingleton<OnboardingRepository>(
+    () => OnboardingRepositoryImpl(
+      remoteDataSource: sl(),
+      localDataSource: sl(),
+      networkInfo: sl(),
+    ),
+  );
+
+  // Data sources
+  sl.registerLazySingleton<OnboardingRemoteDataSource>(
+    () => OnboardingRemoteDataSourceImpl(client: sl()),
+  );
+  sl.registerLazySingleton<OnboardingLocalDataSource>(
+    () => OnboardingLocalDataSourceImpl(sharedPreferences: sl()),
+  );
+
   // CORE
   sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl(), sl()));
 

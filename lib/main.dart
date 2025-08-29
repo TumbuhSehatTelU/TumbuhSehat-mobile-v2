@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'injection_container.dart' as di;
+import 'presentation/cubit/splash/splash_cubit.dart';
+import 'presentation/screens/splash_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,30 +16,16 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-      providers: [
-      ],
+      providers: [BlocProvider(create: (_) => di.sl<SplashCubit>())],
       child: MaterialApp(
         title: 'Tumbuh Sehat',
         theme: ThemeData(
           fontFamily: 'OpenSans',
-          primarySwatch: Colors.blue,
+          primarySwatch: Colors.lightGreen,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        home:
-            const HomeScreen(), 
+        home: const SplashScreen(),
       ),
-    );
-  }
-}
-
-// Dummy
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Home')),
-      body: const Center(child: Text('Dummy')),
     );
   }
 }
