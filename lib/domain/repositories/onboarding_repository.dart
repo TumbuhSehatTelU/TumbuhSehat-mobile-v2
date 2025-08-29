@@ -5,6 +5,7 @@ import '../../data/models/family_model.dart';
 import '../../data/models/parent_model.dart';
 
 abstract class OnboardingRepository {
+  Future<Either<Failure, FamilyModel>> getCachedFamily();
   Future<Either<Failure, FamilyModel>> checkUniqueCode(String code);
   Future<Either<Failure, FamilyModel>> createNewFamily(FamilyModel family);
   Future<Either<Failure, void>> addParentToFamily({

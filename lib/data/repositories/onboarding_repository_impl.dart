@@ -21,6 +21,16 @@ class OnboardingRepositoryImpl implements OnboardingRepository {
   });
 
   @override
+  Future<Either<Failure, FamilyModel>> getCachedFamily() async {
+    try {
+      final family = await localDataSource.getCachedFamily();
+      return Right(family);
+    } on CacheException catch (e) {
+      return Left(CacheFailure(e.message));
+    }
+  }
+  
+  @override
   Future<Either<Failure, FamilyModel>> checkUniqueCode(String code) async {
     if (await networkInfo.isConnected) {
       try {
