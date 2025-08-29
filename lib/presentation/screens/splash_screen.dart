@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_tumbuh_sehat_v2/core/theme/ts_text_style.dart';
 
 import '../../core/theme/ts_color.dart';
+import '../../gen/assets.gen.dart';
 import '../cubit/splash/splash_cubit.dart';
 import '../widgets/ts_auth_header.dart';
 import '../widgets/ts_button.dart';
@@ -31,10 +32,10 @@ class _SplashScreenState extends State<SplashScreen>
     context.read<SplashCubit>().checkAuthStatus();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 50),
+      duration: const Duration(seconds: 500),
     )..forward();
 
-    _timer = Timer(const Duration(seconds: 50), _navigate);
+    _timer = Timer(const Duration(seconds: 500), _navigate);
   }
 
   void _navigate() {
@@ -53,6 +54,9 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    bool isTablet = MediaQuery.of(context).size.width > 600;
+    double maxWidth = MediaQuery.of(context).size.width;
+    double maxHeight = MediaQuery.of(context).size.height;
     return BlocListener<SplashCubit, SplashState>(
       listener: (context, state) {
         if (state is SplashAuthenticated) {
@@ -82,10 +86,15 @@ class _SplashScreenState extends State<SplashScreen>
                 ),
               ),
               const Spacer(flex: 2),
+              _buildBottomBar(),
+              const Spacer(),
+              Assets.images.illustrationSplashScreen.svg(
+                width: maxWidth * 0.9,
+                height: maxHeight * (isTablet ? 0.3 : 0.2),
+              ),
             ],
           ),
         ),
-        bottomNavigationBar: _buildBottomBar(),
       ),
     );
   }
@@ -96,26 +105,33 @@ class _SplashScreenState extends State<SplashScreen>
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          AnimatedBuilder(
-            animation: _controller,
-            builder: (context, child) {
-              return LinearProgressIndicator(
-                value: _controller.value,
-                backgroundColor: TSColor.monochrome.lightGrey.withOpacity(0.5),
-                valueColor: AlwaysStoppedAnimation<Color>(
-                  TSColor.mainTosca.primary,
-                ),
-              );
-            },
-          ),
-          const SizedBox(height: 16),
           TSButton(
             onPressed: _navigate,
             text: 'Mulai Sekarang',
-            backgroundColor: TSColor.mainTosca.primary,
+            textStyle: getResponsiveTextStyle(context, TSFont.bold.large),
+            backgroundColor: TSColor.secondaryGreen.primary,
             borderColor: Colors.transparent,
-            contentColor: TSColor.monochrome.pureWhite,
+            contentColor: TSColor.monochrome.black,
+            customBorderRadius: 48,
             width: double.infinity,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 20, left: 20),
+            child: AnimatedBuilder(
+              animation: _controller,
+              builder: (context, child) {
+                return LinearProgressIndicator(
+                  borderRadius: BorderRadius.all(Radius.circular(24)),
+                  value: _controller.value,
+                  backgroundColor: TSColor.monochrome.lightGrey.withOpacity(
+                    0.3,
+                  ),
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    TSColor.secondaryGreen.shade400,
+                  ),
+                );
+              },
+            ),
           ),
         ],
       ),
