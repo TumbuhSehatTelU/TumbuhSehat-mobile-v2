@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_tumbuh_sehat_v2/core/theme/ts_color.dart';
-import 'package:mobile_tumbuh_sehat_v2/core/theme/ts_shadow.dart';
-import 'package:mobile_tumbuh_sehat_v2/core/theme/ts_text_style.dart';
-import 'package:mobile_tumbuh_sehat_v2/gen/assets.gen.dart';
-import 'package:mobile_tumbuh_sehat_v2/presentation/widgets/ts_page_scaffold.dart';
 
+
+import '../../../core/theme/ts_color.dart';
+import '../../../core/theme/ts_shadow.dart';
+import '../../../core/theme/ts_text_style.dart';
+import '../../../gen/assets.gen.dart';
 import '../../widgets/ts_auth_header.dart';
 import '../../widgets/ts_button.dart';
+import '../../widgets/ts_page_scaffold.dart';
 import 'enter_unique_code_screen.dart';
 import 'parent_registration_screen.dart';
 
