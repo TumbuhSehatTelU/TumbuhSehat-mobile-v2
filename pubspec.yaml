@@ -16,6 +16,7 @@ dependencies:
   flutter_bloc: ^9.1.1
   flutter_svg: ^2.2.0
   get_it: ^8.2.0
+  intl: ^0.20.2
   json_annotation: ^4.9.0
   lottie: ^3.3.1
   shared_preferences: ^2.5.3
