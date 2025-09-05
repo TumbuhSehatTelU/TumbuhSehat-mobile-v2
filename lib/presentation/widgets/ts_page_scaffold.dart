@@ -20,16 +20,23 @@ class TSPageScaffold extends StatelessWidget {
     final bool isTablet = screenWidth > 600;
     final double horizontalPadding = isTablet ? 60.0 : 24.0;
 
-    return Scaffold(
-      appBar: appBar,
-      body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-          child: body,
+    void unfocusKeyboard() {
+      FocusScope.of(context).unfocus();
+    }
+
+    return GestureDetector(
+      onTap: unfocusKeyboard,
+      child: Scaffold(
+        appBar: appBar,
+        body: SafeArea(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+            child: body,
+          ),
         ),
+        floatingActionButton: floatingActionButton,
+        bottomNavigationBar: bottomNavigationBar,
       ),
-      floatingActionButton: floatingActionButton,
-      bottomNavigationBar: bottomNavigationBar,
     );
   }
 }
