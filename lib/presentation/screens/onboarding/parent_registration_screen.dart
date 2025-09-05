@@ -185,6 +185,7 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
                     SizedBox(height: 8),
                     TSTextField(
                       placeholder: 'Contoh: 089512341234',
+                      keyboardType: TextInputType.phone,
                       controller: _phoneController,
                       isPassword: false,
                       backgroundColor: TSColor.monochrome.pureWhite,
@@ -268,6 +269,10 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
                             SizedBox(height: 8),
                             TSTextField(
                               placeholder: 'Contoh: 56',
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
                               controller: _weightController,
                               isPassword: false,
                               backgroundColor: TSColor.monochrome.pureWhite,
@@ -304,6 +309,10 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
                             SizedBox(height: 8),
                             TSTextField(
                               placeholder: 'Contoh: 156',
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
                               controller: _heightController,
                               isPassword: false,
                               backgroundColor: TSColor.monochrome.pureWhite,
@@ -378,6 +387,7 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
                   SizedBox(height: 8),
                   TSTextField(
                     placeholder: 'Contoh: abcdefgh12',
+                    textInputAction: TextInputAction.done,
                     controller: _confirmPasswordController,
                     isPassword: true,
                     backgroundColor: TSColor.monochrome.pureWhite,
@@ -385,10 +395,12 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
                     borderRadius: 240,
                     width: double.infinity,
                     boxShadow: TSShadow.shadows.weight500,
-                    validator: TSValidator([
-                      (val) => val.isNotEmpty,
-                      (val) => val == _passwordController.text,
-                    ], [
+                    validator: TSValidator(
+                      [
+                        (val) => val.isNotEmpty,
+                        (val) => val == _passwordController.text,
+                      ],
+                      [
                         'Konfirmasi password tidak boleh kosong',
                         'Password tidak cocok',
                       ],

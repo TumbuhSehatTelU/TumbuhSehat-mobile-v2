@@ -1,4 +1,4 @@
-// ignore_for_file: non_constant_identifier_names
+// ignore_for_file: non_constant_identifier_names, use_super_parameters
 
 import 'package:flutter/material.dart';
 
@@ -33,13 +33,13 @@ class TSTextField extends FormField<String> {
     required double borderRadius,
     required double width,
     required List<BoxShadow> boxShadow,
-    FormFieldValidator<String>? validator, // Menggunakan validator standar
+    FormFieldValidator<String>? validator,
+    TextInputType? keyboardType,
+    TextInputAction? textInputAction,
   }) : super(
          validator: validator,
          initialValue: controller?.text,
          builder: (FormFieldState<String> field) {
-           // Widget _InnerTSTextField ini akan mengelola state UI lokal (seperti show/hide password)
-           // sementara FormFieldState (field) mengelola state data (value, error).
            return _InnerTSTextField(
              field: field,
              controller: controller,
@@ -50,6 +50,8 @@ class TSTextField extends FormField<String> {
              borderRadius: borderRadius,
              width: width,
              boxShadow: boxShadow,
+             keyboardType: keyboardType, // <-- PASS KE BAWAH
+             textInputAction: textInputAction,
            );
          },
        );
@@ -65,6 +67,8 @@ class _InnerTSTextField extends StatefulWidget {
   final double borderRadius;
   final double width;
   final List<BoxShadow> boxShadow;
+  final TextInputType? keyboardType;
+  final TextInputAction? textInputAction;
 
   const _InnerTSTextField({
     required this.field,
@@ -76,15 +80,21 @@ class _InnerTSTextField extends StatefulWidget {
     required this.borderRadius,
     required this.width,
     required this.boxShadow,
+    this.keyboardType,
+    this.textInputAction,
   });
 
   @override
   _InnerTSTextFieldState createState() => _InnerTSTextFieldState();
 }
 
-class _InnerTSTextFieldState extends State<_InnerTSTextField> {
+class _InnerTSTextFieldState extends State<_InnerTSTextField>
+    with SingleTickerProviderStateMixin {
   bool _obscureText = false;
   late final TextEditingController _effectiveController;
+  late final FocusNode _focusNode;
+  late final AnimationController _animationController;
+  late final Animation<Color?> _borderColorAnimation;
 
   @override
   void initState() {
@@ -92,8 +102,25 @@ class _InnerTSTextFieldState extends State<_InnerTSTextField> {
     _obscureText = widget.isPassword;
     _effectiveController =
         widget.controller ?? TextEditingController(text: widget.field.value);
-
     _effectiveController.addListener(_onControllerChanged);
+    _focusNode = FocusNode();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 700),
+    );
+    _borderColorAnimation = ColorTween(
+      begin: widget.borderColor,
+      end: TSColor.secondaryGreen.primary,
+    ).animate(_animationController);
+
+    _focusNode.addListener(() {
+      if (_focusNode.hasFocus) {
+        _animationController.repeat(reverse: true);
+      } else {
+        _animationController.stop();
+        _animationController.reset();
+      }
+    });
   }
 
   @override
@@ -102,6 +129,8 @@ class _InnerTSTextFieldState extends State<_InnerTSTextField> {
     if (widget.controller == null) {
       _effectiveController.dispose();
     }
+    _animationController.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -116,69 +145,80 @@ class _InnerTSTextFieldState extends State<_InnerTSTextField> {
     final hasError = widget.field.hasError;
     final errorText = widget.field.errorText;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: widget.width,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          decoration: BoxDecoration(
-            color: widget.backgroundColor,
-            border: Border.all(
-              color: hasError
-                  ? TSColor.additionalColor.red
-                  : widget.borderColor,
-              width: 2,
-            ),
-            borderRadius: BorderRadius.circular(widget.borderRadius),
-            boxShadow: widget.boxShadow,
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _effectiveController,
-                  obscureText: _obscureText,
-                  style: TSFont.regular.body.withColor(
-                    TSColor.monochrome.black,
-                  ),
-                  decoration: InputDecoration(
-                    hintText: widget.placeholder,
-                    hintStyle: TSFont.regular.body.withColor(
-                      TSColor.monochrome.lightGrey,
+    return AnimatedBuilder(
+      animation: _animationController,
+      builder: (context, child) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: widget.width,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              decoration: BoxDecoration(
+                color: widget.backgroundColor,
+                border: Border.all(
+                  color: hasError
+                      ? TSColor.additionalColor.red
+                      : (_focusNode.hasFocus
+                            ? _borderColorAnimation.value!
+                            : widget.borderColor),
+                  width: 2,
+                ),
+                borderRadius: BorderRadius.circular(widget.borderRadius),
+                boxShadow: widget.boxShadow,
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      focusNode: _focusNode,
+                      keyboardType: widget.keyboardType,
+                      textInputAction:
+                          widget.textInputAction ?? TextInputAction.next,
+                      controller: _effectiveController,
+                      obscureText: _obscureText,
+                      style: TSFont.regular.body.withColor(
+                        TSColor.monochrome.black,
+                      ),
+                      decoration: InputDecoration(
+                        hintText: widget.placeholder,
+                        hintStyle: TSFont.regular.body.withColor(
+                          TSColor.monochrome.lightGrey,
+                        ),
+                        border: InputBorder.none,
+                      ),
                     ),
-                    border: InputBorder.none,
                   ),
-                ),
-              ),
-              if (widget.isPassword)
-                IconButton(
-                  icon: Icon(
-                    _obscureText ? Icons.visibility_off : Icons.visibility,
-                    color: TSColor.monochrome.lightGrey,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _obscureText = !_obscureText;
-                    });
-                  },
-                ),
-            ],
-          ),
-        ),
-        if (hasError && errorText != null)
-          Padding(
-            padding: const EdgeInsets.only(top: 4, left: 8),
-            child: Text(
-              errorText,
-              style: TSFont.regular.small.withColor(
-                TSColor.additionalColor.red,
+                  if (widget.isPassword)
+                    IconButton(
+                      icon: Icon(
+                        _obscureText ? Icons.visibility_off : Icons.visibility,
+                        color: TSColor.monochrome.lightGrey,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscureText = !_obscureText;
+                        });
+                      },
+                    ),
+                ],
               ),
             ),
-          )
-        else
-          const SizedBox(height: 16),
-      ],
+            if (hasError && errorText != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 4, left: 8),
+                child: Text(
+                  errorText,
+                  style: TSFont.regular.small.withColor(
+                    TSColor.additionalColor.red,
+                  ),
+                ),
+              )
+            else
+              const SizedBox(height: 16),
+          ],
+        );
+      },
     );
   }
 }
