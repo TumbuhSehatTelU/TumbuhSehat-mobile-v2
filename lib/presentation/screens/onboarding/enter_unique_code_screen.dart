@@ -23,8 +23,7 @@ class EnterUniqueCodeScreen extends StatefulWidget {
 
 class _EnterUniqueCodeScreenState extends State<EnterUniqueCodeScreen> {
   late final TextEditingController _codeController;
-  final GlobalKey<TSTextFieldState> _textFieldKey =
-      GlobalKey<TSTextFieldState>();
+  final _formKey = GlobalKey<FormState>();
 
   int _failureCount = 0;
   DateTime? _penaltyReleaseTime;
@@ -121,8 +120,7 @@ class _EnterUniqueCodeScreenState extends State<EnterUniqueCodeScreen> {
   void _handleSubmit(BuildContext context, bool isLoading) {
     if (isLoading || _secondsRemaining > 0) return;
 
-    final isValid = _textFieldKey.currentState?.validate() ?? false;
-    if (isValid) {
+    if (_formKey.currentState?.validate() ?? false) {
       context.read<OnboardingCubit>().checkUniqueCode(
         _codeController.text.trim(),
       );
@@ -162,84 +160,90 @@ class _EnterUniqueCodeScreenState extends State<EnterUniqueCodeScreen> {
         final isPenalized = _secondsRemaining > 0;
 
         return TSPageScaffold(
-          body: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              AuthHeader(),
-              Spacer(flex: 1),
-              Text(
-                "Masukkan Kode Unik\nKeluarga Anda",
-                style: getResponsiveTextStyle(
-                  context,
-                  TSFont.bold.h2.withColor(TSColor.monochrome.black),
-                ),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: 12),
-              Text(
-                "Gunakan Kode Unik dari keluarga anda\nagar saling terhubung",
-                style: getResponsiveTextStyle(
-                  context,
-                  TSFont.regular.large.withColor(TSColor.monochrome.black),
-                ),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: 12),
-              Text(
-                "Tidak tahu cara melihat kode unik? klik di sini",
-                style: getResponsiveTextStyle(
-                  context,
-                  TSFont.regular.body.withColor(TSColor.monochrome.black),
-                ),
-                textAlign: TextAlign.center,
-              ),
-              Spacer(flex: 1),
-              Text(
-                "Kode Unik",
-                style: getResponsiveTextStyle(
-                  context,
-                  TSFont.bold.large.withColor(TSColor.monochrome.black),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TSTextField(
-                key: _textFieldKey,
-                placeholder: 'Contoh: 1356ABCD',
-                controller: _codeController,
-                isPassword: false,
-                validationLogicList: [(val) => val.isNotEmpty],
-                validationMessageList: ['Kode tidak boleh kosong'],
-                backgroundColor: TSColor.monochrome.pureWhite,
-                borderColor: Colors.transparent,
-                borderRadius: 240,
-                width: double.infinity,
-                boxShadow: TSShadow.shadows.weight500,
-              ),
-              const SizedBox(height: 8),
-              if (isPenalized)
+          body: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                AuthHeader(),
+                Spacer(flex: 1),
                 Text(
-                  _penaltyTimeText,
-                  style: TextStyle(color: TSColor.additionalColor.red),
-                )
-              else
-                Text(_attemptsText),
+                  "Masukkan Kode Unik\nKeluarga Anda",
+                  style: getResponsiveTextStyle(
+                    context,
+                    TSFont.bold.h2.withColor(TSColor.monochrome.black),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 12),
+                Text(
+                  "Gunakan Kode Unik dari keluarga anda\nagar saling terhubung",
+                  style: getResponsiveTextStyle(
+                    context,
+                    TSFont.regular.large.withColor(TSColor.monochrome.black),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 12),
+                Text(
+                  "Tidak tahu cara melihat kode unik? klik di sini",
+                  style: getResponsiveTextStyle(
+                    context,
+                    TSFont.regular.body.withColor(TSColor.monochrome.black),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                Spacer(flex: 1),
+                Text(
+                  "Kode Unik",
+                  style: getResponsiveTextStyle(
+                    context,
+                    TSFont.bold.large.withColor(TSColor.monochrome.black),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TSTextField(
+                  placeholder: 'Contoh: 1356ABCD',
+                  controller: _codeController,
+                  isPassword: false,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Kode tidak boleh kosong';
+                    }
+                    return null;
+                  },
+                  backgroundColor: TSColor.monochrome.pureWhite,
+                  borderColor: Colors.transparent,
+                  borderRadius: 240,
+                  width: double.infinity,
+                  boxShadow: TSShadow.shadows.weight500,
+                ),
+                const SizedBox(height: 8),
+                if (isPenalized)
+                  Text(
+                    _penaltyTimeText,
+                    style: TextStyle(color: TSColor.additionalColor.red),
+                  )
+                else
+                  Text(_attemptsText),
 
-              const SizedBox(height: 24),
+                const SizedBox(height: 24),
 
-              TSButton(
-                onPressed: () => _handleSubmit(context, isLoading),
-                text: isLoading ? 'Memeriksa...' : 'Lanjutkan',
-                textStyle: getResponsiveTextStyle(context, TSFont.bold.large),
-                backgroundColor: (isLoading || isPenalized)
-                    ? TSColor.monochrome.grey
-                    : TSColor.secondaryGreen.primary,
-                borderColor: Colors.transparent,
-                contentColor: TSColor.monochrome.black,
-                customBorderRadius: 240,
-              ),
-              Spacer(flex: 3),
-            ],
+                TSButton(
+                  onPressed: () => _handleSubmit(context, isLoading),
+                  text: isLoading ? 'Memeriksa...' : 'Lanjutkan',
+                  textStyle: getResponsiveTextStyle(context, TSFont.bold.large),
+                  backgroundColor: (isLoading || isPenalized)
+                      ? TSColor.monochrome.grey
+                      : TSColor.secondaryGreen.primary,
+                  borderColor: Colors.transparent,
+                  contentColor: TSColor.monochrome.black,
+                  customBorderRadius: 240,
+                ),
+                Spacer(flex: 3),
+              ],
+            ),
           ),
         );
       },

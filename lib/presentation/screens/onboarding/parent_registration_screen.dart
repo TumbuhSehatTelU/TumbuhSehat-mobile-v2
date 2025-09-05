@@ -146,7 +146,7 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
   Widget build(BuildContext context) {
     return BlocListener<OnboardingCubit, OnboardingState>(
       listener: (context, state) {
-         if (state is OnboardingLoading) {
+        if (state is OnboardingLoading) {
           showDialog(
             context: context,
             barrierDismissible: false,
@@ -192,14 +192,16 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
                       borderRadius: 240,
                       width: double.infinity,
                       boxShadow: TSShadow.shadows.weight500,
-                      validationLogicList: [
-                        (val) => val.isNotEmpty,
-                        (val) => int.tryParse(val) != null,
-                      ],
-                      validationMessageList: [
-                        'Nomor HP tidak boleh kosong',
-                        'Nomor HP harus berupa angka',
-                      ],
+                      validator: TSValidator(
+                        [
+                          (val) => val.isNotEmpty,
+                          (val) => int.tryParse(val) != null,
+                        ],
+                        [
+                          'Nomor HP tidak boleh kosong',
+                          'Nomor HP harus berupa angka',
+                        ],
+                      ),
                     ),
                     const SizedBox(height: 16),
                   ],
@@ -217,8 +219,10 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
                     borderRadius: 240,
                     width: double.infinity,
                     boxShadow: TSShadow.shadows.weight500,
-                    validationLogicList: [(val) => val.isNotEmpty],
-                    validationMessageList: ['Nama tidak boleh kosong'],
+                    validator: TSValidator(
+                      [(val) => val.isNotEmpty],
+                      ['Nama tidak boleh kosong'],
+                    ),
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -238,8 +242,10 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
                         borderRadius: 240,
                         width: double.infinity,
                         boxShadow: TSShadow.shadows.weight500,
-                        validationLogicList: [(val) => val.isNotEmpty],
-                        validationMessageList: ['Tanggal lahir harus diisi'],
+                        validator: TSValidator(
+                          [(val) => val.isNotEmpty],
+                          ['Tanggal lahir harus diisi'],
+                        ),
                       ),
                     ),
                   ),
@@ -269,14 +275,16 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
                               borderRadius: 240,
                               width: double.infinity,
                               boxShadow: TSShadow.shadows.weight500,
-                              validationLogicList: [
-                                (val) => val.isNotEmpty,
-                                (val) => double.tryParse(val) != null,
-                              ],
-                              validationMessageList: [
-                                'Berat badan harus diisi',
-                                'Berat badan harus angka',
-                              ],
+                              validator: TSValidator(
+                                [
+                                  (val) => val.isNotEmpty,
+                                  (val) => double.tryParse(val) != null,
+                                ],
+                                [
+                                  'Berat badan harus diisi',
+                                  'Berat badan harus angka',
+                                ],
+                              ),
                             ),
                           ],
                         ),
@@ -303,14 +311,16 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
                               borderRadius: 240,
                               width: double.infinity,
                               boxShadow: TSShadow.shadows.weight500,
-                              validationLogicList: [
-                                (val) => val.isNotEmpty,
-                                (val) => double.tryParse(val) != null,
-                              ],
-                              validationMessageList: [
-                                'Tinggi badan harus diisi',
-                                'Tinggi badan harus angka',
-                              ],
+                              validator: TSValidator(
+                                [
+                                  (val) => val.isNotEmpty,
+                                  (val) => double.tryParse(val) != null,
+                                ],
+                                [
+                                  'Tinggi badan harus diisi',
+                                  'Tinggi badan harus angka',
+                                ],
+                              ),
                             ),
                           ],
                         ),
@@ -351,14 +361,13 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
                     borderRadius: 240,
                     width: double.infinity,
                     boxShadow: TSShadow.shadows.weight500,
-                    validationLogicList: [
-                      (val) => val.isNotEmpty,
-                      (val) => val.length >= 8,
-                    ],
-                    validationMessageList: [
-                      'Password tidak boleh kosong',
-                      'Password minimal 8 karakter',
-                    ],
+                    validator: TSValidator(
+                      [(val) => val.isNotEmpty, (val) => val.length >= 8],
+                      [
+                        'Password tidak boleh kosong',
+                        'Password minimal 8 karakter',
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 16),
 
@@ -376,14 +385,14 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
                     borderRadius: 240,
                     width: double.infinity,
                     boxShadow: TSShadow.shadows.weight500,
-                    validationLogicList: [
+                    validator: TSValidator([
                       (val) => val.isNotEmpty,
                       (val) => val == _passwordController.text,
-                    ],
-                    validationMessageList: [
-                      'Konfirmasi password tidak boleh kosong',
-                      'Password tidak cocok',
-                    ],
+                    ], [
+                        'Konfirmasi password tidak boleh kosong',
+                        'Password tidak cocok',
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 32),
 
