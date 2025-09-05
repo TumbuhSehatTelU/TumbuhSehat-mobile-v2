@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'injection_container.dart' as di;
+import 'presentation/cubit/onboarding/onboarding_cubit.dart';
 import 'presentation/cubit/splash/splash_cubit.dart';
 import 'presentation/screens/splash_screen.dart';
 
@@ -16,7 +17,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-      providers: [BlocProvider(create: (_) => di.sl<SplashCubit>())],
+      providers: [
+        BlocProvider(create: (_) => di.sl<SplashCubit>()),
+        BlocProvider(create: (_) => di.sl<OnboardingCubit>()),
+      ],
       child: MaterialApp(
         title: 'Tumbuh Sehat',
         theme: ThemeData(
