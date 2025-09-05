@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'core/network/network_info.dart';
 import 'injection_container.dart' as di;
 import 'presentation/cubit/onboarding/onboarding_cubit.dart';
 import 'presentation/cubit/splash/splash_cubit.dart';
@@ -8,6 +9,7 @@ import 'presentation/screens/splash_screen.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await di.init();
+  NetworkInfoImpl.setForceOffline(true);
   runApp(const MyApp());
 }
 

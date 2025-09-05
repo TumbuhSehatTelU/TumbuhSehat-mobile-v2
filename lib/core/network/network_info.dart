@@ -1,4 +1,3 @@
-
 // ignore_for_file: unrelated_type_equality_checks
 
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -12,13 +11,23 @@ class NetworkInfoImpl implements NetworkInfo {
   final Connectivity connectivity;
   final Dio dio;
 
+  static bool _forceOffline = true;
+
+  static void setForceOffline(bool value) {
+    _forceOffline = value;
+  }
+
   NetworkInfoImpl(this.connectivity, this.dio);
 
   @override
   Future<bool> get isConnected async {
+    if (_forceOffline) {
+      return false;
+    }
+    
     final connectivityResult = await connectivity.checkConnectivity();
     if (connectivityResult == ConnectivityResult.none) {
-      return false; 
+      return false;
     }
 
     try {
