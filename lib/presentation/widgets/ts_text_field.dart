@@ -1,6 +1,7 @@
 // ignore_for_file: non_constant_identifier_names, use_super_parameters
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../core/theme/ts_color.dart';
 import '../../core/theme/ts_text_style.dart';
@@ -36,6 +37,7 @@ class TSTextField extends FormField<String> {
     FormFieldValidator<String>? validator,
     TextInputType? keyboardType,
     TextInputAction? textInputAction,
+    List<TextInputFormatter>? inputFormatters,
   }) : super(
          validator: validator,
          initialValue: controller?.text,
@@ -52,6 +54,7 @@ class TSTextField extends FormField<String> {
              boxShadow: boxShadow,
              keyboardType: keyboardType,
              textInputAction: textInputAction,
+             inputFormatters: inputFormatters,
            );
          },
        );
@@ -69,6 +72,7 @@ class _InnerTSTextField extends StatefulWidget {
   final List<BoxShadow> boxShadow;
   final TextInputType? keyboardType;
   final TextInputAction? textInputAction;
+  final List<TextInputFormatter>? inputFormatters;
 
   const _InnerTSTextField({
     required this.field,
@@ -82,6 +86,7 @@ class _InnerTSTextField extends StatefulWidget {
     required this.boxShadow,
     this.keyboardType,
     this.textInputAction,
+    this.inputFormatters,
   });
 
   @override
@@ -172,6 +177,7 @@ class _InnerTSTextFieldState extends State<_InnerTSTextField>
                   Expanded(
                     child: TextField(
                       focusNode: _focusNode,
+                      inputFormatters: widget.inputFormatters,
                       keyboardType: widget.keyboardType,
                       textInputAction:
                           widget.textInputAction ?? TextInputAction.next,

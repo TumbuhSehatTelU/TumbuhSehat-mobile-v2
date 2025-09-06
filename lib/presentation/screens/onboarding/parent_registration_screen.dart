@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/ts_color.dart';
@@ -97,7 +98,7 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: _selectedDateOfBirth ?? DateTime.now(),
+      initialDate: _selectedDateOfBirth ?? DateTime(DateTime.now().year - 25),
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
     );
@@ -110,28 +111,7 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
   }
 
   void _submitForm() {
-    final phoneValid =
-        !(!widget.isJoiningFamily && _phoneController.text.isEmpty);
-    final nameValid = _nameController.text.isNotEmpty;
-    final dobValid = _dobController.text.isNotEmpty;
-    final weightValid = _weightController.text.isNotEmpty;
-    final heightValid = _heightController.text.isNotEmpty;
-    final roleValid = _selectedRole != null;
-    final passwordValid = _passwordController.text.length >= 8;
-    final confirmPwValid =
-        _passwordController.text == _confirmPasswordController.text;
-
-    if (!phoneValid ||
-        !nameValid ||
-        !dobValid ||
-        !weightValid ||
-        !heightValid ||
-        !roleValid ||
-        !passwordValid ||
-        !confirmPwValid) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Harap isi semua data dengan benar')),
-      );
+    if (!_formKey.currentState!.validate()) {
       return;
     }
 
@@ -197,10 +177,7 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
       return 'Lanjutkan';
     }
 
-    final buttonColor = _isFormComplete
-        ? TSColor.secondaryGreen.primary
-        : TSColor.monochrome.lightGrey;
-    final onButtonPress = _isFormComplete ? _submitForm : null;
+    final onButtonPress = _submitForm;
     return BlocListener<OnboardingCubit, OnboardingState>(
       listener: (context, state) {
         if (state is OnboardingLoading) {
@@ -227,6 +204,7 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
       child: TSPageScaffold(
         appBar: AppBar(title: const Text('Registrasi Data Diri')),
         body: Form(
+          autovalidateMode: AutovalidateMode.onUserInteraction,
           key: _formKey,
           child: SingleChildScrollView(
             child: Padding(
@@ -243,6 +221,7 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
                       isPassword: false,
                       backgroundColor: TSColor.monochrome.pureWhite,
                       boxShadow: TSShadow.shadows.weight500,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       validator: TSValidator(
                         [
                           (val) => val.isNotEmpty,
@@ -296,7 +275,7 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
                           children: [
                             _buildSectionHeader(context, "Berat Badan (kg)"),
                             TSTextField(
-                              placeholder: 'Contoh: 56',
+                              placeholder: 'Contoh: 56.5',
                               keyboardType:
                                   const TextInputType.numberWithOptions(
                                     decimal: true,
@@ -305,6 +284,11 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
                               isPassword: false,
                               backgroundColor: TSColor.monochrome.pureWhite,
                               boxShadow: TSShadow.shadows.weight500,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(
+                                  RegExp(r'^\d+\.?\d{0,2}'),
+                                ),
+                              ],
                               validator: TSValidator(
                                 [
                                   (val) => val.isNotEmpty,
@@ -335,6 +319,11 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
                               isPassword: false,
                               backgroundColor: TSColor.monochrome.pureWhite,
                               boxShadow: TSShadow.shadows.weight500,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(
+                                  RegExp(r'^\d+\.?\d{0,2}'),
+                                ),
+                              ],
                               validator: TSValidator(
                                 [
                                   (val) => val.isNotEmpty,
@@ -416,7 +405,7 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
                     customBorderRadius: 240,
                     boxShadow: TSShadow.shadows.weight500,
                     size: ButtonSize.medium,
-                    backgroundColor: buttonColor,
+                    backgroundColor: TSColor.secondaryGreen.primary,
                     borderColor: Colors.transparent,
                     contentColor: TSColor.monochrome.black,
                   ),
