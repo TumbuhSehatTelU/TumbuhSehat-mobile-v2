@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'core/network/network_info.dart';
 import 'injection_container.dart' as di;
+import 'presentation/cubit/login/login_cubit.dart';
 import 'presentation/cubit/onboarding/onboarding_cubit.dart';
 import 'presentation/cubit/splash/splash_cubit.dart';
 import 'presentation/screens/splash_screen.dart';
@@ -22,6 +23,7 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (_) => di.sl<SplashCubit>()),
         BlocProvider(create: (_) => di.sl<OnboardingCubit>()),
+        BlocProvider(create: (_) => di.sl<LoginCubit>()),
       ],
       child: MaterialApp(
         title: 'Tumbuh Sehat',

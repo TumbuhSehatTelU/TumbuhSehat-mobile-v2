@@ -29,7 +29,7 @@ class OnboardingRepositoryImpl implements OnboardingRepository {
       return Left(CacheFailure(e.message));
     }
   }
-  
+
   @override
   Future<Either<Failure, FamilyModel>> checkUniqueCode(String code) async {
     if (await networkInfo.isConnected) {
@@ -122,10 +122,14 @@ class OnboardingRepositoryImpl implements OnboardingRepository {
 
   @override
   Future<Either<Failure, FamilyModel>> login({
-    String? uniqueCode,
     required String name,
     required String password,
+    required bool rememberMe,
+    String? uniqueCode,
   }) async {
+    if (!rememberMe) {
+      await localDataSource.clearCachedFamily();
+    }
     if (await networkInfo.isConnected) {
       if (uniqueCode == null || uniqueCode.isEmpty) {
         return const Left(
@@ -134,7 +138,9 @@ class OnboardingRepositoryImpl implements OnboardingRepository {
       }
       try {
         final family = await remoteDataSource.login(uniqueCode, name, password);
-        await localDataSource.cacheFamily(family);
+        if (rememberMe) {
+          await localDataSource.cacheFamily(family);
+        }
         return Right(family);
       } on ServerException catch (e) {
         return Left(ServerFailure(e.message));
@@ -142,7 +148,16 @@ class OnboardingRepositoryImpl implements OnboardingRepository {
     } else {
       try {
         final family = await localDataSource.loginOffline(name, password);
-        return Right(family);
+        final parentExists = family.parents.any(
+          (parent) => parent.name == name && parent.password == password,
+        );
+        if (parentExists) {
+          return Right(family);
+        } else {
+          return const Left(
+            CacheFailure('Nama atau password salah untuk mode offline.'),
+          );
+        }
       } on CacheException catch (e) {
         return Left(CacheFailure(e.message));
       }

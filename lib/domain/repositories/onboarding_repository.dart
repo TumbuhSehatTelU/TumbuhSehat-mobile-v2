@@ -17,8 +17,9 @@ abstract class OnboardingRepository {
     required ChildModel child,
   });
   Future<Either<Failure, FamilyModel>> login({
-    String? uniqueCode,
     required String name,
     required String password,
+    required bool rememberMe,
+    String? uniqueCode,
   });
 }

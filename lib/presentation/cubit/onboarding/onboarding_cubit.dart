@@ -153,22 +153,4 @@ class OnboardingCubit extends Cubit<OnboardingState> {
       (updatedFamily) => emit(OnboardingSuccess(updatedFamily)),
     );
   }
-
-  Future<void> login({
-    String? uniqueCode,
-    required String name,
-    required String password,
-  }) async {
-    emit(OnboardingLoading());
-    final result = await onboardingRepository.login(
-      uniqueCode: uniqueCode,
-      name: name,
-      password: password,
-    );
-
-    result.fold(
-      (failure) => emit(OnboardingFailure(failure.message)),
-      (family) => emit(OnboardingSuccess(family)),
-    );
-  }
 }

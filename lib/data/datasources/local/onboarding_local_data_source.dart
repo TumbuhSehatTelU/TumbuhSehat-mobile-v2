@@ -9,6 +9,7 @@ abstract class OnboardingLocalDataSource {
   Future<void> cacheFamily(FamilyModel family);
   Future<FamilyModel> getCachedFamily();
   Future<FamilyModel> loginOffline(String name, String password);
+  Future<void> clearCachedFamily();
 }
 
 const String CACHED_FAMILY = 'CACHED_FAMILY';
@@ -60,5 +61,10 @@ class OnboardingLocalDataSourceImpl implements OnboardingLocalDataSource {
     } catch (e) {
       throw CacheException('An unknown error occurred during offline login.');
     }
+  }
+
+  @override
+  Future<void> clearCachedFamily() {
+    return sharedPreferences.remove(CACHED_FAMILY);
   }
 }

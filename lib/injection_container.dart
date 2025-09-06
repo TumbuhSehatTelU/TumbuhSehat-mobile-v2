@@ -9,6 +9,7 @@ import 'data/datasources/local/onboarding_local_data_source.dart';
 import 'data/datasources/remote/onboarding_remote_data_source.dart';
 import 'data/repositories/onboarding_repository_impl.dart';
 import 'domain/repositories/onboarding_repository.dart';
+import 'presentation/cubit/login/login_cubit.dart';
 import 'presentation/cubit/onboarding/onboarding_cubit.dart';
 import 'presentation/cubit/splash/splash_cubit.dart';
 
@@ -19,6 +20,7 @@ Future<void> init() async {
   // Cubit
   sl.registerFactory(() => SplashCubit(onboardingRepository: sl()));
   sl.registerFactory(() => OnboardingCubit(onboardingRepository: sl()));
+  sl.registerFactory(() => LoginCubit(onboardingRepository: sl()));
 
   // Repository
   sl.registerLazySingleton<OnboardingRepository>(
