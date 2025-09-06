@@ -54,8 +54,7 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
 
   DateTime? _selectedDateOfBirth;
   ParentRole? _selectedRole;
-
-  bool _isFormComplete = false;
+  bool _hasAttemptedSubmit = false;
 
   @override
   void initState() {
@@ -67,24 +66,10 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
     _heightController = TextEditingController();
     _passwordController = TextEditingController();
     _confirmPasswordController = TextEditingController();
-    _phoneController.addListener(_validateForm);
-    _nameController.addListener(_validateForm);
-    _dobController.addListener(_validateForm);
-    _weightController.addListener(_validateForm);
-    _heightController.addListener(_validateForm);
-    _passwordController.addListener(_validateForm);
-    _confirmPasswordController.addListener(_validateForm);
   }
 
   @override
   void dispose() {
-    _phoneController.removeListener(_validateForm);
-    _nameController.removeListener(_validateForm);
-    _dobController.removeListener(_validateForm);
-    _weightController.removeListener(_validateForm);
-    _heightController.removeListener(_validateForm);
-    _passwordController.removeListener(_validateForm);
-    _confirmPasswordController.removeListener(_validateForm);
     _phoneController.dispose();
     _nameController.dispose();
     _dobController.dispose();
@@ -111,6 +96,10 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
   }
 
   void _submitForm() {
+    setState(() {
+      _hasAttemptedSubmit = true;
+    });
+
     if (!_formKey.currentState!.validate()) {
       return;
     }
@@ -135,36 +124,6 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
       );
     } else {
       onboardingCubit.submitLactationStatus(isLactating: false);
-    }
-  }
-
-  void _validateForm() {
-    final isPhoneValid =
-        widget.isJoiningFamily || _phoneController.text.isNotEmpty;
-    final isNameValid = _nameController.text.isNotEmpty;
-    final isDobValid = _dobController.text.isNotEmpty;
-    final isWeightValid = _weightController.text.isNotEmpty;
-    final isHeightValid = _heightController.text.isNotEmpty;
-    final isRoleValid = _selectedRole != null;
-    final isPasswordValid = _passwordController.text.length >= 8;
-    final isConfirmPwValid =
-        _confirmPasswordController.text.isNotEmpty &&
-        _confirmPasswordController.text == _passwordController.text;
-
-    final isComplete =
-        isPhoneValid &&
-        isNameValid &&
-        isDobValid &&
-        isWeightValid &&
-        isHeightValid &&
-        isRoleValid &&
-        isPasswordValid &&
-        isConfirmPwValid;
-
-    if (_isFormComplete != isComplete) {
-      setState(() {
-        _isFormComplete = isComplete;
-      });
     }
   }
 
@@ -204,7 +163,9 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
       child: TSPageScaffold(
         appBar: AppBar(title: const Text('Registrasi Data Diri')),
         body: Form(
-          autovalidateMode: AutovalidateMode.onUserInteraction,
+          autovalidateMode: _hasAttemptedSubmit
+              ? AutovalidateMode.onUserInteraction
+              : AutovalidateMode.disabled,
           key: _formKey,
           child: SingleChildScrollView(
             child: Padding(
@@ -350,7 +311,6 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
                       setState(() {
                         _selectedRole = newValue;
                       });
-                      _validateForm();
                     },
                     itemBuilder: (role) => Text(role.displayName),
                     validator: (value) =>

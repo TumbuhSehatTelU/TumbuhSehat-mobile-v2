@@ -67,10 +67,9 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     LactationPeriod? lactationPeriod,
   }) async {
     if (state is! OnboardingDataCollection) return;
-
+    final currentData = state as OnboardingDataCollection;
     emit(OnboardingLoading());
-
-    final data = (state as OnboardingDataCollection).copyWith(
+    final data = currentData.copyWith(
       isLactating: isLactating,
       lactationPeriod: isLactating ? lactationPeriod : LactationPeriod.none,
     );
@@ -105,14 +104,14 @@ class OnboardingCubit extends Cubit<OnboardingState> {
               children: [],
             ),
           ),
-        ), // Success indicates join flow is done. UI can navigate to login.
+        ),
       );
     }
     // Flow: Create new family
     else {
       final family = FamilyModel(
         phoneNumber: data.phoneNumber!,
-        uniqueCode: '', 
+        uniqueCode: '', // BE will generate this
         parents: [parent],
         children: const [],
       );
