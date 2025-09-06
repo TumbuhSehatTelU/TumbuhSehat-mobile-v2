@@ -54,6 +54,8 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
   DateTime? _selectedDateOfBirth;
   ParentRole? _selectedRole;
 
+  bool _isFormComplete = false;
+
   @override
   void initState() {
     super.initState();
@@ -64,10 +66,24 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
     _heightController = TextEditingController();
     _passwordController = TextEditingController();
     _confirmPasswordController = TextEditingController();
+    _phoneController.addListener(_validateForm);
+    _nameController.addListener(_validateForm);
+    _dobController.addListener(_validateForm);
+    _weightController.addListener(_validateForm);
+    _heightController.addListener(_validateForm);
+    _passwordController.addListener(_validateForm);
+    _confirmPasswordController.addListener(_validateForm);
   }
 
   @override
   void dispose() {
+    _phoneController.removeListener(_validateForm);
+    _nameController.removeListener(_validateForm);
+    _dobController.removeListener(_validateForm);
+    _weightController.removeListener(_validateForm);
+    _heightController.removeListener(_validateForm);
+    _passwordController.removeListener(_validateForm);
+    _confirmPasswordController.removeListener(_validateForm);
     _phoneController.dispose();
     _nameController.dispose();
     _dobController.dispose();
@@ -142,8 +158,49 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
     }
   }
 
+  void _validateForm() {
+    final isPhoneValid =
+        widget.isJoiningFamily || _phoneController.text.isNotEmpty;
+    final isNameValid = _nameController.text.isNotEmpty;
+    final isDobValid = _dobController.text.isNotEmpty;
+    final isWeightValid = _weightController.text.isNotEmpty;
+    final isHeightValid = _heightController.text.isNotEmpty;
+    final isRoleValid = _selectedRole != null;
+    final isPasswordValid = _passwordController.text.length >= 8;
+    final isConfirmPwValid =
+        _confirmPasswordController.text.isNotEmpty &&
+        _confirmPasswordController.text == _passwordController.text;
+
+    final isComplete =
+        isPhoneValid &&
+        isNameValid &&
+        isDobValid &&
+        isWeightValid &&
+        isHeightValid &&
+        isRoleValid &&
+        isPasswordValid &&
+        isConfirmPwValid;
+
+    if (_isFormComplete != isComplete) {
+      setState(() {
+        _isFormComplete = isComplete;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    String getButtonText() {
+      if (widget.isJoiningFamily && _selectedRole != ParentRole.ibu) {
+        return 'Daftar';
+      }
+      return 'Lanjutkan';
+    }
+
+    final buttonColor = _isFormComplete
+        ? TSColor.secondaryGreen.primary
+        : TSColor.monochrome.lightGrey;
+    final onButtonPress = _isFormComplete ? _submitForm : null;
     return BlocListener<OnboardingCubit, OnboardingState>(
       listener: (context, state) {
         if (state is OnboardingLoading) {
@@ -346,10 +403,12 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
                     label: 'Hubungan dengan Anak',
                     value: _selectedRole,
                     items: ParentRole.values,
+                    borderRadius: 240,
                     onChanged: (newValue) {
                       setState(() {
                         _selectedRole = newValue;
                       });
+                      _validateForm();
                     },
                     itemBuilder: (role) => Text(role.displayName),
                     validator: (value) =>
@@ -409,12 +468,22 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
                   const SizedBox(height: 32),
 
                   TSButton(
-                    onPressed: _submitForm,
-                    text: 'Lanjutkan',
-                    backgroundColor: TSColor.mainTosca.primary,
+                    onPressed: onButtonPress,
+                    text: getButtonText(),
+                    textStyle: getResponsiveTextStyle(
+                      context,
+                      TSFont.bold.large,
+                    ),
+                    customBorderRadius: 240,
+                    boxShadow: TSShadow.shadows.weight500,
+                    size: ButtonSize.medium,
+                    backgroundColor: buttonColor,
                     borderColor: Colors.transparent,
-                    contentColor: Colors.white,
+                    contentColor: TSColor.monochrome.black,
                   ),
+                  const SizedBox(height: 24),
+
+                  _buildLoginRedirect(context),
                 ],
               ),
             ),
@@ -423,4 +492,29 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
       ),
     );
   }
+}
+
+Widget _buildLoginRedirect(BuildContext context) {
+  return GestureDetector(
+    onTap: () {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+      );
+    },
+    child: RichText(
+      textAlign: TextAlign.center,
+      text: TextSpan(
+        style: TSFont.regular.large.withColor(TSColor.monochrome.grey),
+        children: <TextSpan>[
+          const TextSpan(text: 'Sudah punya akun? '),
+          TextSpan(
+            text: 'Masuk',
+            style: TSFont.semiBold.large.withColor(
+              TSColor.additionalColor.blue,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
 }
