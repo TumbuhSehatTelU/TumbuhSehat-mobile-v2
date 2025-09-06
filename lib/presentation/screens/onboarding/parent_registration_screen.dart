@@ -235,20 +235,13 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   if (!widget.isJoiningFamily) ...[
-                    Text(
-                      "No Handphone",
-                      style: getResponsiveTextStyle(context, TSFont.bold.body),
-                    ),
-                    SizedBox(height: 8),
+                    _buildSectionHeader(context, "No Handphone"),
                     TSTextField(
                       placeholder: 'Contoh: 089512341234',
                       keyboardType: TextInputType.phone,
                       controller: _phoneController,
                       isPassword: false,
                       backgroundColor: TSColor.monochrome.pureWhite,
-                      borderColor: Colors.transparent,
-                      borderRadius: 240,
-                      width: double.infinity,
                       boxShadow: TSShadow.shadows.weight500,
                       validator: TSValidator(
                         [
@@ -263,19 +256,12 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
                     ),
                     const SizedBox(height: 16),
                   ],
-                  Text(
-                    "Nama Lengkap",
-                    style: getResponsiveTextStyle(context, TSFont.bold.body),
-                  ),
-                  SizedBox(height: 8),
+                  _buildSectionHeader(context, "Nama Lengkap"),
                   TSTextField(
                     placeholder: 'Contoh: Syahreza Adnan Al Azhar',
                     controller: _nameController,
                     isPassword: false,
                     backgroundColor: TSColor.monochrome.pureWhite,
-                    borderColor: Colors.transparent,
-                    borderRadius: 240,
-                    width: double.infinity,
                     boxShadow: TSShadow.shadows.weight500,
                     validator: TSValidator(
                       [(val) => val.isNotEmpty],
@@ -283,11 +269,7 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  Text(
-                    "Tanggal Lahir",
-                    style: getResponsiveTextStyle(context, TSFont.bold.body),
-                  ),
-                  SizedBox(height: 8),
+                  _buildSectionHeader(context, "Tanggal Lahir"),
                   GestureDetector(
                     onTap: () => _selectDate(context),
                     child: AbsorbPointer(
@@ -296,9 +278,6 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
                         controller: _dobController,
                         isPassword: false,
                         backgroundColor: TSColor.monochrome.pureWhite,
-                        borderColor: Colors.transparent,
-                        borderRadius: 240,
-                        width: double.infinity,
                         boxShadow: TSShadow.shadows.weight500,
                         validator: TSValidator(
                           [(val) => val.isNotEmpty],
@@ -315,15 +294,7 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              "Berat Badan (kg)",
-                              style: getResponsiveTextStyle(
-                                context,
-                                TSFont.bold.body,
-                              ),
-                              textAlign: TextAlign.start,
-                            ),
-                            SizedBox(height: 8),
+                            _buildSectionHeader(context, "Berat Badan (kg)"),
                             TSTextField(
                               placeholder: 'Contoh: 56',
                               keyboardType:
@@ -333,9 +304,6 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
                               controller: _weightController,
                               isPassword: false,
                               backgroundColor: TSColor.monochrome.pureWhite,
-                              borderColor: Colors.transparent,
-                              borderRadius: 240,
-                              width: double.infinity,
                               boxShadow: TSShadow.shadows.weight500,
                               validator: TSValidator(
                                 [
@@ -356,14 +324,7 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              "Tinggi Badan (cm)",
-                              style: getResponsiveTextStyle(
-                                context,
-                                TSFont.bold.body,
-                              ),
-                            ),
-                            SizedBox(height: 8),
+                            _buildSectionHeader(context, "Tinggi Badan (cm)"),
                             TSTextField(
                               placeholder: 'Contoh: 156',
                               keyboardType:
@@ -373,9 +334,6 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
                               controller: _heightController,
                               isPassword: false,
                               backgroundColor: TSColor.monochrome.pureWhite,
-                              borderColor: Colors.transparent,
-                              borderRadius: 240,
-                              width: double.infinity,
                               boxShadow: TSShadow.shadows.weight500,
                               validator: TSValidator(
                                 [
@@ -394,16 +352,11 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  Text(
-                    "Hubungan dengan Anak",
-                    style: getResponsiveTextStyle(context, TSFont.bold.body),
-                  ),
-                  SizedBox(height: 8),
+                  _buildSectionHeader(context, "Hubungan dengan anak"),
                   TSDropdown<ParentRole>(
                     label: 'Hubungan dengan Anak',
                     value: _selectedRole,
                     items: ParentRole.values,
-                    borderRadius: 240,
                     onChanged: (newValue) {
                       setState(() {
                         _selectedRole = newValue;
@@ -415,19 +368,12 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
                         value == null ? 'Pilih hubungan' : null,
                   ),
                   const SizedBox(height: 16),
-                  Text(
-                    "Password",
-                    style: getResponsiveTextStyle(context, TSFont.bold.body),
-                  ),
-                  SizedBox(height: 8),
+                  _buildSectionHeader(context, "Password"),
                   TSTextField(
                     placeholder: 'Contoh: abcdefgh12',
                     controller: _passwordController,
                     isPassword: true,
                     backgroundColor: TSColor.monochrome.pureWhite,
-                    borderColor: Colors.transparent,
-                    borderRadius: 240,
-                    width: double.infinity,
                     boxShadow: TSShadow.shadows.weight500,
                     validator: TSValidator(
                       [(val) => val.isNotEmpty, (val) => val.length >= 8],
@@ -439,20 +385,13 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  Text(
-                    "Konfirmasi Password",
-                    style: getResponsiveTextStyle(context, TSFont.bold.body),
-                  ),
-                  SizedBox(height: 8),
+                  _buildSectionHeader(context, "Konfirmasi Password"),
                   TSTextField(
                     placeholder: 'Contoh: abcdefgh12',
                     textInputAction: TextInputAction.done,
                     controller: _confirmPasswordController,
                     isPassword: true,
                     backgroundColor: TSColor.monochrome.pureWhite,
-                    borderColor: Colors.transparent,
-                    borderRadius: 240,
-                    width: double.infinity,
                     boxShadow: TSShadow.shadows.weight500,
                     validator: TSValidator(
                       [
@@ -492,6 +431,16 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
       ),
     );
   }
+}
+
+Widget _buildSectionHeader(BuildContext context, String title) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(title, style: getResponsiveTextStyle(context, TSFont.bold.body)),
+      const SizedBox(height: 8),
+    ],
+  );
 }
 
 Widget _buildLoginRedirect(BuildContext context) {

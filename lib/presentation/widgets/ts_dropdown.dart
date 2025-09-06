@@ -12,7 +12,8 @@ class TSDropdown<T> extends StatelessWidget {
   final void Function(T?)? onChanged;
   final String? Function(T?)? validator;
   final Widget Function(T item) itemBuilder;
-  final double? borderRadius;
+  final List<BoxShadow>? boxShadow;
+  final double borderRadius;
 
   const TSDropdown({
     super.key,
@@ -23,16 +24,16 @@ class TSDropdown<T> extends StatelessWidget {
     required this.onChanged,
     this.validator,
     required this.itemBuilder,
-    this.borderRadius,
+    this.borderRadius = 240,
+    this.boxShadow,
   });
 
   @override
   Widget build(BuildContext context) {
-    final effectiveBorderRadius = BorderRadius.circular(borderRadius ?? 12.0);
     return Container(
       decoration: BoxDecoration(
         boxShadow: TSShadow.shadows.weight300,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(borderRadius),
       ),
       child: DropdownButtonFormField<T>(
         value: value,
@@ -57,22 +58,22 @@ class TSDropdown<T> extends StatelessWidget {
             borderSide: BorderSide.none,
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: effectiveBorderRadius,
+            borderRadius: BorderRadius.circular(borderRadius),
             borderSide: BorderSide.none,
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: effectiveBorderRadius,
+            borderRadius: BorderRadius.circular(borderRadius),
             borderSide: BorderSide(color: TSColor.mainTosca.primary, width: 2),
           ),
           errorBorder: OutlineInputBorder(
-            borderRadius: effectiveBorderRadius,
+            borderRadius: BorderRadius.circular(borderRadius),
             borderSide: BorderSide(
               color: TSColor.additionalColor.red,
               width: 2,
             ),
           ),
           focusedErrorBorder: OutlineInputBorder(
-            borderRadius: effectiveBorderRadius,
+            borderRadius: BorderRadius.circular(borderRadius),
             borderSide: BorderSide(
               color: TSColor.additionalColor.red,
               width: 2,
