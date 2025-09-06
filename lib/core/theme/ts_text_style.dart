@@ -10,9 +10,7 @@ extension TextStyleExtension on TextStyle {
 TextStyle getResponsiveTextStyle(BuildContext context, TextStyle mobileStyle) {
   final bool isTablet = MediaQuery.of(context).size.width > 600;
   if (isTablet) {
-    return mobileStyle.copyWith(
-      fontSize: mobileStyle.fontSize! * 1.5,
-    );
+    return mobileStyle.copyWith(fontSize: mobileStyle.fontSize! * 1.5);
   }
   return mobileStyle;
 }
