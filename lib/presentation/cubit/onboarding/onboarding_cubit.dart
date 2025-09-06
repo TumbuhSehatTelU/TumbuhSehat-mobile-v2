@@ -81,8 +81,8 @@ class OnboardingCubit extends Cubit<OnboardingState> {
       dateOfBirth: data.dateOfBirth!,
       height: data.height!,
       weight: data.weight!,
-      isPregnant: data.isPregnant!,
-      gestationalAge: data.gestationalAge!,
+      isPregnant: data.isPregnant ?? false,
+      gestationalAge: data.gestationalAge ?? GestationalAge.none, 
       isLactating: data.isLactating!,
       lactationPeriod: data.lactationPeriod!,
     );

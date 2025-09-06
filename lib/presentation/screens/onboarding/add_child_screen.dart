@@ -10,7 +10,7 @@ import '../../cubit/onboarding/onboarding_cubit.dart';
 import '../../widgets/child_form_card.dart';
 import '../../widgets/ts_button.dart';
 import '../../widgets/ts_page_scaffold.dart';
-import 'welcome_screen.dart';
+import 'login_screen.dart';
 
 class ChildFormData {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
@@ -85,7 +85,7 @@ class _AddChildScreenState extends State<AddChildScreen> {
   void _submitNextChild(BuildContext context, int index, String uniqueCode) {
     if (index >= _childForms.length) {
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const WelcomeScreen()),
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
         (route) => false,
       );
       return;
@@ -118,7 +118,7 @@ class _AddChildScreenState extends State<AddChildScreen> {
 
   void _skipAndContinue() {
     Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (context) => const WelcomeScreen()),
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
       (route) => false,
     );
   }
