@@ -11,6 +11,7 @@ import '../../widgets/ts_button.dart';
 import '../../widgets/ts_dropdown.dart';
 import '../../widgets/ts_page_scaffold.dart';
 import '../../widgets/ts_text_field.dart';
+import 'add_child_screen.dart';
 import 'login_screen.dart';
 import 'pregnancy_check_screen.dart';
 
@@ -147,17 +148,22 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
                 const Center(child: CircularProgressIndicator()),
           );
         } else if (state is OnboardingFailure) {
-          Navigator.of(context).pop();
+          Navigator.of(context).pop(); 
           ScaffoldMessenger.of(
             context,
           ).showSnackBar(SnackBar(content: Text(state.message)));
-        } else if (state is OnboardingSuccess &&
-            _selectedRole != ParentRole.ibu) {
-          Navigator.of(context).pop();
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => const LoginScreen()),
-            (route) => false,
-          );
+        } else if (state is OnboardingSuccess) {
+          Navigator.of(context).pop(); 
+          if (!widget.isJoiningFamily) {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => const AddChildScreen()),
+            );
+          } else {
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (context) => const LoginScreen()),
+              (route) => false,
+            );
+          }
         }
       },
       child: TSPageScaffold(

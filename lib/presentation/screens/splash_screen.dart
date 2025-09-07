@@ -5,7 +5,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-
 import '../../core/theme/ts_color.dart';
 import '../../core/theme/ts_text_style.dart';
 import '../../gen/assets.gen.dart';
