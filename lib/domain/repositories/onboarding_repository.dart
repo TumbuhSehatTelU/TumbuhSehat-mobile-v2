@@ -21,5 +21,6 @@ abstract class OnboardingRepository {
     required String password,
     required bool rememberMe,
     String? uniqueCode,
+    String? phoneNumber,
   });
 }

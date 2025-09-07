@@ -16,32 +16,6 @@ import 'presentation/cubit/splash/splash_cubit.dart';
 final sl = GetIt.instance;
 
 Future<void> init() async {
-  // FEATURES
-  // Cubit
-  sl.registerFactory(() => SplashCubit(onboardingRepository: sl()));
-  sl.registerFactory(() => OnboardingCubit(onboardingRepository: sl()));
-  sl.registerFactory(() => LoginCubit(onboardingRepository: sl()));
-
-  // Repository
-  sl.registerLazySingleton<OnboardingRepository>(
-    () => OnboardingRepositoryImpl(
-      remoteDataSource: sl(),
-      localDataSource: sl(),
-      networkInfo: sl(),
-    ),
-  );
-
-  // Data sources
-  sl.registerLazySingleton<OnboardingRemoteDataSource>(
-    () => OnboardingRemoteDataSourceImpl(client: sl()),
-  );
-  sl.registerLazySingleton<OnboardingLocalDataSource>(
-    () => OnboardingLocalDataSourceImpl(sharedPreferences: sl()),
-  );
-
-  // CORE
-  sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl(), sl()));
-
   // EXTERNAL
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton(() => sharedPreferences);
@@ -55,4 +29,30 @@ Future<void> init() async {
     return Dio(options);
   });
   sl.registerLazySingleton(() => Connectivity());
+
+  // CORE
+  sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl(), sl()));
+
+  // Data sources
+  sl.registerLazySingleton<OnboardingRemoteDataSource>(
+    () => OnboardingRemoteDataSourceImpl(client: sl()),
+  );
+  sl.registerLazySingleton<OnboardingLocalDataSource>(
+    () => OnboardingLocalDataSourceImpl(sharedPreferences: sl()),
+  );
+
+  // Repository
+  sl.registerLazySingleton<OnboardingRepository>(
+    () => OnboardingRepositoryImpl(
+      remoteDataSource: sl(),
+      localDataSource: sl(),
+      networkInfo: sl(),
+    ),
+  );
+
+  // FEATURES
+  // Cubit
+  sl.registerFactory(() => SplashCubit(onboardingRepository: sl()));
+  sl.registerFactory(() => OnboardingCubit(onboardingRepository: sl()));
+  sl.registerFactory(() => LoginCubit(onboardingRepository: sl()));
 }

@@ -20,10 +20,16 @@ class OnboardingLocalDataSourceImpl implements OnboardingLocalDataSource {
   OnboardingLocalDataSourceImpl({required this.sharedPreferences});
 
   @override
-  Future<void> cacheFamily(FamilyModel family) {
+  Future<void> cacheFamily(FamilyModel family) async {
     try {
       final jsonString = json.encode(family.toJson());
-      return sharedPreferences.setString(CACHED_FAMILY, jsonString);
+      final success = await sharedPreferences.setString(
+        CACHED_FAMILY,
+        jsonString,
+      );
+      if (!success) {
+        throw CacheException('Failed to write to SharedPreferences.');
+      }
     } catch (e) {
       throw CacheException('Failed to cache the family data.');
     }
@@ -32,9 +38,10 @@ class OnboardingLocalDataSourceImpl implements OnboardingLocalDataSource {
   @override
   Future<FamilyModel> getCachedFamily() {
     final jsonString = sharedPreferences.getString(CACHED_FAMILY);
-    if (jsonString != null) {
+    if (jsonString != null && jsonString.isNotEmpty) {
       try {
-        return Future.value(FamilyModel.fromJson(json.decode(jsonString)));
+        final model = FamilyModel.fromJson(json.decode(jsonString));
+        return Future.value(model);
       } catch (e) {
         throw CacheException('Error parsing cached data.');
       }

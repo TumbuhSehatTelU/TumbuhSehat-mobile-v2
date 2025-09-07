@@ -25,10 +25,10 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 5000),
+      duration: const Duration(seconds: 500000),
     )..forward();
 
-    _timer = Timer(const Duration(seconds: 5000), _navigateToHome);
+    _timer = Timer(const Duration(seconds: 500000), _navigateToHome);
   }
 
   @override

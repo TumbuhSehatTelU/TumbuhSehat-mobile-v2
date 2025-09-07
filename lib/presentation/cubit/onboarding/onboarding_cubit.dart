@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:uuid/uuid.dart';
 import '../../../data/models/child_model.dart';
 import '../../../data/models/family_model.dart';
 import '../../../data/models/parent_model.dart';
@@ -82,7 +83,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
       height: data.height!,
       weight: data.weight!,
       isPregnant: data.isPregnant ?? false,
-      gestationalAge: data.gestationalAge ?? GestationalAge.none, 
+      gestationalAge: data.gestationalAge ?? GestationalAge.none,
       isLactating: data.isLactating!,
       lactationPeriod: data.lactationPeriod!,
     );
@@ -109,9 +110,10 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     }
     // Flow: Create new family
     else {
+      final tempUniqueCode = const Uuid().v4();
       final family = FamilyModel(
         phoneNumber: data.phoneNumber!,
-        uniqueCode: '', // BE will generate this
+        uniqueCode: tempUniqueCode,
         parents: [parent],
         children: const [],
       );
@@ -126,13 +128,15 @@ class OnboardingCubit extends Cubit<OnboardingState> {
   }
 
   Future<void> submitChildData({
-    required String uniqueCode,
     required String name,
     required Gender gender,
     required DateTime dateOfBirth,
     required double height,
     required double weight,
   }) async {
+    if (state is! OnboardingSuccess) return;
+    final currentFamily = (state as OnboardingSuccess).family;
+
     emit(OnboardingLoading());
 
     final child = ChildModel(
@@ -144,7 +148,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     );
 
     final result = await onboardingRepository.updateFamilyWithChild(
-      uniqueCode: uniqueCode,
+      uniqueCode: currentFamily.uniqueCode,
       child: child,
     );
 

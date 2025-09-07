@@ -77,12 +77,10 @@ class _AddChildScreenState extends State<AddChildScreen> {
       return;
     }
 
-    final uniqueCode = currentState.family.uniqueCode;
-
-    _submitNextChild(context, 0, uniqueCode);
+    _submitNextChild(context, 0);
   }
 
-  void _submitNextChild(BuildContext context, int index, String uniqueCode) {
+  void _submitNextChild(BuildContext context, int index) {
     if (index >= _childForms.length) {
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const LoginScreen()),
@@ -94,7 +92,6 @@ class _AddChildScreenState extends State<AddChildScreen> {
     final form = _childForms[index];
     if (form.formKey.currentState?.validate() ?? false) {
       context.read<OnboardingCubit>().submitChildData(
-        uniqueCode: uniqueCode,
         name: form.nameController.text,
         gender: form.gender!,
         dateOfBirth: form.dateOfBirth!,
@@ -107,7 +104,7 @@ class _AddChildScreenState extends State<AddChildScreen> {
           .stream
           .firstWhere((state) => state is OnboardingSuccess)
           .then((_) {
-            _submitNextChild(context, index + 1, uniqueCode);
+            _submitNextChild(context, index + 1);
           });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

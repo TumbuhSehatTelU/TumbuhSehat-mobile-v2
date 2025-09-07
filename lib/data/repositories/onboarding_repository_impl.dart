@@ -126,10 +126,16 @@ class OnboardingRepositoryImpl implements OnboardingRepository {
     required String password,
     required bool rememberMe,
     String? uniqueCode,
+    String? phoneNumber,
   }) async {
-    if (!rememberMe) {
-      await localDataSource.clearCachedFamily();
+    Future<void> handleSessionPersistence(FamilyModel family) async {
+      if (rememberMe) {
+        await localDataSource.cacheFamily(family);
+      } else {
+        await localDataSource.clearCachedFamily();
+      }
     }
+
     if (await networkInfo.isConnected) {
       if (uniqueCode == null || uniqueCode.isEmpty) {
         return const Left(
@@ -138,20 +144,34 @@ class OnboardingRepositoryImpl implements OnboardingRepository {
       }
       try {
         final family = await remoteDataSource.login(uniqueCode, name, password);
-        if (rememberMe) {
-          await localDataSource.cacheFamily(family);
-        }
+        await handleSessionPersistence(family);
         return Right(family);
       } on ServerException catch (e) {
         return Left(ServerFailure(e.message));
       }
     } else {
+      if (phoneNumber == null || phoneNumber.isEmpty) {
+        return const Left(
+          CacheFailure("Nomor handphone diperlukan untuk login offline."),
+        );
+      }
       try {
-        final family = await localDataSource.loginOffline(name, password);
+        final family = await localDataSource.getCachedFamily();
+        
+        if (family.phoneNumber != phoneNumber) {
+          return const Left(
+            CacheFailure(
+              'Data keluarga untuk nomor ini tidak ditemukan di cache.',
+            ),
+          );
+        }
+
         final parentExists = family.parents.any(
           (parent) => parent.name == name && parent.password == password,
         );
+
         if (parentExists) {
+          await handleSessionPersistence(family);
           return Right(family);
         } else {
           return const Left(

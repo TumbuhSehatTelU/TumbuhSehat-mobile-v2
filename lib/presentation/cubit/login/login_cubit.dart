@@ -16,8 +16,7 @@ class LoginCubit extends Cubit<LoginState> {
     required String password,
     required bool rememberMe,
     String? uniqueCode,
-    String?
-    phoneNumber,
+    String? phoneNumber,
   }) async {
     emit(LoginLoading());
     final result = await onboardingRepository.login(
@@ -25,6 +24,7 @@ class LoginCubit extends Cubit<LoginState> {
       password: password,
       rememberMe: rememberMe,
       uniqueCode: uniqueCode,
+      phoneNumber: phoneNumber,
     );
 
     result.fold(
