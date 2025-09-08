@@ -4,7 +4,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../../core/theme/ts_text_style.dart';
+import '../../../gen/assets.gen.dart';
 import '../../../core/theme/ts_color.dart';
+import '../../widgets/ts_auth_header.dart';
+import '../../widgets/ts_button.dart';
 import '../../widgets/ts_page_scaffold.dart';
 import '../main/main_screen.dart';
 
@@ -25,10 +29,10 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 500000),
+      duration: const Duration(seconds: 10),
     )..forward();
 
-    _timer = Timer(const Duration(seconds: 500000), _navigateToHome);
+    _timer = Timer(const Duration(seconds: 10), _navigateToHome);
   }
 
   @override
@@ -50,14 +54,36 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
   @override
   Widget build(BuildContext context) {
+    double maxWidth = MediaQuery.of(context).size.width;
+    double maxHeight = MediaQuery.of(context).size.height;
     return GestureDetector(
       onTap: _navigateToHome,
       child: TSPageScaffold(
-        body: const Center(
-          child: Text(
-            'Selamat Datang!',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
+        body: Column(
+          children: [
+            AuthHeader(),
+            Spacer(flex: 1),
+            Text(
+              'Selamat Datang di\nTumbuhSehat!',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+            const Spacer(flex: 1),
+            Assets.images.illustrationWelcomeScreen.svg(
+              width: maxWidth * 0.9,
+              height: maxHeight * 0.25,
+            ),
+            TSButton(
+              onPressed: _navigateToHome,
+              text: 'Mulai Sekarang',
+              textStyle: getResponsiveTextStyle(context, TSFont.bold.large),
+              backgroundColor: TSColor.secondaryGreen.primary,
+              borderColor: Colors.transparent,
+              contentColor: TSColor.monochrome.black,
+              customBorderRadius: 48,
+              width: double.infinity,
+            ),
+          ],
         ),
         bottomNavigationBar: _buildProgressBar(),
       ),
