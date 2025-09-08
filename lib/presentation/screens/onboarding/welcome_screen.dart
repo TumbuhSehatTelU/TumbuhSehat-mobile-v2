@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/ts_color.dart';
 import '../../widgets/ts_page_scaffold.dart';
-import '../home_screen.dart';
+import '../main/main_screen.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -42,7 +42,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     _timer?.cancel();
     if (mounted) {
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
+        MaterialPageRoute(builder: (_) => const MainScreen()),
         (route) => false,
       );
     }
