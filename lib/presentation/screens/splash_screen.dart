@@ -12,7 +12,7 @@ import '../cubit/splash/splash_cubit.dart';
 import '../widgets/ts_auth_header.dart';
 import '../widgets/ts_button.dart';
 import '../widgets/ts_page_scaffold.dart';
-import 'main/beranda_screen.dart';
+import 'main/main_screen.dart';
 import 'onboarding/join_or_create_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -63,7 +63,7 @@ class _SplashScreenState extends State<SplashScreen>
       listener: (context, state) {
         if (state is SplashAuthenticated) {
           setState(() {
-            _destinationScreen = const BerandaScreen();
+            _destinationScreen = const MainScreen();
           });
         } else if (state is SplashUnauthenticated) {
           setState(() {

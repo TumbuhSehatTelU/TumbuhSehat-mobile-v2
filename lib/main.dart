@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mobile_tumbuh_sehat_v2/core/theme/ts_color.dart';
 import 'core/network/network_info.dart';
 import 'injection_container.dart' as di;
 import 'presentation/cubit/login/login_cubit.dart';
@@ -33,6 +34,19 @@ class MyApp extends StatelessWidget {
           fontFamily: 'OpenSans',
           primarySwatch: Colors.lightGreen,
           visualDensity: VisualDensity.adaptivePlatformDensity,
+          scaffoldBackgroundColor: TSColor.monochrome.white,
+          checkboxTheme: CheckboxThemeData(
+            fillColor: MaterialStateProperty.resolveWith((states) {
+              if (states.contains(MaterialState.selected)) {
+                return TSColor.secondaryGreen.primary;
+              }
+              return TSColor.monochrome.white;
+            }),
+            checkColor: MaterialStateProperty.all(TSColor.monochrome.black),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
         ),
         home: const SplashScreen(),
       ),

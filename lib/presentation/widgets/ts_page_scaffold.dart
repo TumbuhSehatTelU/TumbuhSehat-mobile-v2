@@ -18,7 +18,7 @@ class TSPageScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final bool isTablet = screenWidth > 600;
-    final double horizontalPadding = isTablet ? 60.0 : 24.0;
+    final double horizontalPadding = isTablet ? 60.0 : 32.0;
 
     void unfocusKeyboard() {
       FocusScope.of(context).unfocus();
