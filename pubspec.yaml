@@ -7,6 +7,7 @@ environment:
   sdk: ^3.8.1
 
 dependencies:
+  animated_bottom_navigation_bar: ^1.4.0
   connectivity_plus: ^6.1.5
   dartz: ^0.10.1
   dio: ^5.9.0
@@ -44,6 +45,7 @@ flutter:
   assets:
     - assets/images/
     - assets/lottie/
+    - assets/icons/
 
   fonts:
     - family: OpenSans
