@@ -9,6 +9,7 @@ import 'beranda_screen.dart';
 import 'chatbot_screen.dart';
 import 'komunitas_screen.dart';
 import 'profil_screen.dart';
+import 'scan_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -30,8 +31,9 @@ class _MainScreenState extends State<MainScreen> {
   final List<String> _iconNames = ['Beranda', 'Chatbot', 'Komunitas', 'Profil'];
 
   void _onScanPressed() {
-    // TODO: Implement navigation or action for Scan button
-    print('Scan button pressed!');
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => const ScanScreen()));
   }
 
   @override

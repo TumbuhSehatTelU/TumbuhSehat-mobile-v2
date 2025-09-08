@@ -11,6 +11,7 @@ import 'data/repositories/onboarding_repository_impl.dart';
 import 'domain/repositories/onboarding_repository.dart';
 import 'presentation/cubit/login/login_cubit.dart';
 import 'presentation/cubit/onboarding/onboarding_cubit.dart';
+import 'presentation/cubit/scan/scan_cubit.dart';
 import 'presentation/cubit/splash/splash_cubit.dart';
 
 final sl = GetIt.instance;
@@ -55,4 +56,5 @@ Future<void> init() async {
   sl.registerFactory(() => SplashCubit(onboardingRepository: sl()));
   sl.registerFactory(() => OnboardingCubit(onboardingRepository: sl()));
   sl.registerFactory(() => LoginCubit(onboardingRepository: sl()));
+  sl.registerFactory(() => ScanCubit(onboardingRepository: sl()));
 }

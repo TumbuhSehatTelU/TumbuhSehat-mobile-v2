@@ -1,5 +1,4 @@
-import 'package:flutter/widgets.dart';
-
+import 'package:flutter/material.dart';
 import '../../widgets/ts_page_scaffold.dart';
 
 class ScanScreen extends StatefulWidget {
@@ -12,6 +11,9 @@ class ScanScreen extends StatefulWidget {
 class _ScanScreenState extends State<ScanScreen> {
   @override
   Widget build(BuildContext context) {
-    return const TSPageScaffold(body: Center(child: Text('Scan Screen')));
+    return TSPageScaffold(
+      appBar: AppBar(title: const Text('Scan Makanan')),
+      body: Center(child: Text('Scan Screen')),
+    );
   }
 }
