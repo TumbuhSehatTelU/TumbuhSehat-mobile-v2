@@ -8,112 +8,47 @@ part of 'meal_history_model.dart';
 
 MealHistoryModel _$MealHistoryModelFromJson(Map<String, dynamic> json) =>
     MealHistoryModel(
-      familyUniqueCode: json['familyUniqueCode'] as String,
-      mealTimestamp: json['mealTimestamp'] as String,
+      timestamp: (json['timestamp'] as num).toInt(),
       eaters: EatersModel.fromJson(json['eaters'] as Map<String, dynamic>),
-      mealComponents: (json['mealComponents'] as List<dynamic>)
+      components: (json['components'] as List<dynamic>)
           .map((e) => MealComponentModel.fromJson(e as Map<String, dynamic>))
           .toList(),
-      totalNutritions: TotalNutritionsModel.fromJson(
-        json['totalNutritions'] as Map<String, dynamic>,
-      ),
     );
 
 Map<String, dynamic> _$MealHistoryModelToJson(MealHistoryModel instance) =>
     <String, dynamic>{
-      'familyUniqueCode': instance.familyUniqueCode,
-      'mealTimestamp': instance.mealTimestamp,
+      'timestamp': instance.timestamp,
       'eaters': instance.eaters.toJson(),
-      'mealComponents': instance.mealComponents.map((e) => e.toJson()).toList(),
-      'totalNutritions': instance.totalNutritions.toJson(),
+      'components': instance.components.map((e) => e.toJson()).toList(),
     };
 
 EatersModel _$EatersModelFromJson(Map<String, dynamic> json) => EatersModel(
-  parents: (json['parents'] as List<dynamic>)
-      .map((e) => ParentEaterModel.fromJson(e as Map<String, dynamic>))
+  parentIds: (json['parent_ids'] as List<dynamic>)
+      .map((e) => e as String)
       .toList(),
-  children: (json['children'] as List<dynamic>)
-      .map((e) => ChildEaterModel.fromJson(e as Map<String, dynamic>))
+  childIds: (json['child_ids'] as List<dynamic>)
+      .map((e) => e as String)
       .toList(),
 );
 
 Map<String, dynamic> _$EatersModelToJson(EatersModel instance) =>
     <String, dynamic>{
-      'parents': instance.parents.map((e) => e.toJson()).toList(),
-      'children': instance.children.map((e) => e.toJson()).toList(),
-    };
-
-ParentEaterModel _$ParentEaterModelFromJson(Map<String, dynamic> json) =>
-    ParentEaterModel(
-      name: json['name'] as String,
-      role: json['role'] as String,
-    );
-
-Map<String, dynamic> _$ParentEaterModelToJson(ParentEaterModel instance) =>
-    <String, dynamic>{'name': instance.name, 'role': instance.role};
-
-ChildEaterModel _$ChildEaterModelFromJson(Map<String, dynamic> json) =>
-    ChildEaterModel(
-      name: json['name'] as String,
-      dateOfBirth: json['dateOfBirth'] as String,
-    );
-
-Map<String, dynamic> _$ChildEaterModelToJson(ChildEaterModel instance) =>
-    <String, dynamic>{
-      'name': instance.name,
-      'dateOfBirth': instance.dateOfBirth,
+      'parent_ids': instance.parentIds,
+      'child_ids': instance.childIds,
     };
 
 MealComponentModel _$MealComponentModelFromJson(Map<String, dynamic> json) =>
     MealComponentModel(
-      foodName: json['foodName'] as String,
+      foodName: json['food_name'] as String,
       quantity: (json['quantity'] as num).toDouble(),
-      urtName: json['urtName'] as String,
-      massInGrams: (json['massInGrams'] as num).toDouble(),
-      nutritions: NutritionsModel.fromJson(
-        json['nutritions'] as Map<String, dynamic>,
-      ),
+      urtName: json['urt_name'] as String,
+      totalGrams: (json['total_grams'] as num).toDouble(),
     );
 
 Map<String, dynamic> _$MealComponentModelToJson(MealComponentModel instance) =>
     <String, dynamic>{
-      'foodName': instance.foodName,
+      'food_name': instance.foodName,
       'quantity': instance.quantity,
-      'urtName': instance.urtName,
-      'massInGrams': instance.massInGrams,
-      'nutritions': instance.nutritions.toJson(),
+      'urt_name': instance.urtName,
+      'total_grams': instance.totalGrams,
     };
-
-NutritionsModel _$NutritionsModelFromJson(Map<String, dynamic> json) =>
-    NutritionsModel(
-      calories: (json['calories'] as num).toDouble(),
-      protein: (json['protein'] as num).toDouble(),
-      fat: (json['fat'] as num).toDouble(),
-      carbohydrates: (json['carbohydrates'] as num).toDouble(),
-    );
-
-Map<String, dynamic> _$NutritionsModelToJson(NutritionsModel instance) =>
-    <String, dynamic>{
-      'calories': instance.calories,
-      'protein': instance.protein,
-      'fat': instance.fat,
-      'carbohydrates': instance.carbohydrates,
-    };
-
-TotalNutritionsModel _$TotalNutritionsModelFromJson(
-  Map<String, dynamic> json,
-) => TotalNutritionsModel(
-  calories: (json['calories'] as num).toDouble(),
-  protein: (json['protein'] as num).toDouble(),
-  fat: (json['fat'] as num).toDouble(),
-  carbohydrates: (json['carbohydrates'] as num).toDouble(),
-);
-
-Map<String, dynamic> _$TotalNutritionsModelToJson(
-  TotalNutritionsModel instance,
-) => <String, dynamic>{
-  'calories': instance.calories,
-  'protein': instance.protein,
-  'fat': instance.fat,
-  'carbohydrates': instance.carbohydrates,
-};
