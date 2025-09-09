@@ -5,11 +5,16 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 
 import 'core/network/network_info.dart';
 import 'core/utils/constants.dart';
+import 'data/datasources/local/food_local_data_source.dart';
 import 'data/datasources/local/onboarding_local_data_source.dart';
+import 'data/datasources/remote/food_remote_data_source.dart';
 import 'data/datasources/remote/onboarding_remote_data_source.dart';
+import 'data/repositories/food_repository_impl.dart';
 import 'data/repositories/onboarding_repository_impl.dart';
+import 'domain/repositories/food_repository.dart';
 import 'domain/repositories/onboarding_repository.dart';
 import 'presentation/cubit/login/login_cubit.dart';
+import 'presentation/cubit/meal_analysis/meal_analysis_cubit.dart';
 import 'presentation/cubit/onboarding/onboarding_cubit.dart';
 import 'presentation/cubit/scan/scan_cubit.dart';
 import 'presentation/cubit/splash/splash_cubit.dart';
@@ -43,10 +48,23 @@ Future<void> init() async {
   sl.registerLazySingleton<OnboardingLocalDataSource>(
     () => OnboardingLocalDataSourceImpl(sharedPreferences: sl()),
   );
+  sl.registerLazySingleton<FoodRemoteDataSource>(
+    () => FoodRemoteDataSourceImpl(client: sl()),
+  );
+  sl.registerLazySingleton<FoodLocalDataSource>(
+    () => FoodLocalDataSourceImpl(dbHelper: sl()),
+  );
 
   // Repository
   sl.registerLazySingleton<OnboardingRepository>(
     () => OnboardingRepositoryImpl(
+      remoteDataSource: sl(),
+      localDataSource: sl(),
+      networkInfo: sl(),
+    ),
+  );
+  sl.registerLazySingleton<FoodRepository>(
+    () => FoodRepositoryImpl(
       remoteDataSource: sl(),
       localDataSource: sl(),
       networkInfo: sl(),
@@ -59,4 +77,5 @@ Future<void> init() async {
   sl.registerFactory(() => OnboardingCubit(onboardingRepository: sl()));
   sl.registerFactory(() => LoginCubit(onboardingRepository: sl()));
   sl.registerFactory(() => ScanCubit(onboardingRepository: sl()));
+  sl.registerFactory(() => MealAnalysisCubit(foodRepository: sl()));
 }

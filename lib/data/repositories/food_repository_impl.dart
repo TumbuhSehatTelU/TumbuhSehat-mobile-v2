@@ -6,8 +6,10 @@ import '../../domain/repositories/food_repository.dart';
 import '../datasources/local/food_local_data_source.dart';
 import '../datasources/remote/food_remote_data_source.dart';
 import '../models/child_model.dart';
+import '../models/food_model.dart';
 import '../models/meal_history_model.dart';
 import '../models/parent_model.dart';
+import '../models/urt_model.dart';
 
 class FoodRepositoryImpl implements FoodRepository {
   final FoodRemoteDataSource remoteDataSource;
@@ -40,6 +42,26 @@ class FoodRepositoryImpl implements FoodRepository {
       return const Right(null);
     } on CacheException catch (e) {
       return Left(CacheFailure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<FoodModel>>> searchFoods(String query) async {
+    try {
+      final foods = await localDataSource.searchFoods(query);
+      return Right(foods);
+    } catch (e) {
+      return Left(CacheFailure('Gagal mencari data makanan: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<UrtModel>>> getUrtsForFood(int foodId) async {
+    try {
+      final urts = await localDataSource.getUrtsForFood(foodId);
+      return Right(urts);
+    } catch (e) {
+      return Left(CacheFailure('Gagal mendapatkan URT: $e'));
     }
   }
 }

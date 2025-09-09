@@ -1,8 +1,10 @@
 import 'package:dartz/dartz.dart';
 import '../../core/error/failures.dart';
 import '../../data/models/child_model.dart';
+import '../../data/models/food_model.dart';
 import '../../data/models/meal_history_model.dart';
 import '../../data/models/parent_model.dart';
+import '../../data/models/urt_model.dart';
 
 abstract class FoodRepository {
   Future<Either<Failure, void>> saveMealHistory({
@@ -10,14 +12,16 @@ abstract class FoodRepository {
     required List<ParentModel> parents,
     required List<ChildModel> children,
   });
+  Future<Either<Failure, List<FoodModel>>> searchFoods(String query);
+  Future<Either<Failure, List<UrtModel>>> getUrtsForFood(int foodId);
 }
 
 // KONTRAK BE FOOD HISTORY
 // {
 //   "timestamp": 1678886400,
 //   "eaters": {
-//     "parent_ids": ["parent_uuid_1", "parent_uuid_2"],
-//     "child_ids": ["child_uuid_5"]
+//      "parent_names": ["Anton", "Tono"],
+//      "child_names": ["Toni"]
 //   },
 //   "components": [
 //     {

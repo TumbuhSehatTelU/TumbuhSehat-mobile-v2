@@ -26,13 +26,13 @@ class MealHistoryModel extends Equatable {
 
 @JsonSerializable()
 class EatersModel extends Equatable {
-  @JsonKey(name: 'parent_ids')
-  final List<String> parentIds;
+  @JsonKey(name: 'parent_names')
+  final List<String> parentNames;
 
-  @JsonKey(name: 'child_ids')
-  final List<String> childIds;
+  @JsonKey(name: 'child_names')
+  final List<String> childNames;
 
-  const EatersModel({required this.parentIds, required this.childIds});
+  const EatersModel({required this.parentNames, required this.childNames});
 
   factory EatersModel.fromJson(Map<String, dynamic> json) =>
       _$EatersModelFromJson(json);
@@ -40,7 +40,7 @@ class EatersModel extends Equatable {
   Map<String, dynamic> toJson() => _$EatersModelToJson(this);
 
   @override
-  List<Object> get props => [parentIds, childIds];
+  List<Object> get props => [parentNames, childNames];
 }
 
 @JsonSerializable()

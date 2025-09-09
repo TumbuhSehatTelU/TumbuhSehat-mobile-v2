@@ -23,18 +23,18 @@ Map<String, dynamic> _$MealHistoryModelToJson(MealHistoryModel instance) =>
     };
 
 EatersModel _$EatersModelFromJson(Map<String, dynamic> json) => EatersModel(
-  parentIds: (json['parent_ids'] as List<dynamic>)
+  parentNames: (json['parent_names'] as List<dynamic>)
       .map((e) => e as String)
       .toList(),
-  childIds: (json['child_ids'] as List<dynamic>)
+  childNames: (json['child_names'] as List<dynamic>)
       .map((e) => e as String)
       .toList(),
 );
 
 Map<String, dynamic> _$EatersModelToJson(EatersModel instance) =>
     <String, dynamic>{
-      'parent_ids': instance.parentIds,
-      'child_ids': instance.childIds,
+      'parent_names': instance.parentNames,
+      'child_names': instance.childNames,
     };
 
 MealComponentModel _$MealComponentModelFromJson(Map<String, dynamic> json) =>
