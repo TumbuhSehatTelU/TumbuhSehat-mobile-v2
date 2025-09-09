@@ -5,9 +5,9 @@ import '../../core/network/network_info.dart';
 import '../../domain/repositories/food_repository.dart';
 import '../datasources/local/food_local_data_source.dart';
 import '../datasources/remote/food_remote_data_source.dart';
-import '../models/food_component_model.dart';
+import '../models/child_model.dart';
 import '../models/meal_history_model.dart';
-import '../models/serving_size_model.dart';
+import '../models/parent_model.dart';
 
 class FoodRepositoryImpl implements FoodRepository {
   final FoodRemoteDataSource remoteDataSource;
@@ -21,53 +21,25 @@ class FoodRepositoryImpl implements FoodRepository {
   });
 
   @override
-  Future<Either<Failure, List<FoodComponentModel>>> searchFoods(
-    String query,
-  ) async {
+  Future<Either<Failure, void>> saveMealHistory({
+    required MealHistoryModel history,
+    required List<ParentModel> parents,
+    required List<ChildModel> children,
+  }) async {
     try {
-      final foods = await localDataSource.searchFoods(query);
-      return Right(foods);
-    } catch (e) {
-      return Left(
-        CacheFailure('Gagal mencari data makanan dari database lokal.'),
-      );
-    }
-  }
-
-  @override
-  Future<Either<Failure, List<ServingSizeModel>>> getServingSizes(
-    int foodId,
-  ) async {
-    try {
-      final servingSizes = await localDataSource.getServingSizes(foodId);
-      return Right(servingSizes);
-    } catch (e) {
-      return Left(
-        CacheFailure('Gagal mendapatkan ukuran saji dari database lokal.'),
-      );
-    }
-  }
-
-  @override
-  Future<Either<Failure, void>> saveMealHistory(MealHistoryModel meal) async {
-    try {
-      await localDataSource.saveMealHistory(meal);
+      await localDataSource.saveMealHistory(history, parents, children);
 
       if (await networkInfo.isConnected) {
         try {
-          await remoteDataSource.postMealHistory(meal);
-          // TODO: Implement logic to update `is_synced` status in local DB upon successful post
+          await remoteDataSource.postMealHistory(history);
+          // TODO: Buat method `updateSyncStatus` di LocalDataSource
         } on ServerException catch (e) {
-          print(
-            'Failed to sync meal history: ${e.message}. Data is saved locally.',
-          );
+          print('Failed to sync meal history: ${e.message}');
         }
       }
       return const Right(null);
-    } catch (e) {
-      return Left(
-        CacheFailure('Gagal menyimpan histori makanan di database lokal.'),
-      );
+    } on CacheException catch (e) {
+      return Left(CacheFailure(e.message));
     }
   }
 }
