@@ -13,6 +13,7 @@ import 'presentation/cubit/login/login_cubit.dart';
 import 'presentation/cubit/onboarding/onboarding_cubit.dart';
 import 'presentation/cubit/scan/scan_cubit.dart';
 import 'presentation/cubit/splash/splash_cubit.dart';
+import 'core/database/database_helper.dart';
 
 final sl = GetIt.instance;
 
@@ -33,6 +34,7 @@ Future<void> init() async {
 
   // CORE
   sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl(), sl()));
+  sl.registerLazySingleton(() => DatabaseHelper.instance);
 
   // Data sources
   sl.registerLazySingleton<OnboardingRemoteDataSource>(

@@ -50,7 +50,7 @@ flutter:
     - assets/images/
     - assets/lottie/
     - assets/icons/
-    - assets/database/
+    - assets/db/
 
   fonts:
     - family: OpenSans
