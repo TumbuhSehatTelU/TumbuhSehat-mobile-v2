@@ -12,83 +12,42 @@ abstract class FoodRepository {
 
 // KONTRAK BE FOOD HISTORY
 // {
-//     "familyUniqueCode": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
-//     "mealTimestamp": "2023-11-21T08:45:15.123Z",
-//     "eaters": {
-//         "parents": [
-//             {
-//                 "name": "Tono",
-//                 "role": "Ayah"
-//             }
-//         ],
-//         "children": [
-//             {
-//                 "name": "Toni",
-//                 "dateOfBirth": "2022-01-10"
-//             }
-//         ]
+//   "timestamp": 1678886400,
+//   "eaters": {
+//     "parent_ids": ["parent_uuid_1", "parent_uuid_2"],
+//     "child_ids": ["child_uuid_5"]
+//   },
+//   "components": [
+//     {
+//       "food_name": "Nasi Putih",
+//       "quantity": 2.0,
+//       "urt_name": "Centong",
+//       "total_grams": 200.0
 //     },
-//     "mealComponents": [
-//         {
-//             "foodName": "Nasi Putih",
-//             "quantity": 1.5,
-//             "urtName": "Centong",
-//             "massInGrams": 150.0,
-//             "nutritions": {
-//                 "calories": 193.5,
-//                 "protein": 3.6,
-//                 "fat": 0.3,
-//                 "carbohydrates": 41.85
-//             }
-//         },
-//         {
-//             "foodName": "Tempe Goreng",
-//             "quantity": 2.0,
-//             "urtName": "Potong Sedang",
-//             "massInGrams": 50.0,
-//             "nutritions": {
-//                 "calories": 130.0,
-//                 "protein": 11.0,
-//                 "fat": 8.0,
-//                 "carbohydrates": 5.0
-//             }
-//         }
-//     ],
-//     "totalNutritions": {
-//         "calories": 323.5,
-//         "protein": 14.6,
-//         "fat": 8.3,
-//         "carbohydrates": 46.85
-//     },
+//     {
+//       "food_name": "Telur Dadar",
+//       "quantity": 1.0,
+//       "urt_name": "Butir",
+//       "total_grams": 55.0
+//     }
+//   ]
 // }
 
-// Tabel: meal_histories
-// Kolom:
-// - id (Primary Key)
-// - family_id (Foreign Key ke families.familyUniqueCode atau ngga id)
-// - meal_timestamp (Timestamp)
-// - total_calories (Float)
-// - total_protein (Float)
-// - total_fat (Float)
-// - total_carbohydrates (Float)
-// - created_at (Timestamp)
-
-// Tabel: meal_history_components
-// Kolom:
-// - id (Primary Key)
-// - meal_history_id (Foreign Key ke meal_histories.id)
-// - food_name (String)
-// - quantity (Float)
-// - urt_name (String)
-// - mass_in_grams (Float)
-// - calories (Float)
-// - protein (Float)
-// - fat (Float)
-// - carbohydrates (Float)
-
-// Tabel: meal_history_eaters
-// Kolom:
-// - id (Primary Key)
-// - meal_history_id (Foreign Key ke meal_histories.id)
-// - parent_id (Foreign Key ke parents.id, Nullable)
-// - child_id (Foreign Key ke children.id, Nullable)
+// Tabel 1: meal_histories
+// id (UUID / BIGINT, Primary Key)
+// family_id (UUID / BIGINT, Foreign Key)
+// timestamp (TIMESTAMP)
+// created_at (TIMESTAMP)
+// updated_at (TIMESTAMP)
+// Tabel 2: meal_components
+// id (UUID / BIGINT, Primary Key)
+// meal_history_id (UUID / BIGINT, Foreign Key ke meal_histories.id)
+// food_name (VARCHAR(255))
+// quantity (DECIMAL(8, 2))
+// urt_name (VARCHAR(100))
+// total_grams (DECIMAL(8, 2))
+// Tabel 3: meal_eaters
+// id (UUID / BIGINT, Primary Key)
+// meal_history_id (UUID / BIGINT, Foreign Key ke meal_histories.id)
+// parent_id (UUID / BIGINT, Foreign Key, Nullable)
+// child_id (UUID / BIGINT, Foreign Key, Nullable)
