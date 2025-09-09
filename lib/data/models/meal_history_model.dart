@@ -9,7 +9,6 @@ class MealHistoryModel {
   final EatersModel eaters;
   final List<MealComponentModel> mealComponents;
   final TotalNutritionsModel totalNutritions;
-  final String analysisMethod;
 
   MealHistoryModel({
     required this.familyUniqueCode,
@@ -17,7 +16,6 @@ class MealHistoryModel {
     required this.eaters,
     required this.mealComponents,
     required this.totalNutritions,
-    required this.analysisMethod,
   });
 
   factory MealHistoryModel.fromJson(Map<String, dynamic> json) =>

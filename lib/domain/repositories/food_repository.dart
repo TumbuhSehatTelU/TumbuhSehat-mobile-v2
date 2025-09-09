@@ -60,5 +60,35 @@ abstract class FoodRepository {
 //         "fat": 8.3,
 //         "carbohydrates": 46.85
 //     },
-//     "analysisMethod": "MANUAL_INPUT"
 // }
+
+// Tabel: meal_histories
+// Kolom:
+// - id (Primary Key)
+// - family_id (Foreign Key ke families.familyUniqueCode atau ngga id)
+// - meal_timestamp (Timestamp)
+// - total_calories (Float)
+// - total_protein (Float)
+// - total_fat (Float)
+// - total_carbohydrates (Float)
+// - created_at (Timestamp)
+
+// Tabel: meal_history_components
+// Kolom:
+// - id (Primary Key)
+// - meal_history_id (Foreign Key ke meal_histories.id)
+// - food_name (String)
+// - quantity (Float)
+// - urt_name (String)
+// - mass_in_grams (Float)
+// - calories (Float)
+// - protein (Float)
+// - fat (Float)
+// - carbohydrates (Float)
+
+// Tabel: meal_history_eaters
+// Kolom:
+// - id (Primary Key)
+// - meal_history_id (Foreign Key ke meal_histories.id)
+// - parent_id (Foreign Key ke parents.id, Nullable)
+// - child_id (Foreign Key ke children.id, Nullable)

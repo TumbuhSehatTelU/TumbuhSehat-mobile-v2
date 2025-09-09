@@ -17,7 +17,6 @@ MealHistoryModel _$MealHistoryModelFromJson(Map<String, dynamic> json) =>
       totalNutritions: TotalNutritionsModel.fromJson(
         json['totalNutritions'] as Map<String, dynamic>,
       ),
-      analysisMethod: json['analysisMethod'] as String,
     );
 
 Map<String, dynamic> _$MealHistoryModelToJson(MealHistoryModel instance) =>
@@ -27,7 +26,6 @@ Map<String, dynamic> _$MealHistoryModelToJson(MealHistoryModel instance) =>
       'eaters': instance.eaters.toJson(),
       'mealComponents': instance.mealComponents.map((e) => e.toJson()).toList(),
       'totalNutritions': instance.totalNutritions.toJson(),
-      'analysisMethod': instance.analysisMethod,
     };
 
 EatersModel _$EatersModelFromJson(Map<String, dynamic> json) => EatersModel(
