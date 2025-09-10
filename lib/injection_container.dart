@@ -73,9 +73,13 @@ Future<void> init() async {
 
   // FEATURES
   // Cubit
-  sl.registerFactory(() => SplashCubit(onboardingRepository: sl()));
+  sl.registerFactory(
+    () => SplashCubit(onboardingRepository: sl(), sharedPreferences: sl()),
+  );
   sl.registerFactory(() => OnboardingCubit(onboardingRepository: sl()));
-  sl.registerFactory(() => LoginCubit(onboardingRepository: sl()));
+  sl.registerFactory(
+    () => LoginCubit(onboardingRepository: sl(), sharedPreferences: sl()),
+  );
   sl.registerFactory(() => ScanCubit(onboardingRepository: sl()));
   sl.registerFactory(() => MealAnalysisCubit(foodRepository: sl()));
 }

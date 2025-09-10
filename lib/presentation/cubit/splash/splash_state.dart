@@ -9,6 +9,17 @@ abstract class SplashState extends Equatable {
 
 class SplashInitial extends SplashState {}
 
-class SplashAuthenticated extends SplashState {}
+class SplashAuthenticated extends SplashState {
+  final FamilyModel family;
+  final String loggedInUserName;
+
+  const SplashAuthenticated({
+    required this.family,
+    required this.loggedInUserName,
+  });
+
+  @override
+  List<Object> get props => [family, loggedInUserName];
+}
 
 class SplashUnauthenticated extends SplashState {}

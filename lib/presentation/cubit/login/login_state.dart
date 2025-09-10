@@ -13,10 +13,12 @@ class LoginLoading extends LoginState {}
 
 class LoginSuccess extends LoginState {
   final FamilyModel family;
-  const LoginSuccess({required this.family});
+  final String loggedInUserName;
+
+  const LoginSuccess({required this.family, required this.loggedInUserName});
 
   @override
-  List<Object> get props => [family];
+  List<Object> get props => [family, loggedInUserName];
 }
 
 class LoginFailure extends LoginState {
