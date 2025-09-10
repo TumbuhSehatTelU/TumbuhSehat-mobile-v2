@@ -10,6 +10,8 @@ import '../../cubit/meal_analysis/meal_analysis_cubit.dart';
 import '../../widgets/food_input_card.dart';
 import '../../widgets/ts_button.dart';
 import '../../widgets/ts_page_scaffold.dart';
+import '../../widgets/ts_success_modal.dart';
+import '../main/main_screen.dart';
 
 class ManualInputScreen extends StatefulWidget {
   final Set<ParentModel> selectedParents;
@@ -39,13 +41,21 @@ class _ManualInputScreenState extends State<ManualInputScreen> {
               builder: (_) => const Center(child: CircularProgressIndicator()),
             );
           } else if (state.status == MealAnalysisStatus.success) {
-            Navigator.of(context).pop(); // Tutup dialog
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Data makanan berhasil disimpan!')),
+            Navigator.of(context).pop();
+            showTSSuccessModal(
+              context: context,
+              message: 'Data Makanan Berhasil Disimpan!',
+              autoClose: true,
+              duration: const Duration(seconds: 3),
+              onClosed: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const MainScreen()),
+                  (route) => false,
+                );
+              },
             );
-            Navigator.of(context).pop(); // Kembali ke ScanScreen
           } else if (state.status == MealAnalysisStatus.error) {
-            Navigator.of(context).pop(); // Tutup dialog
+            Navigator.of(context).pop();
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.errorMessage ?? 'Terjadi kesalahan'),
