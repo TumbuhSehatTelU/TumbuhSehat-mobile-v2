@@ -167,7 +167,7 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
         }
       },
       child: TSPageScaffold(
-        title: 'Registrasi Data Diri',
+        title: 'Registrasi',
         body: Form(
           autovalidateMode: _hasAttemptedSubmit
               ? AutovalidateMode.onUserInteraction

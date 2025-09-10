@@ -9,10 +9,12 @@ import 'presentation/cubit/onboarding/onboarding_cubit.dart';
 import 'presentation/cubit/scan/scan_cubit.dart';
 import 'presentation/cubit/splash/splash_cubit.dart';
 import 'presentation/screens/splash_screen.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await di.init();
+  await initializeDateFormatting('id_ID', null);
   NetworkInfoImpl.setForceOffline(true);
   runApp(const MyApp());
 }
