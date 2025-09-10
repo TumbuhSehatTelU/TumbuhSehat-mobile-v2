@@ -5,8 +5,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
-import '../../core/theme/ts_color.dart';
-import '../../core/theme/ts_text_style.dart';
+import '../../../core/theme/ts_color.dart';
+import '../../../core/theme/ts_text_style.dart';
 
 class GenericLoadingModalContent extends StatefulWidget {
   final String lottieAnimation;

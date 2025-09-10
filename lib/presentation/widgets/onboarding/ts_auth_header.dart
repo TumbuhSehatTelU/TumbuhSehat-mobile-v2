@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../core/theme/ts_color.dart';
-import '../../core/theme/ts_text_style.dart';
-import '../../gen/assets.gen.dart';
+import '../../../core/theme/ts_color.dart';
+import '../../../core/theme/ts_text_style.dart';
+import '../../../gen/assets.gen.dart';
 
 class AuthHeader extends StatelessWidget {
   const AuthHeader({super.key});

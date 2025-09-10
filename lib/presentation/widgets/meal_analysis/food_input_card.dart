@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:mobile_tumbuh_sehat_v2/core/theme/ts_shadow.dart';
 import 'package:mobile_tumbuh_sehat_v2/core/theme/ts_text_style.dart';
-import '../../core/theme/ts_color.dart';
-import '../../data/models/food_model.dart';
-import '../../data/models/urt_model.dart';
-import '../cubit/meal_analysis/meal_analysis_cubit.dart';
+import '../../../core/theme/ts_color.dart';
+import '../../../data/models/food_model.dart';
+import '../../../data/models/urt_model.dart';
+import '../../cubit/meal_analysis/meal_analysis_cubit.dart';
 
 class FoodInputCard extends StatelessWidget {
   final FoodCardData cardData;

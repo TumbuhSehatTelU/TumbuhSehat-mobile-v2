@@ -3,13 +3,13 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../core/theme/ts_color.dart';
-import '../../core/theme/ts_shadow.dart';
-import '../../core/theme/ts_text_style.dart';
-import '../../data/models/child_model.dart';
-import '../screens/onboarding/add_child_screen.dart';
-import 'ts_button.dart';
-import 'ts_text_field.dart';
+import '../../../core/theme/ts_color.dart';
+import '../../../core/theme/ts_shadow.dart';
+import '../../../core/theme/ts_text_style.dart';
+import '../../../data/models/child_model.dart';
+import '../../screens/onboarding/add_child_screen.dart';
+import '../common/ts_button.dart';
+import '../common/ts_text_field.dart';
 
 class ChildFormCard extends StatefulWidget {
   final ChildFormData formData;

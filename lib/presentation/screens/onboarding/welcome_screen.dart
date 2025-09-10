@@ -7,9 +7,9 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/ts_text_style.dart';
 import '../../../gen/assets.gen.dart';
 import '../../../core/theme/ts_color.dart';
-import '../../widgets/ts_auth_header.dart';
-import '../../widgets/ts_button.dart';
-import '../../widgets/ts_page_scaffold.dart';
+import '../../widgets/onboarding/ts_auth_header.dart';
+import '../../widgets/common/ts_button.dart';
+import '../../widgets/layouts/ts_page_scaffold.dart';
 import '../main/main_screen.dart';
 
 class WelcomeScreen extends StatefulWidget {

@@ -6,9 +6,9 @@ import 'package:mobile_tumbuh_sehat_v2/core/theme/ts_text_style.dart';
 import '../../../core/theme/ts_color.dart';
 import '../../../data/models/parent_model.dart';
 import '../../cubit/onboarding/onboarding_cubit.dart';
-import '../../widgets/ts_button.dart';
-import '../../widgets/ts_dropdown.dart';
-import '../../widgets/ts_page_scaffold.dart';
+import '../../widgets/common/ts_button.dart';
+import '../../widgets/common/ts_dropdown.dart';
+import '../../widgets/layouts/ts_page_scaffold.dart';
 import 'lactation_check_screen.dart';
 
 class PregnancyCheckScreen extends StatefulWidget {

@@ -7,10 +7,10 @@ import '../../../data/models/child_model.dart';
 import '../../../data/models/parent_model.dart';
 import '../../../injection_container.dart';
 import '../../cubit/meal_analysis/meal_analysis_cubit.dart';
-import '../../widgets/food_input_card.dart';
-import '../../widgets/ts_button.dart';
-import '../../widgets/ts_page_scaffold.dart';
-import '../../widgets/ts_success_modal.dart';
+import '../../widgets/meal_analysis/food_input_card.dart';
+import '../../widgets/common/ts_button.dart';
+import '../../widgets/layouts/ts_page_scaffold.dart';
+import '../../widgets/dialogs_and_modals/ts_success_modal.dart';
 import '../main/main_screen.dart';
 
 class ManualInputScreen extends StatefulWidget {

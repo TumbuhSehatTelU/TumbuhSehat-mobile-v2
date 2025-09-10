@@ -3,8 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../core/theme/ts_color.dart';
-import '../../core/theme/ts_text_style.dart';
+import '../../../core/theme/ts_color.dart';
+import '../../../core/theme/ts_text_style.dart';
 
 FormFieldValidator<String> TSValidator(
   List<bool Function(String)> logicList,

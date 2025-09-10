@@ -8,10 +8,10 @@ import '../../../core/theme/ts_color.dart';
 import '../../../core/theme/ts_text_style.dart';
 import '../../../injection_container.dart';
 import '../../cubit/login/login_cubit.dart';
-import '../../widgets/ts_auth_header.dart';
-import '../../widgets/ts_button.dart';
-import '../../widgets/ts_page_scaffold.dart';
-import '../../widgets/ts_text_field.dart';
+import '../../widgets/onboarding/ts_auth_header.dart';
+import '../../widgets/common/ts_button.dart';
+import '../../widgets/layouts/ts_page_scaffold.dart';
+import '../../widgets/common/ts_text_field.dart';
 import 'join_or_create_screen.dart';
 
 class LoginScreen extends StatefulWidget {

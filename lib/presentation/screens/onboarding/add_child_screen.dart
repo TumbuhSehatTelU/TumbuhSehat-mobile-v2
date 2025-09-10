@@ -7,9 +7,9 @@ import '../../../core/theme/ts_color.dart';
 import '../../../core/theme/ts_text_style.dart';
 import '../../../data/models/child_model.dart';
 import '../../cubit/onboarding/onboarding_cubit.dart';
-import '../../widgets/child_form_card.dart';
-import '../../widgets/ts_button.dart';
-import '../../widgets/ts_page_scaffold.dart';
+import '../../widgets/onboarding/child_form_card.dart';
+import '../../widgets/common/ts_button.dart';
+import '../../widgets/layouts/ts_page_scaffold.dart';
 import 'login_screen.dart';
 
 class ChildFormData {

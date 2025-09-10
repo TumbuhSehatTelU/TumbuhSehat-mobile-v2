@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../core/theme/ts_color.dart';
-import '../../core/theme/ts_shadow.dart';
-import '../../core/theme/ts_text_style.dart';
+import '../../../core/theme/ts_color.dart';
+import '../../../core/theme/ts_shadow.dart';
+import '../../../core/theme/ts_text_style.dart';
 
 class TSDropdown<T> extends StatelessWidget {
   final String label;

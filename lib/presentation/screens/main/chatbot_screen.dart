@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import '../../widgets/ts_page_scaffold.dart';
+import '../../widgets/layouts/ts_page_scaffold.dart';
 
 class ChatbotScreen extends StatefulWidget {
   const ChatbotScreen({super.key});
