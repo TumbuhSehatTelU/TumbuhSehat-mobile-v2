@@ -88,6 +88,23 @@ class DatabaseHelper {
       CHECK (parent_name IS NOT NULL OR child_name IS NOT NULL)
     )
   ''');
+
+    // AKG
+    await db.execute('''
+    CREATE TABLE akg_standards (
+      id INTEGER PRIMARY KEY,
+      category TEXT NOT NULL,
+      gender TEXT NOT NULL,
+      start_month INTEGER NOT NULL,
+      end_month INTEGER NOT NULL,
+      calories REAL,
+      protein REAL,
+      fat REAL,
+      carbohydrates REAL,
+      fiber REAL,
+      water REAL
+    )
+  ''');
   }
 
   Future<void> _seedDatabase(Database db) async {
@@ -105,6 +122,11 @@ class DatabaseHelper {
       db: db,
       tableName: 'food_serving_options',
       csvPath: 'assets/db/food_serving_options.csv',
+    );
+    await _seedTableFromCSV(
+      db: db,
+      tableName: 'akg_standards',
+      csvPath: 'assets/db/akg_standards.csv',
     );
   }
 
