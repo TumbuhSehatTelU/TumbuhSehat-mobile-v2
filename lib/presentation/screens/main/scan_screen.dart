@@ -53,7 +53,10 @@ class _ScanScreenState extends State<ScanScreen> {
     Widget destination;
     switch (_selectedType!) {
       case AnalysisType.manual:
-        destination = const ManualInputScreen();
+        destination = ManualInputScreen(
+          selectedParents: _selectedParents,
+          selectedChildren: _selectedChildren,
+        );
         break;
       case AnalysisType.photo:
         destination = const PhotoScanScreen();
@@ -70,6 +73,7 @@ class _ScanScreenState extends State<ScanScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          const SizedBox(height: 24),
           Text(
             'Pilih cara menganalisis makanan',
             style: getResponsiveTextStyle(
@@ -142,13 +146,7 @@ class _ScanScreenState extends State<ScanScreen> {
   @override
   Widget build(BuildContext context) {
     return TSPageScaffold(
-      appBar: AppBar(
-        title: const Text('Analisis Gizi'),
-        titleTextStyle: getResponsiveTextStyle(
-          context,
-          TSFont.bold.h1.withColor(TSColor.monochrome.black),
-        ),
-      ),
+      title: 'Analisis Gizi',
       body: BlocBuilder<ScanCubit, ScanState>(
         builder: (context, state) {
           if (state is ScanLoading) {

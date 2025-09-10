@@ -148,12 +148,12 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
                 const Center(child: CircularProgressIndicator()),
           );
         } else if (state is OnboardingFailure) {
-          Navigator.of(context).pop(); 
+          Navigator.of(context).pop();
           ScaffoldMessenger.of(
             context,
           ).showSnackBar(SnackBar(content: Text(state.message)));
         } else if (state is OnboardingSuccess) {
-          Navigator.of(context).pop(); 
+          Navigator.of(context).pop();
           if (!widget.isJoiningFamily) {
             Navigator.of(context).push(
               MaterialPageRoute(builder: (context) => const AddChildScreen()),
@@ -167,7 +167,7 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
         }
       },
       child: TSPageScaffold(
-        appBar: AppBar(title: const Text('Registrasi Data Diri')),
+        title: 'Registrasi Data Diri',
         body: Form(
           autovalidateMode: _hasAttemptedSubmit
               ? AutovalidateMode.onUserInteraction

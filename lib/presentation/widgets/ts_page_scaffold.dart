@@ -1,15 +1,23 @@
 import 'package:flutter/material.dart';
 
+import 'ts_app_bar.dart';
+
 class TSPageScaffold extends StatelessWidget {
   final Widget body;
-  final AppBar? appBar;
+  final String? title;
+  final List<Widget>? actions;
+  final VoidCallback? onBackButtonPressed;
+  final bool showBackButton;
   final Widget? floatingActionButton;
   final Widget? bottomNavigationBar;
 
   const TSPageScaffold({
     super.key,
     required this.body,
-    this.appBar,
+    this.title,
+    this.actions,
+    this.onBackButtonPressed,
+    this.showBackButton = true,
     this.floatingActionButton,
     this.bottomNavigationBar,
   });
@@ -27,7 +35,14 @@ class TSPageScaffold extends StatelessWidget {
     return GestureDetector(
       onTap: unfocusKeyboard,
       child: Scaffold(
-        appBar: appBar,
+        appBar: title != null
+            ? TSAppBar(
+                title: title!,
+                actions: actions,
+                onBackButtonPressed: onBackButtonPressed,
+                showBackButton: showBackButton,
+              )
+            : null,
         body: SafeArea(
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: horizontalPadding),

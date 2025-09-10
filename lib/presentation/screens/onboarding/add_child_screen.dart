@@ -143,7 +143,7 @@ class _AddChildScreenState extends State<AddChildScreen> {
         }
       },
       child: TSPageScaffold(
-        appBar: AppBar(title: const Text('Tambah Data Anak')),
+        title: 'Tambah Data Anak',
         body: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(vertical: 24),
           child: Column(

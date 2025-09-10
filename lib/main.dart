@@ -31,7 +31,11 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Tumbuh Sehat',
         theme: ThemeData(
+          useMaterial3: true,
           fontFamily: 'OpenSans',
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: TSColor.mainTosca.primary,
+          ),
           primarySwatch: Colors.lightGreen,
           visualDensity: VisualDensity.adaptivePlatformDensity,
           scaffoldBackgroundColor: TSColor.monochrome.white,

@@ -61,7 +61,7 @@ class _PregnancyCheckScreenState extends State<PregnancyCheckScreen> {
         }
 
         return TSPageScaffold(
-          appBar: AppBar(title: const Text('Kondisi Kehamilan')),
+          title: 'Kondisi Kehamilan',
           body: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,

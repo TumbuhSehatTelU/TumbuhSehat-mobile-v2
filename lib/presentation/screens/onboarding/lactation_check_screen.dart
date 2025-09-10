@@ -76,7 +76,7 @@ class _LactationCheckScreenState extends State<LactationCheckScreen> {
         }
 
         return TSPageScaffold(
-          appBar: AppBar(title: const Text('Kondisi Menyusui')),
+          title: 'Kondisi Menyusui',
           body: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
