@@ -40,13 +40,13 @@ class MyApp extends StatelessWidget {
           visualDensity: VisualDensity.adaptivePlatformDensity,
           scaffoldBackgroundColor: TSColor.monochrome.white,
           checkboxTheme: CheckboxThemeData(
-            fillColor: MaterialStateProperty.resolveWith((states) {
-              if (states.contains(MaterialState.selected)) {
+            fillColor: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.selected)) {
                 return TSColor.secondaryGreen.primary;
               }
               return TSColor.monochrome.white;
             }),
-            checkColor: MaterialStateProperty.all(TSColor.monochrome.black),
+            checkColor: WidgetStateProperty.all(TSColor.monochrome.black),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(4),
             ),
