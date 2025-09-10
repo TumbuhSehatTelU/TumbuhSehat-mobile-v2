@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_tumbuh_sehat_v2/core/theme/ts_color.dart';
 import 'core/network/network_info.dart';
 import 'injection_container.dart' as di;
+import 'presentation/cubit/beranda/beranda_cubit.dart';
 import 'presentation/cubit/login/login_cubit.dart';
 import 'presentation/cubit/onboarding/onboarding_cubit.dart';
 import 'presentation/cubit/scan/scan_cubit.dart';
@@ -27,6 +28,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => di.sl<OnboardingCubit>()),
         BlocProvider(create: (_) => di.sl<LoginCubit>()),
         BlocProvider(create: (_) => di.sl<ScanCubit>()),
+        BlocProvider(create: (_) => di.sl<BerandaCubit>()),
       ],
       child: MaterialApp(
         title: 'Tumbuh Sehat',

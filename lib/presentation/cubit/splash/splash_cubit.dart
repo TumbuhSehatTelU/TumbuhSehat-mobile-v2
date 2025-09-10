@@ -20,9 +20,7 @@ class SplashCubit extends Cubit<SplashState> {
   Future<void> checkAuthStatus() async {
     final result = await onboardingRepository.getCachedFamily();
 
-    result.fold(
-      (failure) => emit(SplashUnauthenticated()),
-      (family) {
+    result.fold((failure) => emit(SplashUnauthenticated()), (family) {
       final loggedInUserName = sharedPreferences.getString(
         LOGGED_IN_USER_NAME_KEY,
       );
@@ -36,7 +34,6 @@ class SplashCubit extends Cubit<SplashState> {
       } else {
         emit(SplashUnauthenticated());
       }
-    },
-    );
+    });
   }
 }

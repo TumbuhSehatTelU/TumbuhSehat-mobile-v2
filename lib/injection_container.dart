@@ -13,6 +13,7 @@ import 'data/repositories/food_repository_impl.dart';
 import 'data/repositories/onboarding_repository_impl.dart';
 import 'domain/repositories/food_repository.dart';
 import 'domain/repositories/onboarding_repository.dart';
+import 'presentation/cubit/beranda/beranda_cubit.dart';
 import 'presentation/cubit/login/login_cubit.dart';
 import 'presentation/cubit/meal_analysis/meal_analysis_cubit.dart';
 import 'presentation/cubit/onboarding/onboarding_cubit.dart';
@@ -81,5 +82,8 @@ Future<void> init() async {
     () => LoginCubit(onboardingRepository: sl(), sharedPreferences: sl()),
   );
   sl.registerFactory(() => ScanCubit(onboardingRepository: sl()));
+  sl.registerFactory(
+    () => BerandaCubit(onboardingRepository: sl(), sharedPreferences: sl()),
+  );
   sl.registerFactory(() => MealAnalysisCubit(foodRepository: sl()));
 }
