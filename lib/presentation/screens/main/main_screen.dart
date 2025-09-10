@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
@@ -43,50 +45,60 @@ class _MainScreenState extends State<MainScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: _onScanPressed,
         backgroundColor: TSColor.mainTosca.primary,
+        shape: const CircleBorder(),
         child: SvgPicture.asset(
           Assets.icons.scan.path,
           colorFilter: ColorFilter.mode(
             TSColor.monochrome.pureWhite,
             BlendMode.srcIn,
           ),
-          width: 24,
-          height: 24,
+          width: 32,
+          height: 32,
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: AnimatedBottomNavigationBar.builder(
-        itemCount: _pages.length,
-        tabBuilder: (int index, bool isActive) {
-          final iconName = _iconNames[index];
-          final color = isActive
-              ? TSColor.mainTosca.primary
-              : TSColor.monochrome.black;
-          final style = isActive ? TSFont.bold.small : TSFont.regular.small;
-          final assetPath = isActive
-              ? 'assets/icons/$iconName Active.svg'
-              : 'assets/icons/$iconName Inactive.svg';
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              spreadRadius: 0,
+              blurRadius: 24,
+              offset: const Offset(0, -15),
+            ),
+          ],
+        ),
+        child: AnimatedBottomNavigationBar.builder(
+          height: 80,
+          backgroundColor: TSColor.monochrome.white,
+          itemCount: _pages.length,
+          tabBuilder: (int index, bool isActive) {
+            final iconName = _iconNames[index];
+            final color = isActive
+                ? TSColor.mainTosca.primary
+                : TSColor.monochrome.black;
+            final style = isActive ? TSFont.bold.small : TSFont.regular.small;
+            final assetPath = isActive
+                ? 'assets/icons/$iconName Active.svg'
+                : 'assets/icons/$iconName Inactive.svg';
 
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SvgPicture.asset(
-                assetPath,
-                width: 24,
-                height: 24,
-                colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
-              ),
-              const SizedBox(height: 4),
-              Text(iconName, style: style.withColor(color)),
-            ],
-          );
-        },
-        activeIndex: _activeIndex,
-        gapLocation: GapLocation.center,
-        notchSmoothness: NotchSmoothness.softEdge,
-        leftCornerRadius: 32,
-        rightCornerRadius: 32,
-        onTap: (index) => setState(() => _activeIndex = index),
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SvgPicture.asset(assetPath, width: 24, height: 24),
+                const SizedBox(height: 4),
+                Text(iconName, style: style.withColor(color)),
+              ],
+            );
+          },
+          activeIndex: _activeIndex,
+          gapLocation: GapLocation.center,
+          notchSmoothness: NotchSmoothness.softEdge,
+          leftCornerRadius: 24,
+          rightCornerRadius: 24,
+          onTap: (index) => setState(() => _activeIndex = index),
+        ),
       ),
     );
   }
