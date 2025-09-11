@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:dartz/dartz.dart';
+import 'package:sqflite/sqflite.dart';
 import '../../core/database/database_helper.dart';
 import '../../core/error/failures.dart';
 import '../../domain/repositories/nutrition_repository.dart';
@@ -18,7 +19,8 @@ class NutritionRepositoryImpl implements NutritionRepository {
   @override
   Future<Either<Failure, WeeklySummaryModel>> getWeeklySummary({
     required dynamic member,
-    required DateTime targetDate,
+    required DateTime endDate,
+    required Duration duration,
   }) async {
     try {
       final akgStandard = await _calculateAkgForMember(member);
@@ -30,11 +32,7 @@ class NutritionRepositoryImpl implements NutritionRepository {
         );
       }
 
-      final weekStartDate = targetDate.subtract(
-        Duration(days: targetDate.weekday - 1),
-      );
-      final weekEndDate = weekStartDate.add(const Duration(days: 7));
-
+      final startDate = endDate.subtract(duration);
       final db = await dbHelper.database;
       final historyMaps = await db.query(
         'meal_histories as mh '
@@ -45,15 +43,16 @@ class NutritionRepositoryImpl implements NutritionRepository {
         whereArgs: [
           member.name,
           member.name,
-          weekStartDate.millisecondsSinceEpoch,
-          weekEndDate.millisecondsSinceEpoch,
+          startDate.millisecondsSinceEpoch,
+          endDate.millisecondsSinceEpoch,
         ],
       );
 
       final summary = await _processHistoryData(
         historyMaps,
         akgStandard,
-        weekStartDate,
+        startDate,
+        endDate,
       );
 
       return Right(summary);
@@ -196,48 +195,15 @@ class NutritionRepositoryImpl implements NutritionRepository {
   Future<WeeklySummaryModel> _processHistoryData(
     List<Map<String, dynamic>> maps,
     AkgModel akg,
-    DateTime weekStart,
+    DateTime startDate,
+    DateTime endDate,
   ) async {
-    if (maps.isEmpty) {
-      return WeeklySummaryModel(
-        akgStandard: akg,
-        nutrientSummaries: {
-          'calories': NutrientSummary(totalIntake: 0, target: akg.calories * 7),
-          'protein': NutrientSummary(totalIntake: 0, target: akg.protein * 7),
-          'fat': NutrientSummary(totalIntake: 0, target: akg.fat * 7),
-          'carbohydrates': NutrientSummary(
-            totalIntake: 0,
-            target: akg.carbohydrates * 7,
-          ),
-          'fiber': NutrientSummary(totalIntake: 0, target: akg.fiber * 7),
-        },
-        dailyIntakes: List.generate(
-          7,
-          (i) => DailyCaloryIntake(
-            date: weekStart.add(Duration(days: i)),
-            totalCalories: 0,
-          ),
-        ),
-        dailyMealEntries: {},
-      );
-    }
+    final Map<String, double> totalNutrientsInRange = {};
+    final Map<DateTime, double> dailyTotalCalories = {};
+    final Map<DateTime, List<MealEntry>> dailyMealEntries = {};
 
     final db = await dbHelper.database;
-    final uniqueFoodNames = maps.map((m) => m['food_name'] as String).toSet();
-
-    final foodNutrientMaps = await db.query(
-      'foods',
-      where: 'name IN (${List.filled(uniqueFoodNames.length, '?').join(',')})',
-      whereArgs: uniqueFoodNames.toList(),
-    );
-
-    final foodNutrientLookup = {
-      for (var foodMap in foodNutrientMaps) foodMap['name'] as String: foodMap,
-    };
-
-    final Map<String, double> weeklyTotalNutrients = {};
-    final Map<int, double> dailyTotalCalories = {};
-    final Map<DateTime, List<MealEntry>> dailyMealEntries = {};
+    final foodNutrientLookup = await _getFoodNutrientLookup(maps, db);
 
     for (final map in maps) {
       final foodName = map['food_name'] as String;
@@ -247,42 +213,38 @@ class NutritionRepositoryImpl implements NutritionRepository {
       );
 
       final Map<String, dynamic>? foodNutrients = foodNutrientLookup[foodName];
-      if (foodNutrients == null) {
-        continue;
-      }
+      if (foodNutrients == null) continue;
 
       final factor = totalGrams / 100.0;
       double componentCalories = 0;
+
       foodNutrients.forEach((key, value) {
         if (value is num) {
           final nutrientValue = value.toDouble() * factor;
-          weeklyTotalNutrients.update(
+          totalNutrientsInRange.update(
             key,
             (v) => v + nutrientValue,
             ifAbsent: () => nutrientValue,
           );
-          if (key == 'calories') {
-            componentCalories = nutrientValue;
-          }
+          if (key == 'calories') componentCalories = nutrientValue;
         }
       });
 
-      final dayOfWeek = timestamp.weekday;
+      final dateOnly = DateTime(timestamp.year, timestamp.month, timestamp.day);
       dailyTotalCalories.update(
-        dayOfWeek,
+        dateOnly,
         (v) => v + componentCalories,
         ifAbsent: () => componentCalories,
       );
 
-      final dateOnly = DateTime(timestamp.year, timestamp.month, timestamp.day);
       final mealComponent = MealComponentEntry(
         foodName: foodName,
         calories: componentCalories,
       );
+      final mealList = dailyMealEntries.putIfAbsent(dateOnly, () => []);
 
-      var mealList = dailyMealEntries.putIfAbsent(dateOnly, () => []);
-      var mealEntry = mealList.firstWhere(
-        (entry) => entry.time.isAtSameMomentAs(timestamp),
+      var existingEntry = mealList.firstWhere(
+        (e) => e.time.isAtSameMomentAs(timestamp),
         orElse: () {
           final newEntry = MealEntry(
             time: timestamp,
@@ -293,8 +255,9 @@ class NutritionRepositoryImpl implements NutritionRepository {
           return newEntry;
         },
       );
-      mealEntry.components.add(mealComponent);
+      existingEntry.components.add(mealComponent);
     }
+
     dailyMealEntries.forEach((date, meals) {
       for (var i = 0; i < meals.length; i++) {
         final totalMealCalories = meals[i].components.fold<double>(
@@ -307,36 +270,39 @@ class NutritionRepositoryImpl implements NutritionRepository {
           components: meals[i].components,
         );
       }
+      meals.sort((a, b) => a.time.compareTo(b.time));
     });
 
+    final numberOfDays = endDate.difference(startDate).inDays;
     final nutrientSummaries = {
       'calories': NutrientSummary(
-        totalIntake: weeklyTotalNutrients['calories'] ?? 0,
-        target: akg.calories * 7,
+        totalIntake: totalNutrientsInRange['calories'] ?? 0,
+        target: akg.calories * numberOfDays,
       ),
       'protein': NutrientSummary(
-        totalIntake: weeklyTotalNutrients['protein'] ?? 0,
-        target: akg.protein * 7,
+        totalIntake: totalNutrientsInRange['protein'] ?? 0,
+        target: akg.protein * numberOfDays,
       ),
       'fat': NutrientSummary(
-        totalIntake: weeklyTotalNutrients['fat'] ?? 0,
-        target: akg.fat * 7,
+        totalIntake: totalNutrientsInRange['fat'] ?? 0,
+        target: akg.fat * numberOfDays,
       ),
       'carbohydrates': NutrientSummary(
-        totalIntake: weeklyTotalNutrients['carbohydrates'] ?? 0,
-        target: akg.carbohydrates * 7,
+        totalIntake: totalNutrientsInRange['carbohydrates'] ?? 0,
+        target: akg.carbohydrates * numberOfDays,
       ),
       'fiber': NutrientSummary(
-        totalIntake: weeklyTotalNutrients['fiber'] ?? 0,
-        target: akg.fiber * 7,
+        totalIntake: totalNutrientsInRange['fiber'] ?? 0,
+        target: akg.fiber * numberOfDays,
       ),
     };
 
-    final dailyIntakes = List.generate(7, (index) {
-      final date = weekStart.add(Duration(days: index));
+    final dailyIntakes = List.generate(numberOfDays, (index) {
+      final date = startDate.add(Duration(days: index));
+      final dateOnly = DateTime(date.year, date.month, date.day);
       return DailyCaloryIntake(
-        date: date,
-        totalCalories: dailyTotalCalories[date.weekday] ?? 0,
+        date: dateOnly,
+        totalCalories: dailyTotalCalories[dateOnly] ?? 0,
       );
     });
 
@@ -346,6 +312,25 @@ class NutritionRepositoryImpl implements NutritionRepository {
       dailyIntakes: dailyIntakes,
       dailyMealEntries: dailyMealEntries,
     );
+  }
+
+  Future<Map<String, Map<String, dynamic>>> _getFoodNutrientLookup(
+    List<Map<String, dynamic>> maps,
+    Database db,
+  ) async {
+    if (maps.isEmpty) return {};
+
+    final uniqueFoodNames = maps.map((m) => m['food_name'] as String).toSet();
+
+    final foodNutrientMaps = await db.query(
+      'foods',
+      where: 'name IN (${List.filled(uniqueFoodNames.length, '?').join(',')})',
+      whereArgs: uniqueFoodNames.toList(),
+    );
+
+    return {
+      for (var foodMap in foodNutrientMaps) foodMap['name'] as String: foodMap,
+    };
   }
 
   Future<double> _computeHAZ(

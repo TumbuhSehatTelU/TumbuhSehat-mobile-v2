@@ -42,7 +42,8 @@ class _BerandaScreenState extends State<BerandaScreen> {
 
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (_) => CaloryHistoryScreen(memberName: currentMember.name),
+          builder: (_) =>
+              CaloryHistoryScreen(initialMemberName: currentMember.name),
         ),
       );
     }

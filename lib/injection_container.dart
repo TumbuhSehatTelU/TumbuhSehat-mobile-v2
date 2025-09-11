@@ -93,5 +93,10 @@ Future<void> init() async {
     () => BerandaCubit(onboardingRepository: sl(), sharedPreferences: sl()),
   );
   sl.registerFactory(() => MealAnalysisCubit(foodRepository: sl()));
-  sl.registerFactory(() => CaloryHistoryCubit(nutritionRepository: sl()));
+  sl.registerFactory(
+    () => CaloryHistoryCubit(
+      nutritionRepository: sl(),
+      onboardingRepository: sl(),
+    ),
+  );
 }
