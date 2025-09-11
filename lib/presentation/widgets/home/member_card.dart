@@ -4,6 +4,7 @@ import 'package:mesh_gradient/mesh_gradient.dart';
 import 'package:mobile_tumbuh_sehat_v2/core/theme/ts_text_style.dart';
 import '../../../core/theme/ts_color.dart';
 import '../../../data/models/child_model.dart';
+import '../common/circular_nav_button.dart';
 
 class MemberCard extends StatelessWidget {
   final dynamic member;
@@ -62,7 +63,7 @@ class MemberCard extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildNavButton(
+                  CircularNavButton(
                     icon: Icons.arrow_back,
                     onPressed: () {
                       final currentPage = pageController.page!.round();
@@ -82,7 +83,7 @@ class MemberCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                  _buildNavButton(
+                  CircularNavButton(
                     icon: Icons.arrow_forward,
                     onPressed: () {
                       final currentPage = pageController.page!.round();
@@ -98,25 +99,6 @@ class MemberCard extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildNavButton({
-    required IconData icon,
-    required VoidCallback onPressed,
-  }) {
-    return Container(
-      width: 32,
-      height: 32,
-      decoration: BoxDecoration(
-        color: TSColor.monochrome.pureWhite,
-        shape: BoxShape.circle,
-      ),
-      child: IconButton(
-        icon: Icon(icon, color: TSColor.monochrome.black, size: 24),
-        padding: EdgeInsets.zero,
-        onPressed: onPressed,
       ),
     );
   }
