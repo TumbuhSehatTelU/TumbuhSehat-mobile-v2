@@ -105,6 +105,60 @@ class DatabaseHelper {
       water REAL
     )
   ''');
+
+    await db.execute('''
+    CREATE TABLE who_haz_boys (
+      unit TEXT NOT NULL,
+      value INTEGER NOT NULL,
+      L REAL NOT NULL,
+      M REAL NOT NULL,
+      S REAL NOT NULL,
+      PRIMARY KEY (unit, value)
+    )
+  ''');
+    await db.execute('''
+    CREATE TABLE who_haz_girls (
+      unit TEXT NOT NULL,
+      value INTEGER NOT NULL,
+      L REAL NOT NULL,
+      M REAL NOT NULL,
+      S REAL NOT NULL,
+      PRIMARY KEY (unit, value)
+    )
+  ''');
+
+    await db.execute('''
+    CREATE TABLE who_whz_boys_0_2_years (
+      height_cm REAL PRIMARY KEY,
+      L REAL NOT NULL,
+      M REAL NOT NULL,
+      S REAL NOT NULL
+    )
+  ''');
+    await db.execute('''
+    CREATE TABLE who_whz_boys_2_5_years (
+      height_cm REAL PRIMARY KEY,
+      L REAL NOT NULL,
+      M REAL NOT NULL,
+      S REAL NOT NULL
+    )
+  ''');
+    await db.execute('''
+    CREATE TABLE who_whz_girls_0_2_years (
+      height_cm REAL PRIMARY KEY,
+      L REAL NOT NULL,
+      M REAL NOT NULL,
+      S REAL NOT NULL
+    )
+  ''');
+    await db.execute('''
+    CREATE TABLE who_whz_girls_2_5_years (
+      height_cm REAL PRIMARY KEY,
+      L REAL NOT NULL,
+      M REAL NOT NULL,
+      S REAL NOT NULL
+    )
+  ''');
   }
 
   Future<void> _seedDatabase(Database db) async {
@@ -127,6 +181,38 @@ class DatabaseHelper {
       db: db,
       tableName: 'akg_standards',
       csvPath: 'assets/db/akg_standards.csv',
+    );
+    await _seedTableFromCSV(
+      db: db,
+      tableName: 'who_haz_boys',
+      csvPath: 'assets/db/who_haz_boys.csv',
+    );
+    await _seedTableFromCSV(
+      db: db,
+      tableName: 'who_haz_girls',
+      csvPath: 'assets/db/who_haz_girls.csv',
+    );
+
+    // Seeding Tabel WHZ
+    await _seedTableFromCSV(
+      db: db,
+      tableName: 'who_whz_boys_0_2_years',
+      csvPath: 'assets/db/who_whz_boys_0_2_years.csv',
+    );
+    await _seedTableFromCSV(
+      db: db,
+      tableName: 'who_whz_boys_2_5_years',
+      csvPath: 'assets/db/who_whz_boys_2_5_years.csv',
+    );
+    await _seedTableFromCSV(
+      db: db,
+      tableName: 'who_whz_girls_0_2_years',
+      csvPath: 'assets/db/who_whz_girls_0_2_years.csv',
+    );
+    await _seedTableFromCSV(
+      db: db,
+      tableName: 'who_whz_girls_2_5_years',
+      csvPath: 'assets/db/who_whz_girls_2_5_years.csv',
     );
   }
 
