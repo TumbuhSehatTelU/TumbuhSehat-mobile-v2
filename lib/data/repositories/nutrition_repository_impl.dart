@@ -1,9 +1,12 @@
+import 'dart:math';
+
 import 'package:dartz/dartz.dart';
 import '../../core/database/database_helper.dart';
 import '../../core/error/failures.dart';
 import '../../domain/repositories/nutrition_repository.dart';
 import '../models/akg_model.dart';
 import '../models/child_model.dart';
+import '../models/lms_model.dart';
 import '../models/parent_model.dart';
 import '../models/weekly_summary_model.dart';
 
@@ -18,7 +21,7 @@ class NutritionRepositoryImpl implements NutritionRepository {
     required DateTime targetDate,
   }) async {
     try {
-      final akgStandard = await _getAkgForMember(member);
+      final akgStandard = await _calculateAkgForMember(member);
       if (akgStandard == null) {
         return Left(
           CacheFailure(
@@ -59,26 +62,75 @@ class NutritionRepositoryImpl implements NutritionRepository {
     }
   }
 
-  Future<AkgModel?> _getAkgForMember(dynamic member) async {
+  Future<AkgModel?> _calculateAkgForMember(dynamic member) async {
+    final baseAkg = await _getBaseAkgForMember(member);
+    if (baseAkg == null) return null;
+
+    if (member is! ChildModel) {
+      return baseAkg;
+    }
+
+    final child = member;
+    final ageInDays = DateTime.now().difference(child.dateOfBirth).inDays;
+
+    final haz = await _computeHAZ(ageInDays, child.height, child.gender);
+    final whz = await _computeWHZ(
+      ageInDays,
+      child.weight,
+      child.height,
+      child.gender,
+    );
+
+    double extraCalories = 0;
+    double extraProtein = 0;
+
+    if (whz < -2) {
+      final energyNeed = child.weight * 117.5;
+      final proteinNeed = child.weight * 2.8;
+      extraCalories = max(0, energyNeed - baseAkg.calories);
+      extraProtein = max(0, proteinNeed - baseAkg.protein);
+    }
+
+    if (haz < -2) {
+      extraCalories += baseAkg.calories * 0.13;
+      extraProtein += baseAkg.protein * 0.32;
+    }
+
+    return baseAkg.copyWith(
+      calories: baseAkg.calories + extraCalories,
+      protein: baseAkg.protein + extraProtein,
+      fat: baseAkg.fat,
+      carbohydrates: baseAkg.carbohydrates,
+      fiber: baseAkg.fiber,
+      water: baseAkg.water,
+    );
+  }
+
+  Future<AkgModel?> _getBaseAkgForMember(dynamic member) async {
     final db = await dbHelper.database;
     final now = DateTime.now();
     int ageInMonths;
     String genderString;
+    String category;
 
     if (member is ParentModel) {
       ageInMonths = (now.difference(member.dateOfBirth).inDays / 30).floor();
       genderString = member.gender == Gender.male ? 'male' : 'female';
+      category = genderString;
     } else if (member is ChildModel) {
       ageInMonths = (now.difference(member.dateOfBirth).inDays / 30).floor();
       genderString = 'unspecified';
+      category = 'child';
     } else {
       return null;
     }
 
     final List<Map<String, dynamic>> maps = await db.query(
       'akg_standards',
-      where: 'gender = ? AND ? BETWEEN start_month AND end_month',
-      whereArgs: [genderString, ageInMonths],
+      where:
+          '(category = ? OR gender = ?) AND ? BETWEEN start_month AND end_month',
+      whereArgs: [category, genderString, ageInMonths],
+      limit: 1,
     );
 
     if (maps.isEmpty) return null;
@@ -107,9 +159,10 @@ class NutritionRepositoryImpl implements NutritionRepository {
           where: 'category = ?',
           whereArgs: [pregnancyCategory],
         );
-        if (pregMaps.isNotEmpty) baseAkg += AkgModel.fromMap(pregMaps.first);
+        if (pregMaps.isNotEmpty) {
+          baseAkg += AkgModel.fromMap(pregMaps.first);
+        }
       }
-
       if (member.isLactating &&
           member.lactationPeriod != LactationPeriod.none) {
         String lactationCategory;
@@ -130,7 +183,9 @@ class NutritionRepositoryImpl implements NutritionRepository {
             where: 'category = ?',
             whereArgs: [lactationCategory],
           );
-          if (lactMaps.isNotEmpty) baseAkg += AkgModel.fromMap(lactMaps.first);
+          if (lactMaps.isNotEmpty) {
+            baseAkg += AkgModel.fromMap(lactMaps.first);
+          }
         }
       }
     }
@@ -291,5 +346,81 @@ class NutritionRepositoryImpl implements NutritionRepository {
       dailyIntakes: dailyIntakes,
       dailyMealEntries: dailyMealEntries,
     );
+  }
+
+  Future<double> _computeHAZ(
+    int ageInDays,
+    double heightCm,
+    Gender gender,
+  ) async {
+    final db = await dbHelper.database;
+
+    final ageInWeeks = ageInDays ~/ 7;
+    final ageInMonths = ageInDays ~/ 30;
+
+    String tableName = gender == Gender.male ? 'who_haz_boys' : 'who_haz_girls';
+    String unit;
+    int value;
+
+    if (ageInWeeks <= 13) {
+      unit = 'week';
+      value = ageInWeeks;
+    } else {
+      unit = 'month';
+      value = ageInMonths;
+    }
+
+    final List<Map<String, dynamic>> maps = await db.query(
+      tableName,
+      where: 'unit = ? AND value = ?',
+      whereArgs: [unit, value],
+      limit: 1,
+    );
+
+    if (maps.isEmpty) return 0.0;
+
+    final lms = LmsModel.fromMap(maps.first);
+    return _calculateZScore(value: heightCm, lms: lms);
+  }
+
+  Future<double> _computeWHZ(
+    int ageInDays,
+    double weightKg,
+    double heightCm,
+    Gender gender,
+  ) async {
+    final db = await dbHelper.database;
+
+    final roundedHeight = (heightCm * 2).round() / 2;
+
+    final ageInYears = ageInDays / 365.25;
+    String tableName;
+    final genderString = gender == Gender.male ? 'boys' : 'girls';
+
+    if (ageInYears < 2) {
+      tableName = 'who_whz_${genderString}_0_2_years';
+    } else {
+      tableName = 'who_whz_${genderString}_2_5_years';
+    }
+
+    final List<Map<String, dynamic>> maps = await db.query(
+      tableName,
+      where: 'height_cm = ?',
+      whereArgs: [roundedHeight],
+      limit: 1,
+    );
+
+    if (maps.isEmpty) return 0.0;
+
+    final lms = LmsModel.fromMap(maps.first);
+    return _calculateZScore(value: weightKg, lms: lms);
+  }
+
+  double _calculateZScore({required double value, required LmsModel lms}) {
+    if (lms.l != 0) {
+      return (pow((value / lms.m), lms.l) - 1) / (lms.l * lms.s);
+    } else {
+      return log(value / lms.m) / lms.s;
+    }
   }
 }

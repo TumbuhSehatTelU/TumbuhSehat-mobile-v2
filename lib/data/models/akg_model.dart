@@ -75,4 +75,32 @@ class AkgModel extends Equatable {
       water,
     ];
   }
+
+  AkgModel copyWith({
+    int? id,
+    String? category,
+    String? gender,
+    int? startMonth,
+    int? endMonth,
+    double? calories,
+    double? protein,
+    double? fat,
+    double? carbohydrates,
+    double? fiber,
+    double? water,
+  }) {
+    return AkgModel(
+      id: id ?? this.id,
+      category: category ?? this.category,
+      gender: gender ?? this.gender,
+      startMonth: startMonth ?? this.startMonth,
+      endMonth: endMonth ?? this.endMonth,
+      calories: calories ?? this.calories,
+      protein: protein ?? this.protein,
+      fat: fat ?? this.fat,
+      carbohydrates: carbohydrates ?? this.carbohydrates,
+      fiber: fiber ?? this.fiber,
+      water: water ?? this.water,
+    );
+  }
 }
