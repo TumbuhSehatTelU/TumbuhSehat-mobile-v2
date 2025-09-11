@@ -10,10 +10,13 @@ import 'data/datasources/local/onboarding_local_data_source.dart';
 import 'data/datasources/remote/food_remote_data_source.dart';
 import 'data/datasources/remote/onboarding_remote_data_source.dart';
 import 'data/repositories/food_repository_impl.dart';
+import 'data/repositories/nutrition_repository_impl.dart';
 import 'data/repositories/onboarding_repository_impl.dart';
 import 'domain/repositories/food_repository.dart';
+import 'domain/repositories/nutrition_repository.dart';
 import 'domain/repositories/onboarding_repository.dart';
 import 'presentation/cubit/beranda/beranda_cubit.dart';
+import 'presentation/cubit/calory_history/calory_history_cubit.dart';
 import 'presentation/cubit/login/login_cubit.dart';
 import 'presentation/cubit/meal_analysis/meal_analysis_cubit.dart';
 import 'presentation/cubit/onboarding/onboarding_cubit.dart';
@@ -72,6 +75,10 @@ Future<void> init() async {
     ),
   );
 
+  sl.registerLazySingleton<NutritionRepository>(
+    () => NutritionRepositoryImpl(dbHelper: sl()),
+  );
+
   // FEATURES
   // Cubit
   sl.registerFactory(
@@ -86,4 +93,5 @@ Future<void> init() async {
     () => BerandaCubit(onboardingRepository: sl(), sharedPreferences: sl()),
   );
   sl.registerFactory(() => MealAnalysisCubit(foodRepository: sl()));
+  sl.registerFactory(() => CaloryHistoryCubit(nutritionRepository: sl()));
 }
