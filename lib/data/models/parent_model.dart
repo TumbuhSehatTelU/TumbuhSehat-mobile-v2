@@ -1,5 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
+import 'child_model.dart';
+
 part 'parent_model.g.dart';
 
 enum ParentRole {
@@ -59,8 +61,11 @@ class ParentModel {
   final bool isPregnant;
   final LactationPeriod lactationPeriod;
   final GestationalAge gestationalAge;
+  // IGNORE: ON BE PAYLOAD
+  @JsonKey(includeToJson: false, includeFromJson: false)
+  Gender? gender;
 
-  const ParentModel({
+  ParentModel({
     required this.name,
     required this.password,
     required this.role,
@@ -71,7 +76,36 @@ class ParentModel {
     required this.isPregnant,
     required this.lactationPeriod,
     required this.gestationalAge,
+    this.gender,
   });
+
+  ParentModel copyWith({
+    String? name,
+    String? password,
+    ParentRole? role,
+    DateTime? dateOfBirth,
+    double? height,
+    double? weight,
+    bool? isLactating,
+    bool? isPregnant,
+    LactationPeriod? lactationPeriod,
+    GestationalAge? gestationalAge,
+    Gender? gender,
+  }) {
+    return ParentModel(
+      name: name ?? this.name,
+      password: password ?? this.password,
+      role: role ?? this.role,
+      dateOfBirth: dateOfBirth ?? this.dateOfBirth,
+      height: height ?? this.height,
+      weight: weight ?? this.weight,
+      isLactating: isLactating ?? this.isLactating,
+      isPregnant: isPregnant ?? this.isPregnant,
+      lactationPeriod: lactationPeriod ?? this.lactationPeriod,
+      gestationalAge: gestationalAge ?? this.gestationalAge,
+      gender: gender ?? this.gender,
+    );
+  }
 
   factory ParentModel.fromJson(Map<String, dynamic> json) =>
       _$ParentModelFromJson(json);

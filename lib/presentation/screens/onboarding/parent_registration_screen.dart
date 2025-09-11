@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../../core/theme/ts_color.dart';
 import '../../../core/theme/ts_shadow.dart';
 import '../../../core/theme/ts_text_style.dart';
+import '../../../data/models/child_model.dart';
 import '../../../data/models/parent_model.dart';
 import '../../cubit/onboarding/onboarding_cubit.dart';
 import '../../widgets/common/ts_button.dart';
@@ -56,6 +57,7 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
   DateTime? _selectedDateOfBirth;
   ParentRole? _selectedRole;
   bool _hasAttemptedSubmit = false;
+  Gender? _selectedGender;
 
   @override
   void initState() {
@@ -101,7 +103,10 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
       _hasAttemptedSubmit = true;
     });
 
-    if (!_formKey.currentState!.validate()) {
+    final isFormValid = _formKey.currentState?.validate() ?? false;
+    final isGenderSelected = _selectedGender != null;
+
+    if (!isFormValid || !isGenderSelected) {
       return;
     }
 
@@ -114,6 +119,7 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
       name: _nameController.text.trim(),
       password: _passwordController.text,
       role: _selectedRole!,
+      gender: _selectedGender!,
       dateOfBirth: _selectedDateOfBirth!,
       height: double.tryParse(_heightController.text.trim()) ?? 0.0,
       weight: double.tryParse(_weightController.text.trim()) ?? 0.0,
@@ -213,6 +219,59 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
                       [(val) => val.isNotEmpty],
                       ['Nama tidak boleh kosong'],
                     ),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildSectionHeader(context, 'Jenis Kelamin'),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Radio<Gender>(
+                            value: Gender.male,
+                            groupValue: _selectedGender,
+                            onChanged: (val) =>
+                                setState(() => _selectedGender = val),
+                          ),
+                          Text(
+                            'Laki-laki',
+                            style: getResponsiveTextStyle(
+                              context,
+                              TSFont.regular.body.withColor(
+                                TSColor.monochrome.black,
+                              ),
+                            ),
+                          ),
+                          Spacer(),
+                          Radio<Gender>(
+                            value: Gender.female,
+                            groupValue: _selectedGender,
+                            onChanged: (val) =>
+                                setState(() => _selectedGender = val),
+                          ),
+                          Text(
+                            'Perempuan',
+                            style: getResponsiveTextStyle(
+                              context,
+                              TSFont.regular.body.withColor(
+                                TSColor.monochrome.black,
+                              ),
+                            ),
+                          ),
+                          Spacer(),
+                        ],
+                      ),
+                      if (_hasAttemptedSubmit && _selectedGender == null)
+                        Padding(
+                          padding: EdgeInsets.only(left: 12.0),
+                          child: Text(
+                            'Pilih jenis kelamin',
+                            style: TSFont.regular.small.withColor(
+                              TSColor.additionalColor.red,
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                   const SizedBox(height: 16),
                   _buildSectionHeader(context, "Tanggal Lahir"),

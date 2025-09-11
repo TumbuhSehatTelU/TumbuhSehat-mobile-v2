@@ -38,6 +38,7 @@ class OnboardingDataCollection extends OnboardingState {
   final String? name;
   final String? password;
   final ParentRole? role;
+  final Gender? gender;
   final DateTime? dateOfBirth;
   final double? height;
   final double? weight;
@@ -54,6 +55,7 @@ class OnboardingDataCollection extends OnboardingState {
     this.name,
     this.password,
     this.role,
+    this.gender,
     this.dateOfBirth,
     this.height,
     this.weight,
@@ -69,6 +71,7 @@ class OnboardingDataCollection extends OnboardingState {
     String? name,
     String? password,
     ParentRole? role,
+    Gender? gender,
     DateTime? dateOfBirth,
     double? height,
     double? weight,
@@ -83,6 +86,7 @@ class OnboardingDataCollection extends OnboardingState {
       name: name ?? this.name,
       password: password ?? this.password,
       role: role ?? this.role,
+      gender: gender ?? this.gender,
       dateOfBirth: dateOfBirth ?? this.dateOfBirth,
       height: height ?? this.height,
       weight: weight ?? this.weight,
@@ -100,6 +104,7 @@ class OnboardingDataCollection extends OnboardingState {
     name,
     password,
     role,
+    gender,
     dateOfBirth,
     height,
     weight,
