@@ -21,7 +21,7 @@ class MemberCarouselHeader extends StatelessWidget {
     if (members.isEmpty) return const SizedBox.shrink();
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 24.0),
+      padding: const EdgeInsets.symmetric(vertical: 16.0),
       child: Column(
         children: [
           SizedBox(
