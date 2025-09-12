@@ -15,15 +15,25 @@ class CaloryHistoryLoaded extends CaloryHistoryState {
   final WeeklySummaryModel summary;
   final List<dynamic> allMembers;
   final dynamic currentMember;
+  final List<WeeklyIntake> monthlyTrend;
+  final DateTime displayedMonth;
 
   const CaloryHistoryLoaded({
     required this.summary,
     required this.allMembers,
     required this.currentMember,
+    required this.monthlyTrend,
+    required this.displayedMonth,
   });
 
   @override
-  List<Object> get props => [summary, allMembers, currentMember];
+  List<Object> get props => [
+    summary,
+    allMembers,
+    currentMember,
+    monthlyTrend,
+    displayedMonth,
+  ];
 }
 
 class CaloryHistoryError extends CaloryHistoryState {

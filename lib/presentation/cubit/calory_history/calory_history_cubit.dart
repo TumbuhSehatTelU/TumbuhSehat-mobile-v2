@@ -1,6 +1,9 @@
+import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/error/failures.dart';
+import '../../../data/models/weekly_intake_model.dart';
 import '../../../data/models/weekly_summary_model.dart';
 import '../../../domain/repositories/nutrition_repository.dart';
 import '../../../domain/repositories/onboarding_repository.dart';
@@ -14,11 +17,16 @@ class CaloryHistoryCubit extends Cubit<CaloryHistoryState> {
   final OnboardingRepository onboardingRepository;
 
   List<dynamic> _allMembersCache = [];
+  late DateTime _selectedMonth;
+  dynamic _currentMember;
 
   CaloryHistoryCubit({
     required this.nutritionRepository,
     required this.onboardingRepository,
-  }) : super(CaloryHistoryInitial());
+  }) : super(CaloryHistoryInitial()) {
+    final now = DateTime.now();
+    _selectedMonth = DateTime(now.year, now.month, 1);
+  }
 
   Future<void> loadInitialData(String initialMemberName) async {
     emit(CaloryHistoryLoading());
@@ -31,69 +39,69 @@ class CaloryHistoryCubit extends Cubit<CaloryHistoryState> {
     final family = familyResult.getOrElse(() => throw Exception());
     _allMembersCache = [...family.children, ...family.parents];
 
-    final initialMember = _allMembersCache.firstWhere(
+    _currentMember = _allMembersCache.firstWhere(
       (m) => m.name == initialMemberName,
       orElse: () => _allMembersCache.isNotEmpty ? _allMembersCache.first : null,
     );
 
-    if (initialMember == null) {
+    if (_currentMember == null) {
       emit(
         const CaloryHistoryError('Tidak ada anggota keluarga yang ditemukan.'),
       );
       return;
     }
-
-    await _fetchAndEmitSummary(initialMember);
+    await _fetchAllData();
   }
 
   Future<void> changeMember(dynamic newMember) async {
-    await _fetchAndEmitSummary(newMember);
+    if (_currentMember == newMember) return;
+    _currentMember = newMember;
+    await _fetchAllData();
   }
 
-  Future<void> changeChartRange(CaloryChartRange range) async {
-    if (state is! CaloryHistoryLoaded) return;
-
-    final currentState = state as CaloryHistoryLoaded;
-    emit(CaloryHistoryLoading());
-
-    final duration = range == CaloryChartRange.oneMonth
-        ? const Duration(days: 30)
-        : const Duration(days: 90);
-
-    final summaryResult = await nutritionRepository.getWeeklySummary(
-      member: currentState.currentMember,
-      endDate: DateTime.now(),
-      duration: duration,
+   Future<void> changeMonth({required bool isNext}) async {
+    _selectedMonth = DateTime(
+      _selectedMonth.year,
+      isNext ? _selectedMonth.month + 1 : _selectedMonth.month - 1,
+      1,
     );
-
-    summaryResult.fold((failure) => emit(CaloryHistoryError(failure.message)), (
-      summary,
-    ) {
-      emit(
-        CaloryHistoryLoaded(
-          summary: summary,
-          allMembers: currentState.allMembers,
-          currentMember: currentState.currentMember,
-        ),
-      );
-    });
+    await _fetchAllData();
   }
 
-  Future<void> _fetchAndEmitSummary(dynamic member) async {
-    final summaryResult = await nutritionRepository.getWeeklySummary(
-      member: member,
-      endDate: DateTime.now(),
-      duration: const Duration(days: 7),
-    );
+  Future<void> _fetchAllData() async {
+    if (_currentMember == null) return;
 
-    summaryResult.fold(
-      (failure) => emit(CaloryHistoryError(failure.message)),
-      (summary) => emit(
-        CaloryHistoryLoaded(
-          summary: summary,
-          allMembers: _allMembersCache,
-          currentMember: member,
-        ),
+    if (state is! CaloryHistoryLoaded) {
+      emit(CaloryHistoryLoading());
+    }
+
+    final results = await Future.wait([
+      nutritionRepository.getWeeklySummary(
+        member: _currentMember,
+        endDate: DateTime.now(),
+        duration: const Duration(days: 7),
+      ),
+      nutritionRepository.getMonthlyTrend(
+        member: _currentMember,
+        month: _selectedMonth,
+      ),
+    ]);
+
+    final summaryResult = results[0] as Either<Failure, WeeklySummaryModel>;
+    final trendResult = results[1] as Either<Failure, List<WeeklyIntake>>;
+
+    if (summaryResult.isLeft() || trendResult.isLeft()) {
+      emit(const CaloryHistoryError('Gagal mengambil data riwayat.'));
+      return;
+    }
+
+    emit(
+      CaloryHistoryLoaded(
+        summary: summaryResult.getOrElse(() => throw Exception()),
+        monthlyTrend: trendResult.getOrElse(() => []),
+        allMembers: _allMembersCache,
+        currentMember: _currentMember,
+        displayedMonth: _selectedMonth,
       ),
     );
   }
