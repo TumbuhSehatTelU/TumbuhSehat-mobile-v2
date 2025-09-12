@@ -9,6 +9,7 @@ import '../models/akg_model.dart';
 import '../models/child_model.dart';
 import '../models/lms_model.dart';
 import '../models/parent_model.dart';
+import '../models/weekly_intake_model.dart';
 import '../models/weekly_summary_model.dart';
 
 class NutritionRepositoryImpl implements NutritionRepository {
@@ -61,6 +62,71 @@ class NutritionRepositoryImpl implements NutritionRepository {
     }
   }
 
+  @override
+  Future<Either<Failure, List<WeeklyIntake>>> getMonthlyTrend({
+    required dynamic member,
+    required DateTime month,
+  }) async {
+    try {
+      final db = await dbHelper.database;
+      final firstDayOfMonth = DateTime(month.year, month.month, 1);
+      final lastDayOfMonth = DateTime(month.year, month.month + 1, 0);
+
+      final historyMaps = await db.query(
+        'meal_histories as mh '
+        'JOIN meal_eaters as me ON mh.id = me.meal_history_id '
+        'JOIN meal_components as mc ON mh.id = mc.meal_history_id',
+        where:
+            '(me.parent_name = ? OR me.child_name = ?) AND mh.timestamp >= ? AND mh.timestamp < ?',
+        whereArgs: [
+          member.name,
+          member.name,
+          firstDayOfMonth.millisecondsSinceEpoch,
+          lastDayOfMonth.add(const Duration(days: 1)).millisecondsSinceEpoch,
+        ],
+      );
+
+      if (historyMaps.isEmpty) {
+        return Right(
+          List.generate(
+            5,
+            (i) => WeeklyIntake(weekNumber: i + 1, totalCalories: 0),
+          ),
+        );
+      }
+
+      final foodNutrientLookup = await _getFoodNutrientLookup(historyMaps, db);
+      final weeklyTotals = <int, double>{1: 0, 2: 0, 3: 0, 4: 0, 5: 0};
+
+      for (final map in historyMaps) {
+        final timestamp = DateTime.fromMillisecondsSinceEpoch(
+          map['timestamp'] as int,
+        );
+        final weekNumber = ((timestamp.day - 1) ~/ 7) + 1;
+
+        final foodName = map['food_name'] as String;
+        final totalGrams = (map['total_grams'] as num).toDouble();
+        final foodNutrients = foodNutrientLookup[foodName];
+
+        if (foodNutrients != null) {
+          final caloriesPer100g =
+              (foodNutrients['calories'] as num?)?.toDouble() ?? 0.0;
+          final componentCalories = (totalGrams / 100.0) * caloriesPer100g;
+          weeklyTotals.update(weekNumber, (value) => value + componentCalories);
+        }
+      }
+
+      final result = weeklyTotals.entries.map((entry) {
+        return WeeklyIntake(weekNumber: entry.key, totalCalories: entry.value);
+      }).toList();
+
+      return Right(result);
+    } catch (e) {
+      return Left(CacheFailure('Gagal mengambil tren bulanan: $e'));
+    }
+  }
+
+  // HELPER
   Future<AkgModel?> _calculateAkgForMember(dynamic member) async {
     final baseAkg = await _getBaseAkgForMember(member);
     if (baseAkg == null) return null;
