@@ -10,8 +10,6 @@ import '../../../domain/repositories/onboarding_repository.dart';
 
 part 'calory_history_state.dart';
 
-enum CaloryChartRange { oneMonth, threeMonths }
-
 class CaloryHistoryCubit extends Cubit<CaloryHistoryState> {
   final NutritionRepository nutritionRepository;
   final OnboardingRepository onboardingRepository;

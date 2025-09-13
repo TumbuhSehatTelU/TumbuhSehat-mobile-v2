@@ -44,12 +44,12 @@ class CaloryTrendChart extends StatelessWidget {
     }
 
     return Padding(
-      padding: const EdgeInsets.all(24.0),
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildHeader(isNextMonthDisabled, isPreviousMonthDisabled, context),
-          const SizedBox(height: 24),
+          const SizedBox(height: 32),
           SizedBox(
             height: 200,
             child: BarChart(
@@ -70,37 +70,40 @@ class CaloryTrendChart extends StatelessWidget {
     bool isPreviousMonthDisabled,
     BuildContext context,
   ) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Visibility(
-          visible: !isPreviousMonthDisabled,
-          maintainSize: true,
-          maintainAnimation: true,
-          maintainState: true,
-          child: IconButton(
-            icon: const Icon(Icons.arrow_back_ios),
-            onPressed: onPreviousMonth,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Visibility(
+            visible: !isPreviousMonthDisabled,
+            maintainSize: true,
+            maintainAnimation: true,
+            maintainState: true,
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back_ios),
+              onPressed: onPreviousMonth,
+            ),
           ),
-        ),
-        Text(
-          DateFormat('MMMM yyyy', 'id_ID').format(displayedMonth),
-          style: getResponsiveTextStyle(
-            context,
-            TSFont.bold.large.withColor(TSColor.monochrome.black),
+          Text(
+            DateFormat('MMMM yyyy', 'id_ID').format(displayedMonth),
+            style: getResponsiveTextStyle(
+              context,
+              TSFont.bold.large.withColor(TSColor.monochrome.black),
+            ),
           ),
-        ),
-        Visibility(
-          visible: !isNextMonthDisabled,
-          maintainSize: true,
-          maintainAnimation: true,
-          maintainState: true,
-          child: IconButton(
-            icon: const Icon(Icons.arrow_forward_ios),
-            onPressed: onNextMonth,
+          Visibility(
+            visible: !isNextMonthDisabled,
+            maintainSize: true,
+            maintainAnimation: true,
+            maintainState: true,
+            child: IconButton(
+              icon: const Icon(Icons.arrow_forward_ios),
+              onPressed: onNextMonth,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -136,7 +139,7 @@ class CaloryTrendChart extends StatelessWidget {
         leftTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
-            reservedSize: 64,
+            reservedSize: 48,
             interval: interval,
             getTitlesWidget: _getLeftTitles,
           ),
@@ -240,7 +243,7 @@ class CaloryTrendChart extends StatelessWidget {
     if (value == meta.max) {
       return SideTitleWidget(
         axisSide: meta.axisSide,
-        space: 8.0,
+        space: 1.0,
         child: Padding(
           padding: EdgeInsets.only(bottom: 36.0),
           child: Text('kkal', style: style),
@@ -251,10 +254,10 @@ class CaloryTrendChart extends StatelessWidget {
     if (value == 0) {
       return SideTitleWidget(
         axisSide: meta.axisSide,
-        space: 8.0,
+        space: 1.0,
         child: Padding(
           padding: EdgeInsets.only(top: 72.0),
-          child: Text('Minggu', style: style),
+          child: Text('Pekan', style: style),
         ),
       );
     }
@@ -266,7 +269,7 @@ class CaloryTrendChart extends StatelessWidget {
     final text = '${(value / 1000).toStringAsFixed(0)}rb';
     return SideTitleWidget(
       axisSide: meta.axisSide,
-      space: 8.0,
+      space: 1.0,
       child: Text(text, style: style, textAlign: TextAlign.left),
     );
   }
@@ -275,10 +278,26 @@ class CaloryTrendChart extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        _legendItem(TSColor.additionalColor.green, 'Cukup', context),
-        _legendItem(TSColor.additionalColor.yellow, 'Hampir Cukup', context),
-        _legendItem(TSColor.additionalColor.brown, 'Berlebih', context),
-        _legendItem(TSColor.additionalColor.red, 'Kurang', context),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _legendItem(TSColor.additionalColor.green, 'Cukup', context),
+            const SizedBox(height: 4),
+            _legendItem(
+              TSColor.additionalColor.yellow,
+              'Hampir Cukup',
+              context,
+            ),
+          ],
+        ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _legendItem(TSColor.additionalColor.brown, 'Berlebih', context),
+            const SizedBox(height: 4),
+            _legendItem(TSColor.additionalColor.red, 'Kurang', context),
+          ],
+        ),
       ],
     );
   }
@@ -298,7 +317,7 @@ class CaloryTrendChart extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(width: 4),
+        const SizedBox(width: 8),
         Text(
           text,
           style: getResponsiveTextStyle(

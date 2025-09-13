@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mesh_gradient/mesh_gradient.dart';
+import 'package:mobile_tumbuh_sehat_v2/core/theme/ts_shadow.dart';
 import 'package:mobile_tumbuh_sehat_v2/presentation/widgets/layouts/ts_app_bar.dart';
 
 import '../../../core/theme/ts_color.dart';
@@ -177,8 +178,8 @@ class _CaloryHistoryScreenState extends State<CaloryHistoryScreen> {
                         padding: const EdgeInsets.only(top: 24),
                         sliver: SliverToBoxAdapter(
                           child: Container(
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
+                            decoration: BoxDecoration(
+                              color: TSColor.monochrome.white,
                               borderRadius: BorderRadius.only(
                                 topLeft: Radius.circular(32),
                                 topRight: Radius.circular(32),
@@ -186,25 +187,33 @@ class _CaloryHistoryScreenState extends State<CaloryHistoryScreen> {
                             ),
                             child: Column(
                               children: [
-                                CaloryTrendChart(
-                                  weeklyIntakes: state.monthlyTrend,
-                                  akg: state.summary.akgStandard,
-                                  displayedMonth: state.displayedMonth,
-                                  firstHistoryDate: state.firstHistoryDate,
-                                  onPreviousMonth: () => context
-                                      .read<CaloryHistoryCubit>()
-                                      .changeMonth(isNext: false),
-                                  onNextMonth: () => context
-                                      .read<CaloryHistoryCubit>()
-                                      .changeMonth(isNext: true),
+                                Padding(
+                                  padding: const EdgeInsets.all(28.0),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      boxShadow: TSShadow.shadows.weight500,
+                                      color: TSColor.monochrome.white,
+                                      borderRadius: BorderRadius.circular(32),
+                                    ),
+                                    child: CaloryTrendChart(
+                                      weeklyIntakes: state.monthlyTrend,
+                                      akg: state.summary.akgStandard,
+                                      displayedMonth: state.displayedMonth,
+                                      firstHistoryDate: state.firstHistoryDate,
+                                      onPreviousMonth: () => context
+                                          .read<CaloryHistoryCubit>()
+                                          .changeMonth(isNext: false),
+                                      onNextMonth: () => context
+                                          .read<CaloryHistoryCubit>()
+                                          .changeMonth(isNext: true),
+                                    ),
+                                  ),
                                 ),
-                                const Divider(height: 1),
+                                const Divider(height: 100),
                                 const Text(
                                   'Daily Consumption List Placeholder',
                                 ),
-                                const SizedBox(
-                                  height: 400,
-                                ),
+                                const SizedBox(height: 400),
                               ],
                             ),
                           ),
