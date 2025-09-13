@@ -14,4 +14,7 @@ abstract class NutritionRepository {
     required dynamic member,
     required DateTime month,
   });
+
+  Future<Either<Failure, ({DateTime? first, DateTime? last})>>
+  getHistoryDateRange({required dynamic member});
 }

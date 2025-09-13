@@ -17,6 +17,7 @@ class CaloryHistoryLoaded extends CaloryHistoryState {
   final dynamic currentMember;
   final List<WeeklyIntake> monthlyTrend;
   final DateTime displayedMonth;
+  final DateTime? firstHistoryDate;
 
   const CaloryHistoryLoaded({
     required this.summary,
@@ -24,6 +25,7 @@ class CaloryHistoryLoaded extends CaloryHistoryState {
     required this.currentMember,
     required this.monthlyTrend,
     required this.displayedMonth,
+    this.firstHistoryDate,
   });
 
   @override
@@ -33,6 +35,7 @@ class CaloryHistoryLoaded extends CaloryHistoryState {
     currentMember,
     monthlyTrend,
     displayedMonth,
+    ?firstHistoryDate,
   ];
 }
 

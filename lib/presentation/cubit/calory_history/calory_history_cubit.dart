@@ -15,6 +15,7 @@ enum CaloryChartRange { oneMonth, threeMonths }
 class CaloryHistoryCubit extends Cubit<CaloryHistoryState> {
   final NutritionRepository nutritionRepository;
   final OnboardingRepository onboardingRepository;
+  DateTime? _firstHistoryDate;
 
   List<dynamic> _allMembersCache = [];
   late DateTime _selectedMonth;
@@ -50,6 +51,15 @@ class CaloryHistoryCubit extends Cubit<CaloryHistoryState> {
       );
       return;
     }
+
+    final dateRangeResult = await nutritionRepository.getHistoryDateRange(
+      member: _currentMember,
+    );
+    dateRangeResult.fold((failure) {}, (range) {
+      _firstHistoryDate = range.first;
+      // _lastHistoryDate = range.last;
+    });
+
     await _fetchAllData();
   }
 
@@ -59,12 +69,26 @@ class CaloryHistoryCubit extends Cubit<CaloryHistoryState> {
     await _fetchAllData();
   }
 
-   Future<void> changeMonth({required bool isNext}) async {
-    _selectedMonth = DateTime(
+  Future<void> changeMonth({required bool isNext}) async {
+    final newMonth = DateTime(
       _selectedMonth.year,
       isNext ? _selectedMonth.month + 1 : _selectedMonth.month - 1,
       1,
     );
+
+    if (_firstHistoryDate != null &&
+        newMonth.isBefore(
+          DateTime(_firstHistoryDate!.year, _firstHistoryDate!.month, 1),
+        )) {
+      return;
+    }
+
+    final now = DateTime.now();
+    if (newMonth.isAfter(DateTime(now.year, now.month, 1))) {
+      return;
+    }
+
+    _selectedMonth = newMonth;
     await _fetchAllData();
   }
 
@@ -102,6 +126,7 @@ class CaloryHistoryCubit extends Cubit<CaloryHistoryState> {
         allMembers: _allMembersCache,
         currentMember: _currentMember,
         displayedMonth: _selectedMonth,
+        firstHistoryDate: _firstHistoryDate,
       ),
     );
   }

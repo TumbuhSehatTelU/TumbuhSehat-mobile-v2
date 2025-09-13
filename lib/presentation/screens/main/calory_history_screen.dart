@@ -7,9 +7,9 @@ import 'package:mobile_tumbuh_sehat_v2/presentation/widgets/layouts/ts_app_bar.d
 
 import '../../../core/theme/ts_color.dart';
 import '../../../data/models/child_model.dart';
-import '../../../injection_container.dart' as di;
 import '../../../injection_container.dart';
 import '../../cubit/calory_history/calory_history_cubit.dart';
+import '../../widgets/history/calory_trend_chart.dart';
 import '../../widgets/history/member_carousel_header.dart';
 import '../../widgets/history/nutrient_summary_grid.dart';
 
@@ -26,8 +26,6 @@ class _CaloryHistoryScreenState extends State<CaloryHistoryScreen> {
   late final PageController _pageController;
   int _currentMemberIndex = 0;
   List<dynamic> _allMembers = [];
-  DateTime _selectedDate = DateTime.now();
-  CaloryChartRange _chartRange = CaloryChartRange.oneMonth;
   List<Color> _gradientColors = [];
   List<Color> _getGradientColors({required bool isChild}) {
     if (isChild) {
@@ -175,27 +173,41 @@ class _CaloryHistoryScreenState extends State<CaloryHistoryScreen> {
                         ),
                       ),
 
-                      SliverFillRemaining(
-                        hasScrollBody: false,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Container(
-                              height: 400,
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(32),
-                                  topRight: Radius.circular(32),
-                                ),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  'Konten untuk ${state.currentMember.name}',
-                                ),
+                      SliverPadding(
+                        padding: const EdgeInsets.only(top: 24),
+                        sliver: SliverToBoxAdapter(
+                          child: Container(
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(32),
+                                topRight: Radius.circular(32),
                               ),
                             ),
-                          ],
+                            child: Column(
+                              children: [
+                                CaloryTrendChart(
+                                  weeklyIntakes: state.monthlyTrend,
+                                  akg: state.summary.akgStandard,
+                                  displayedMonth: state.displayedMonth,
+                                  firstHistoryDate: state.firstHistoryDate,
+                                  onPreviousMonth: () => context
+                                      .read<CaloryHistoryCubit>()
+                                      .changeMonth(isNext: false),
+                                  onNextMonth: () => context
+                                      .read<CaloryHistoryCubit>()
+                                      .changeMonth(isNext: true),
+                                ),
+                                const Divider(height: 1),
+                                const Text(
+                                  'Daily Consumption List Placeholder',
+                                ),
+                                const SizedBox(
+                                  height: 400,
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
                     ],

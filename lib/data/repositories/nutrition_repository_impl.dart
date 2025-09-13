@@ -126,6 +126,44 @@ class NutritionRepositoryImpl implements NutritionRepository {
     }
   }
 
+  @override
+  Future<Either<Failure, ({DateTime? first, DateTime? last})>>
+  getHistoryDateRange({required dynamic member}) async {
+    try {
+      final db = await dbHelper.database;
+      final result = await db.rawQuery(
+        '''
+      SELECT MIN(mh.timestamp) as min_date, MAX(mh.timestamp) as max_date
+      FROM meal_histories as mh
+      JOIN meal_eaters as me ON mh.id = me.meal_history_id
+      WHERE me.parent_name = ? OR me.child_name = ?
+    ''',
+        [member.name, member.name],
+      );
+
+      if (result.isEmpty) {
+        return const Right((first: null, last: null));
+      }
+
+      final row = result.first;
+      final minTimestamp = row['min_date'] as int?;
+      final maxTimestamp = row['max_date'] as int?;
+
+      final firstDate = minTimestamp != null
+          ? DateTime.fromMillisecondsSinceEpoch(minTimestamp)
+          : null;
+      final lastDate = maxTimestamp != null
+          ? DateTime.fromMillisecondsSinceEpoch(maxTimestamp)
+          : null;
+
+      return Right((first: firstDate, last: lastDate));
+    } catch (e) {
+      return Left(
+        CacheFailure('Gagal mendapatkan rentang tanggal riwayat: $e'),
+      );
+    }
+  }
+
   // HELPER
   Future<AkgModel?> _calculateAkgForMember(dynamic member) async {
     final baseAkg = await _getBaseAkgForMember(member);

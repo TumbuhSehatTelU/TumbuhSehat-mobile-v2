@@ -46,4 +46,5 @@ class AdditionalColor {
   final Color green = const Color.fromRGBO(100, 207, 100, 1);
   final Color blue = const Color.fromRGBO(89, 128, 204, 1);
   final Color purple = const Color.fromRGBO(192, 107, 186, 1);
+  final Color brown = const Color.fromRGBO(131, 105, 83, 1);
 }
