@@ -7,6 +7,7 @@ import '../../core/error/failures.dart';
 import '../../domain/repositories/nutrition_repository.dart';
 import '../models/akg_model.dart';
 import '../models/child_model.dart';
+import '../models/daily_detail_model.dart';
 import '../models/lms_model.dart';
 import '../models/parent_model.dart';
 import '../models/weekly_intake_model.dart';
@@ -161,6 +162,71 @@ class NutritionRepositoryImpl implements NutritionRepository {
       return Left(
         CacheFailure('Gagal mendapatkan rentang tanggal riwayat: $e'),
       );
+    }
+  }
+
+  @override
+  Future<Either<Failure, DailyDetailModel>> getDailyConsumptionDetail({
+    required dynamic member,
+    required DateTime date,
+  }) async {
+    try {
+      final db = await dbHelper.database;
+      final startDate = DateTime(date.year, date.month, date.day);
+      final endDate = startDate.add(const Duration(days: 1));
+
+      final historyMaps = await db.query(
+        'meal_histories as mh '
+        'JOIN meal_eaters as me ON mh.id = me.meal_history_id '
+        'JOIN meal_components as mc ON mh.id = mc.meal_history_id',
+        where:
+            '(me.parent_name = ? OR me.child_name = ?) AND mh.timestamp >= ? AND mh.timestamp < ?',
+        whereArgs: [
+          member.name,
+          member.name,
+          startDate.millisecondsSinceEpoch,
+          endDate.millisecondsSinceEpoch,
+        ],
+      );
+
+      if (historyMaps.isEmpty) {
+        return Right(DailyDetailModel.empty());
+      }
+
+      final foodNutrientLookup = await _getFoodNutrientLookup(historyMaps, db);
+      final Map<MealTime, List<FoodDetail>> meals = {};
+
+      for (final map in historyMaps) {
+        final foodName = map['food_name'] as String;
+        final totalGrams = (map['total_grams'] as num).toDouble();
+        final timestamp = DateTime.fromMillisecondsSinceEpoch(
+          map['timestamp'] as int,
+        );
+
+        final foodNutrients = foodNutrientLookup[foodName];
+        if (foodNutrients == null) continue;
+
+        final calculatedNutrients = <String, double>{};
+        final factor = totalGrams / 100.0;
+        foodNutrients.forEach((key, value) {
+          if (value is num) {
+            calculatedNutrients[key] = value.toDouble() * factor;
+          }
+        });
+
+        final foodDetail = FoodDetail(
+          foodName: foodName,
+          totalGrams: totalGrams,
+          calculatedNutrients: calculatedNutrients,
+        );
+
+        final mealTime = _getMealTimeFromDate(timestamp);
+        meals.putIfAbsent(mealTime, () => []).add(foodDetail);
+      }
+
+      return Right(DailyDetailModel(meals: meals));
+    } catch (e) {
+      return Left(CacheFailure('Gagal mengambil detail konsumsi harian: $e'));
     }
   }
 
@@ -511,5 +577,13 @@ class NutritionRepositoryImpl implements NutritionRepository {
     } else {
       return log(value / lms.m) / lms.s;
     }
+  }
+
+  MealTime _getMealTimeFromDate(DateTime time) {
+    if (time.hour >= 4 && time.hour < 11) return MealTime.Sarapan;
+    if (time.hour >= 11 && time.hour < 15) return MealTime.MakanSiang;
+    if (time.hour >= 15 && time.hour < 18) return MealTime.CamilanSore;
+    if (time.hour >= 18 && time.hour < 22) return MealTime.MakanMalam;
+    return MealTime.CamilanMalam;
   }
 }
