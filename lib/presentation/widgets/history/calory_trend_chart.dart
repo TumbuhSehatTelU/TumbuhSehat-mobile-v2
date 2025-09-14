@@ -44,7 +44,7 @@ class CaloryTrendChart extends StatelessWidget {
     }
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 24),
+      padding: const EdgeInsets.only(left: 4, right: 4, bottom: 24, top: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -221,7 +221,7 @@ class CaloryTrendChart extends StatelessWidget {
     } else if (percentage <= 1.1) {
       return TSColor.additionalColor.green;
     } else {
-      return TSColor.additionalColor.brown;
+      return TSColor.additionalColor.orange;
     }
   }
 
@@ -293,7 +293,7 @@ class CaloryTrendChart extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _legendItem(TSColor.additionalColor.brown, 'Berlebih', context),
+            _legendItem(TSColor.additionalColor.orange, 'Berlebih', context),
             const SizedBox(height: 4),
             _legendItem(TSColor.additionalColor.red, 'Kurang', context),
           ],

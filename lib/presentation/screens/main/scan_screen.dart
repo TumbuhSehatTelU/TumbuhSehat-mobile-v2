@@ -138,6 +138,7 @@ class _ScanScreenState extends State<ScanScreen> {
             width: double.infinity,
             customBorderRadius: 240,
           ),
+          const SizedBox(height: 48),
         ],
       ),
     );

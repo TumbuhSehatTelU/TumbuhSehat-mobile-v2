@@ -40,9 +40,9 @@ class Monochrome {
 
 class AdditionalColor {
   AdditionalColor();
-  final Color red = const Color.fromRGBO(240, 84, 82, 1);
-  final Color orange = const Color.fromRGBO(252, 178, 73, 1);
-  final Color yellow = const Color.fromRGBO(243, 246, 119, 1);
+  final Color red = const Color.fromARGB(255, 243, 28, 24);
+  final Color orange = const Color.fromARGB(255, 241, 156, 36);
+  final Color yellow = const Color.fromARGB(255, 206, 210, 0);
   final Color green = const Color.fromRGBO(100, 207, 100, 1);
   final Color blue = const Color.fromRGBO(89, 128, 204, 1);
   final Color purple = const Color.fromRGBO(192, 107, 186, 1);

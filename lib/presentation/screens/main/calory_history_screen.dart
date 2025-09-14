@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mesh_gradient/mesh_gradient.dart';
 import 'package:mobile_tumbuh_sehat_v2/core/theme/ts_shadow.dart';
+import 'package:mobile_tumbuh_sehat_v2/core/theme/ts_text_style.dart';
 import 'package:mobile_tumbuh_sehat_v2/presentation/widgets/layouts/ts_app_bar.dart';
 
 import '../../../core/theme/ts_color.dart';
@@ -11,6 +12,7 @@ import '../../../data/models/child_model.dart';
 import '../../../injection_container.dart';
 import '../../cubit/calory_history/calory_history_cubit.dart';
 import '../../widgets/history/calory_trend_chart.dart';
+import '../../widgets/history/daily_consumption_list.dart';
 import '../../widgets/history/member_carousel_header.dart';
 import '../../widgets/history/nutrient_summary_grid.dart';
 
@@ -187,8 +189,18 @@ class _CaloryHistoryScreenState extends State<CaloryHistoryScreen> {
                             ),
                             child: Column(
                               children: [
+                                const SizedBox(height: 24),
+                                Text(
+                                  "Tren Kalori Bulanan",
+                                  style: getResponsiveTextStyle(
+                                    context,
+                                    TSFont.bold.h2.withColor(
+                                      TSColor.monochrome.black,
+                                    ),
+                                  ),
+                                ),
                                 Padding(
-                                  padding: const EdgeInsets.all(28.0),
+                                  padding: const EdgeInsets.all(24.0),
                                   child: Container(
                                     decoration: BoxDecoration(
                                       boxShadow: TSShadow.shadows.weight500,
@@ -209,11 +221,26 @@ class _CaloryHistoryScreenState extends State<CaloryHistoryScreen> {
                                     ),
                                   ),
                                 ),
-                                const Divider(height: 100),
-                                const Text(
-                                  'Daily Consumption List Placeholder',
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 32,
+                                  ),
+                                  child: Divider(
+                                    height: 36,
+                                    thickness: 2,
+                                    color: TSColor.monochrome.lightGrey,
+                                  ),
                                 ),
-                                const SizedBox(height: 400),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 24.0,
+                                  ),
+                                  child: DailyConsumptionList(
+                                    dailyEntries:
+                                        state.summary.dailyMealEntries,
+                                    currentMember: state.currentMember,
+                                  ),
+                                ),
                               ],
                             ),
                           ),

@@ -62,8 +62,23 @@ class _NutrientSummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final percentage = summary.percentage;
-    final statusText = percentage >= 80 ? 'Memenuhi Target' : 'Belum Tercukupi';
-    final statusColor = percentage >= 80 ? Colors.green : Colors.red;
+
+    String statusText;
+    Color statusColor;
+
+    if (percentage < 60) {
+      statusText = 'Belum Tercukupi';
+      statusColor = TSColor.additionalColor.red;
+    } else if (percentage < 80) {
+      statusText = 'Hampir Tercukupi';
+      statusColor = TSColor.additionalColor.yellow;
+    } else if (percentage <= 110) {
+      statusText = 'Memenuhi Target';
+      statusColor = TSColor.additionalColor.green;
+    } else {
+      statusText = 'Berlebih';
+      statusColor = TSColor.additionalColor.orange;
+    }
 
     return Container(
       padding: const EdgeInsets.all(8),
