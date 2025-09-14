@@ -17,6 +17,7 @@ import 'domain/repositories/nutrition_repository.dart';
 import 'domain/repositories/onboarding_repository.dart';
 import 'presentation/cubit/beranda/beranda_cubit.dart';
 import 'presentation/cubit/calory_history/calory_history_cubit.dart';
+import 'presentation/cubit/daily_detail/daily_detail_cubit.dart';
 import 'presentation/cubit/login/login_cubit.dart';
 import 'presentation/cubit/meal_analysis/meal_analysis_cubit.dart';
 import 'presentation/cubit/onboarding/onboarding_cubit.dart';
@@ -98,5 +99,9 @@ Future<void> init() async {
       nutritionRepository: sl(),
       onboardingRepository: sl(),
     ),
+  );
+  sl.registerFactory(
+    () =>
+        DailyDetailCubit(nutritionRepository: sl(), onboardingRepository: sl()),
   );
 }
