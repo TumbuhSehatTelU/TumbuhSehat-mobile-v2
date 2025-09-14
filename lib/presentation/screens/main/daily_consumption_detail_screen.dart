@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:mobile_tumbuh_sehat_v2/core/theme/ts_text_style.dart';
+
+import '../../widgets/layouts/ts_app_bar.dart';
 
 class DailyConsumptionDetailScreen extends StatefulWidget {
   final dynamic member;
@@ -26,7 +29,7 @@ class _DailyConsumptionDetailScreenState
     ).format(widget.date);
 
     return Scaffold(
-      appBar: AppBar(title: Text('Detail Konsumsi ${widget.member.name}')),
+      appBar: TSAppBar(title: "Detail Konsumsi Gizi", tsFont: TSFont.bold.h2),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(

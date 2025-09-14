@@ -8,6 +8,7 @@ class TSAppBar extends StatelessWidget implements PreferredSizeWidget {
   final List<Widget>? actions;
   final VoidCallback? onBackButtonPressed;
   final bool showBackButton;
+  final TextStyle? tsFont;
 
   const TSAppBar({
     super.key,
@@ -15,6 +16,7 @@ class TSAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.actions,
     this.onBackButtonPressed,
     this.showBackButton = true,
+    this.tsFont,
   });
 
   @override
@@ -32,7 +34,10 @@ class TSAppBar extends StatelessWidget implements PreferredSizeWidget {
             children: [
               Text(
                 title,
-                style: getResponsiveTextStyle(context, TSFont.bold.h1),
+                style: getResponsiveTextStyle(
+                  context,
+                  tsFont ?? TSFont.bold.h1,
+                ),
               ),
 
               if (showBackButton)
