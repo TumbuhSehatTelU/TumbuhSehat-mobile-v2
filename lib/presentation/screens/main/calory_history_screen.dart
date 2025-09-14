@@ -122,7 +122,7 @@ class _CaloryHistoryScreenState extends State<CaloryHistoryScreen> {
                         color: _gradientColors[5],
                       ),
                     ],
-                    options: MeshGradientOptions(blend: 4),
+                    options: MeshGradientOptions(blend: 3),
                   ),
                 ),
 
@@ -200,7 +200,7 @@ class _CaloryHistoryScreenState extends State<CaloryHistoryScreen> {
                                   ),
                                 ),
                                 Padding(
-                                  padding: const EdgeInsets.all(24.0),
+                                  padding: const EdgeInsets.all(32.0),
                                   child: Container(
                                     decoration: BoxDecoration(
                                       boxShadow: TSShadow.shadows.weight500,
@@ -223,7 +223,7 @@ class _CaloryHistoryScreenState extends State<CaloryHistoryScreen> {
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.symmetric(
-                                    horizontal: 32,
+                                    horizontal: 48,
                                   ),
                                   child: Divider(
                                     height: 36,
@@ -233,7 +233,7 @@ class _CaloryHistoryScreenState extends State<CaloryHistoryScreen> {
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.symmetric(
-                                    horizontal: 24.0,
+                                    horizontal: 32.0,
                                   ),
                                   child: DailyConsumptionList(
                                     dailyEntries:

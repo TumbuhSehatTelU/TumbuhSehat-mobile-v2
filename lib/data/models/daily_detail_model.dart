@@ -20,12 +20,15 @@ class DailyDetailModel extends Equatable {
 class FoodDetail extends Equatable {
   final String foodName;
   final double totalGrams;
-
+  final double quantity;
+  final String urtName;
   final Map<String, double> calculatedNutrients;
 
   const FoodDetail({
     required this.foodName,
     required this.totalGrams,
+    required this.quantity,
+    required this.urtName,
     required this.calculatedNutrients,
   });
 

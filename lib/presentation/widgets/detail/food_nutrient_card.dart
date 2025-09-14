@@ -1,79 +1,115 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_tumbuh_sehat_v2/core/theme/ts_shadow.dart';
+import 'package:mobile_tumbuh_sehat_v2/core/theme/ts_text_style.dart';
 import '../../../core/theme/ts_color.dart';
 import '../../../data/models/daily_detail_model.dart';
 
 class FoodNutrientCard extends StatelessWidget {
   final FoodDetail foodDetail;
+  final bool isLastItem;
 
-  const FoodNutrientCard({super.key, required this.foodDetail});
+  const FoodNutrientCard({
+    super.key,
+    required this.foodDetail,
+    this.isLastItem = false,
+  });
 
   @override
   Widget build(BuildContext context) {
-    // Kelompokkan nutrisi untuk ditampilkan
     final mainNutrients = {
-      'Protein': '${foodDetail.protein.toStringAsFixed(1)} g',
-      'Lemak': '${foodDetail.fat.toStringAsFixed(1)} g',
-      'Karbohidrat': '${foodDetail.carbohydrates.toStringAsFixed(1)} g',
-      'Serat': '${foodDetail.fiber.toStringAsFixed(1)} g',
+      '🍖 Protein': '${foodDetail.protein.toStringAsFixed(1)} g',
+      '🧈 Lemak': '${foodDetail.fat.toStringAsFixed(1)} g',
+      '🍚 Karbohidrat': '${foodDetail.carbohydrates.toStringAsFixed(1)} g',
+      '🥬 Serat': '${foodDetail.fiber.toStringAsFixed(1)} g',
     };
     final vitamins = foodDetail.vitamins;
     final minerals = foodDetail.minerals;
 
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+    // margin: EdgeInsets.only(bottom: isLastItem ? 8 : 12),
+    //       elevation: 2,
+    //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+
+    return Container(
+      margin: EdgeInsets.only(bottom: isLastItem ? 8 : 12),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        color: TSColor.monochrome.white,
+        boxShadow: TSShadow.shadows.weight500,
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Header: Nama Makanan & Kalori
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
                   child: Text(
-                    foodDetail.foodName,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                    '${foodDetail.foodName} - ${foodDetail.quantity.toStringAsFixed(0)} ${foodDetail.urtName}',
+                    style: getResponsiveTextStyle(
+                      context,
+                      TSFont.semiBold.large.withColor(TSColor.monochrome.black),
                     ),
                   ),
                 ),
                 Text(
                   '${foodDetail.calories.toStringAsFixed(0)} Kkal',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: TSColor.mainTosca.primary,
+                  style: getResponsiveTextStyle(
+                    context,
+                    TSFont.bold.large.withColor(TSColor.mainTosca.shade400),
                   ),
                 ),
               ],
             ),
-            const Divider(height: 24),
-            // Daftar Nutrisi Utama
+            Divider(
+              height: 24,
+              thickness: 2,
+              color: TSColor.monochrome.lightGrey,
+            ),
             ...mainNutrients.entries.map((entry) {
-              // Hanya tampilkan jika nilainya lebih dari 0
               if (double.tryParse(entry.value.split(' ')[0])! > 0) {
-                return _buildNutrientRow(entry.key, entry.value);
+                return _buildNutrientRow(entry.key, entry.value, context);
               }
               return const SizedBox.shrink();
-            }).toList(),
-            // Expander untuk Vitamin & Mineral
-            if (vitamins.isNotEmpty || minerals.isNotEmpty)
+            }),
+            if (vitamins.isNotEmpty)
               Theme(
                 data: Theme.of(
                   context,
                 ).copyWith(dividerColor: Colors.transparent),
                 child: ExpansionTile(
-                  title: const Text('Lihat Vitamin & Mineral'),
+                  title: Text(
+                    'Lihat Detail Vitamin',
+                    style: getResponsiveTextStyle(
+                      context,
+                      TSFont.medium.large.withColor(TSColor.monochrome.black),
+                    ),
+                  ),
                   tilePadding: EdgeInsets.zero,
                   childrenPadding: const EdgeInsets.only(left: 16),
                   children: [
-                    if (vitamins.isNotEmpty)
-                      _buildNutrientSection('Vitamin', vitamins),
-                    if (minerals.isNotEmpty)
-                      _buildNutrientSection('Mineral', minerals),
+                    _buildNutrientSection('Vitamin', vitamins, context),
+                  ],
+                ),
+              ),
+
+            if (minerals.isNotEmpty)
+              Theme(
+                data: Theme.of(
+                  context,
+                ).copyWith(dividerColor: Colors.transparent),
+                child: ExpansionTile(
+                  title: Text(
+                    'Lihat Detail Mineral',
+                    style: getResponsiveTextStyle(
+                      context,
+                      TSFont.medium.large.withColor(TSColor.monochrome.black),
+                    ),
+                  ),
+                  tilePadding: EdgeInsets.zero,
+                  childrenPadding: const EdgeInsets.only(left: 16),
+                  children: [
+                    _buildNutrientSection('Mineral', minerals, context),
                   ],
                 ),
               ),
@@ -83,28 +119,42 @@ class FoodNutrientCard extends StatelessWidget {
     );
   }
 
-  Widget _buildNutrientRow(String name, String value) {
+  Widget _buildNutrientRow(String name, String value, BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(name, style: TextStyle(color: TSColor.monochrome.grey)),
-          Text(value),
+          Text(
+            name,
+            style: getResponsiveTextStyle(
+              context,
+              TSFont.regular.body.withColor(TSColor.monochrome.black),
+            ),
+          ),
+          Text(
+            value,
+            style: getResponsiveTextStyle(
+              context,
+              TSFont.bold.body.withColor(TSColor.secondaryGreen.shade600),
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildNutrientSection(String title, Map<String, double> nutrients) {
+  Widget _buildNutrientSection(
+    String title,
+    Map<String, double> nutrients,
+    BuildContext context,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 8),
+        const SizedBox(height: 4),
         ...nutrients.entries.map((entry) {
           if (entry.value > 0) {
-            // Tentukan unit berdasarkan nama nutrisi
             final unit =
                 (entry.key.contains('vit_a') || entry.key.contains('carotene'))
                 ? 'mcg'
@@ -112,11 +162,12 @@ class FoodNutrientCard extends StatelessWidget {
             return _buildNutrientRow(
               _formatNutrientName(entry.key),
               '${entry.value.toStringAsFixed(1)} $unit',
+              context,
             );
           }
           return const SizedBox.shrink();
         }),
-        const SizedBox(height: 16),
+        const SizedBox(height: 4),
       ],
     );
   }

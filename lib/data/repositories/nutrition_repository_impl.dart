@@ -175,13 +175,22 @@ class NutritionRepositoryImpl implements NutritionRepository {
       final startDate = DateTime(date.year, date.month, date.day);
       final endDate = startDate.add(const Duration(days: 1));
 
-      final historyMaps = await db.query(
-        'meal_histories as mh '
-        'JOIN meal_eaters as me ON mh.id = me.meal_history_id '
-        'JOIN meal_components as mc ON mh.id = mc.meal_history_id',
-        where:
-            '(me.parent_name = ? OR me.child_name = ?) AND mh.timestamp >= ? AND mh.timestamp < ?',
-        whereArgs: [
+      final historyMaps = await db.rawQuery(
+        '''
+        SELECT 
+          mh.timestamp,
+          mc.food_name,
+          mc.quantity,
+          mc.urt_name,
+          mc.total_grams
+        FROM meal_histories as mh
+        JOIN meal_eaters as me ON mh.id = me.meal_history_id
+        JOIN meal_components as mc ON mh.id = mc.meal_history_id
+        WHERE (me.parent_name = ? OR me.child_name = ?) 
+          AND mh.timestamp >= ? 
+          AND mh.timestamp < ?
+        ''',
+        [
           member.name,
           member.name,
           startDate.millisecondsSinceEpoch,
@@ -202,6 +211,8 @@ class NutritionRepositoryImpl implements NutritionRepository {
         final timestamp = DateTime.fromMillisecondsSinceEpoch(
           map['timestamp'] as int,
         );
+        final quantity = (map['quantity'] as num).toDouble();
+        final urtName = map['urt_name'] as String;
 
         final foodNutrients = foodNutrientLookup[foodName];
         if (foodNutrients == null) continue;
@@ -214,9 +225,14 @@ class NutritionRepositoryImpl implements NutritionRepository {
           }
         });
 
+        calculatedNutrients['timestamp'] = timestamp.millisecondsSinceEpoch
+            .toDouble();
+
         final foodDetail = FoodDetail(
           foodName: foodName,
           totalGrams: totalGrams,
+          quantity: quantity,
+          urtName: urtName,
           calculatedNutrients: calculatedNutrients,
         );
 

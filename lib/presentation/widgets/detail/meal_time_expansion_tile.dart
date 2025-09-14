@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_tumbuh_sehat_v2/core/theme/ts_text_style.dart';
 
 import '../../../core/theme/ts_color.dart';
 import '../../../data/models/daily_detail_model.dart';
@@ -37,38 +38,48 @@ class _MealTimeExpansionTileState extends State<MealTimeExpansionTile> {
               _isExpanded = !_isExpanded;
             });
           },
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 2.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   '${widget.title} - ${widget.time}',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: getResponsiveTextStyle(context, TSFont.bold.h3),
                 ),
                 Icon(
                   _isExpanded
-                      ? Icons.keyboard_arrow_up
-                      : Icons.keyboard_arrow_down,
+                      ? Icons.arrow_drop_up_rounded
+                      : Icons.arrow_drop_down_rounded,
                   color: TSColor.monochrome.grey,
+                  size: 36,
                 ),
               ],
             ),
           ),
         ),
-        if (_isExpanded)
-          ListView.builder(
-            itemCount: widget.foods.length,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemBuilder: (context, index) {
-              return FoodNutrientCard(foodDetail: widget.foods[index]);
-            },
-          ),
-        const Divider(),
+        if (_isExpanded) ...[
+          const SizedBox(height: 12),
+          ...widget.foods.asMap().entries.map((entry) {
+            final index = entry.key;
+            final food = entry.value;
+            return Container(
+              margin: EdgeInsets.only(
+                top: 4,
+                bottom: index == widget.foods.length - 1 ? 16 : 20,
+              ),
+              child: FoodNutrientCard(
+                foodDetail: food,
+                isLastItem: index == widget.foods.length - 1,
+              ),
+            );
+          }),
+        ],
+        Container(
+          height: 2,
+          color: TSColor.monochrome.lightGrey,
+          margin: const EdgeInsets.symmetric(vertical: 4),
+        ),
       ],
     );
   }
