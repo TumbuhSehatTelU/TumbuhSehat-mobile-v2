@@ -57,7 +57,7 @@ class _BerandaScreenState extends State<BerandaScreen> {
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (_) => NutritionDetailRecommendationScreen(
-            memberName: currentMember.name,
+            initialMember: currentMember.name,
           ),
         ),
       );
