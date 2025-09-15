@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:dartz/dartz.dart';
-import 'package:sqflite/sqflite.dart';
 import '../../core/database/database_helper.dart';
 import '../../core/error/failures.dart';
 import '../../domain/repositories/nutrition_repository.dart';
@@ -25,7 +24,7 @@ class NutritionRepositoryImpl implements NutritionRepository {
     required Duration duration,
   }) async {
     try {
-      final akgStandard = await _calculateAkgForMember(member);
+      final akgStandard = await getAkgForMember(member);
       if (akgStandard == null) {
         return Left(
           CacheFailure(
@@ -96,7 +95,7 @@ class NutritionRepositoryImpl implements NutritionRepository {
         );
       }
 
-      final foodNutrientLookup = await _getFoodNutrientLookup(historyMaps, db);
+      final foodNutrientLookup = await dbHelper.getFoodNutrientLookup(historyMaps);
       final weeklyTotals = <int, double>{1: 0, 2: 0, 3: 0, 4: 0, 5: 0};
 
       for (final map in historyMaps) {
@@ -202,7 +201,7 @@ class NutritionRepositoryImpl implements NutritionRepository {
         return Right(DailyDetailModel.empty());
       }
 
-      final foodNutrientLookup = await _getFoodNutrientLookup(historyMaps, db);
+      final foodNutrientLookup = await dbHelper.getFoodNutrientLookup(historyMaps);
       final Map<MealTime, List<FoodDetail>> meals = {};
 
       for (final map in historyMaps) {
@@ -246,8 +245,8 @@ class NutritionRepositoryImpl implements NutritionRepository {
     }
   }
 
-  // HELPER
-  Future<AkgModel?> _calculateAkgForMember(dynamic member) async {
+  @override
+  Future<AkgModel?> getAkgForMember(dynamic member) async {
     final baseAkg = await _getBaseAkgForMember(member);
     if (baseAkg == null) return null;
 
@@ -291,6 +290,7 @@ class NutritionRepositoryImpl implements NutritionRepository {
     );
   }
 
+  // HELPER
   Future<AkgModel?> _getBaseAkgForMember(dynamic member) async {
     final db = await dbHelper.database;
     final now = DateTime.now();
@@ -388,8 +388,7 @@ class NutritionRepositoryImpl implements NutritionRepository {
     final Map<DateTime, double> dailyTotalCalories = {};
     final Map<DateTime, List<MealEntry>> dailyMealEntries = {};
 
-    final db = await dbHelper.database;
-    final foodNutrientLookup = await _getFoodNutrientLookup(maps, db);
+    final foodNutrientLookup = await dbHelper.getFoodNutrientLookup(maps);
 
     for (final map in maps) {
       final foodName = map['food_name'] as String;
@@ -502,25 +501,6 @@ class NutritionRepositoryImpl implements NutritionRepository {
       dailyIntakes: dailyIntakes,
       dailyMealEntries: dailyMealEntries,
     );
-  }
-
-  Future<Map<String, Map<String, dynamic>>> _getFoodNutrientLookup(
-    List<Map<String, dynamic>> maps,
-    Database db,
-  ) async {
-    if (maps.isEmpty) return {};
-
-    final uniqueFoodNames = maps.map((m) => m['food_name'] as String).toSet();
-
-    final foodNutrientMaps = await db.query(
-      'foods',
-      where: 'name IN (${List.filled(uniqueFoodNames.length, '?').join(',')})',
-      whereArgs: uniqueFoodNames.toList(),
-    );
-
-    return {
-      for (var foodMap in foodNutrientMaps) foodMap['name'] as String: foodMap,
-    };
   }
 
   Future<double> _computeHAZ(

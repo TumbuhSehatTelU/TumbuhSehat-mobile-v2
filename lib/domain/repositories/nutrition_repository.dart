@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import '../../core/error/failures.dart';
+import '../../data/models/akg_model.dart';
 import '../../data/models/daily_detail_model.dart';
 import '../../data/models/weekly_intake_model.dart';
 import '../../data/models/weekly_summary_model.dart';
@@ -23,4 +24,6 @@ abstract class NutritionRepository {
     required dynamic member,
     required DateTime date,
   });
+
+  Future<AkgModel?> getAkgForMember(dynamic member);
 }

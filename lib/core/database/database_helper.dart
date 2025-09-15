@@ -253,4 +253,27 @@ class DatabaseHelper {
     await batch.commit(noResult: true);
     print('Seeded $tableName successfully.');
   }
+
+  Future<Map<String, Map<String, dynamic>>> getFoodNutrientLookup(
+    List<Map<String, dynamic>> mealComponentMaps,
+  ) async {
+    if (mealComponentMaps.isEmpty) return {};
+
+    final db = await database;
+    final uniqueFoodNames = mealComponentMaps
+        .map((m) => m['food_name'] as String)
+        .toSet();
+
+    if (uniqueFoodNames.isEmpty) return {};
+
+    final foodNutrientMaps = await db.query(
+      'foods',
+      where: 'name IN (${List.filled(uniqueFoodNames.length, '?').join(',')})',
+      whereArgs: uniqueFoodNames.toList(),
+    );
+
+    return {
+      for (var foodMap in foodNutrientMaps) foodMap['name'] as String: foodMap,
+    };
+  }
 }
