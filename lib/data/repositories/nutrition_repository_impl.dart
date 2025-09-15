@@ -393,6 +393,8 @@ class NutritionRepositoryImpl implements NutritionRepository {
 
     for (final map in maps) {
       final foodName = map['food_name'] as String;
+      final quantity = (map['quantity'] as num).toDouble();
+      final urtName = map['urt_name'] as String;
       final totalGrams = (map['total_grams'] as num).toDouble();
       final timestamp = DateTime.fromMillisecondsSinceEpoch(
         map['timestamp'] as int,
@@ -425,6 +427,8 @@ class NutritionRepositoryImpl implements NutritionRepository {
 
       final mealComponent = MealComponentEntry(
         foodName: foodName,
+        quantity: quantity,
+        urtName: urtName,
         calories: componentCalories,
       );
       final mealList = dailyMealEntries.putIfAbsent(dateOnly, () => []);

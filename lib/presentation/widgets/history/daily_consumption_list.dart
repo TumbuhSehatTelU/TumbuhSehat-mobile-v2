@@ -11,19 +11,18 @@ enum MealTime { Sarapan, MakanSiang, CamilanSore, MakanMalam, CamilanMalam }
 
 class DailyConsumptionList extends StatefulWidget {
   final Map<DateTime, List<MealEntry>> dailyEntries;
-  final dynamic currentMember; // <-- TAMBAHKAN INI
+  final dynamic currentMember;
 
   const DailyConsumptionList({
     super.key,
     required this.dailyEntries,
-    required this.currentMember, // <-- TAMBAHKAN INI
+    required this.currentMember,
   });
 
   @override
   State<DailyConsumptionList> createState() => _DailyConsumptionListState();
 }
 
-// 2. GANTI SELURUH KODE DI DALAM `_DailyConsumptionListState`
 class _DailyConsumptionListState extends State<DailyConsumptionList> {
   late DateTime _selectedDate;
 
@@ -51,7 +50,6 @@ class _DailyConsumptionListState extends State<DailyConsumptionList> {
     }
   }
 
-  // --- LOGIKA PENGELOMPOKKAN BARU ---
   Map<MealTime, List<MealEntry>> _groupEntriesByMealTime(
     List<MealEntry> entries,
   ) {
@@ -70,7 +68,6 @@ class _DailyConsumptionListState extends State<DailyConsumptionList> {
     if (time.hour >= 18 && time.hour < 22) return MealTime.MakanMalam;
     return MealTime.CamilanMalam;
   }
-  // --- END LOGIKA BARU ---
 
   @override
   Widget build(BuildContext context) {
@@ -113,6 +110,32 @@ class _DailyConsumptionListState extends State<DailyConsumptionList> {
           boxShadow: TSShadow.shadows.weight300,
           contentColor: TSColor.monochrome.black,
           width: double.infinity,
+        ),
+        const SizedBox(height: 24),
+        TSButton(
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => DailyConsumptionDetailScreen(
+                  member: widget.currentMember,
+                  date: _selectedDate,
+                ),
+              ),
+            );
+          },
+          text: 'Lihat Detail',
+          textStyle: getResponsiveTextStyle(
+            context,
+            TSFont.bold.large.withColor(TSColor.monochrome.pureWhite),
+          ),
+          backgroundColor: TSColor.mainTosca.shade500,
+          borderColor: Colors.transparent,
+          contentColor: TSColor.monochrome.pureWhite,
+          width: double.infinity,
+          boxShadow: TSShadow.shadows.weight300,
+          customBorderRadius: 240,
+          style: ButtonStyleType.leftIcon,
+          icon: Icons.info_outline,
         ),
         const SizedBox(height: 24),
 
@@ -231,7 +254,7 @@ class _MealEntryCard extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          component.foodName,
+                          '${component.foodName} - ${component.quantity.toStringAsFixed(0)} ${component.urtName}',
                           style: getResponsiveTextStyle(
                             context,
                             TSFont.regular.body.withColor(
@@ -254,28 +277,6 @@ class _MealEntryCard extends StatelessWidget {
                 }),
               ],
             ),
-          ),
-          TSButton(
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => DailyConsumptionDetailScreen(
-                    member: currentMember,
-                    date: selectedDate,
-                  ),
-                ),
-              );
-            },
-            text: 'Lihat Detail',
-            textStyle: getResponsiveTextStyle(
-              context,
-              TSFont.bold.large.withColor(TSColor.monochrome.pureWhite),
-            ),
-            backgroundColor: TSColor.mainTosca.shade500,
-            borderColor: Colors.transparent,
-            contentColor: TSColor.monochrome.pureWhite,
-            width: double.infinity,
-            customBorderRadius: 0,
           ),
         ],
       ),

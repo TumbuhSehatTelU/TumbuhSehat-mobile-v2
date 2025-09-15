@@ -66,10 +66,17 @@ class MealEntry extends Equatable {
 
 class MealComponentEntry extends Equatable {
   final String foodName;
+  final double quantity;
+  final String urtName;
   final double calories;
 
-  const MealComponentEntry({required this.foodName, required this.calories});
+  const MealComponentEntry({
+    required this.foodName,
+    required this.quantity,
+    required this.urtName,
+    required this.calories,
+  });
 
   @override
-  List<Object> get props => [foodName, calories];
+  List<Object> get props => [foodName, quantity, urtName, calories];
 }
