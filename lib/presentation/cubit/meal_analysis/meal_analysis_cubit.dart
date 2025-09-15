@@ -80,24 +80,30 @@ class MealAnalysisCubit extends Cubit<MealAnalysisState> {
   void _calculateTotals() {
     final totalNutrients = <String, double>{};
     for (final card in state.foodCards) {
-      final food = card.selectedFood;
-      final urt = card.selectedUrt;
-      final quantity = double.tryParse(card.quantityController.text) ?? 0.0;
+      if (card.selectedFood == null || card.selectedUrt == null) {
+        continue;
+      }
+      final quantity = double.tryParse(card.quantityController.text);
+      if (quantity == null || quantity <= 0) {
+        continue;
+      }
+      final totalGrams = card.selectedUrt!.grams * quantity;
+      if (totalGrams <= 0) continue; 
 
-      if (food != null && urt != null && quantity > 0) {
-        final totalGrams = urt.grams * quantity;
-        final factor = totalGrams / 100.0; // Nutrients are per 100g
+      final factor = totalGrams / 100.0;
 
-        food.nutrients.forEach((key, value) {
-          final nutrientValue = (value as num).toDouble() * factor;
+      card.selectedFood!.nutrients.forEach((key, value) {
+        if (value is num) {
+          final nutrientValue = value.toDouble() * factor;
           totalNutrients.update(
             key,
             (existing) => existing + nutrientValue,
             ifAbsent: () => nutrientValue,
           );
-        });
-      }
+        }
+      });
     }
+
     emit(state.copyWith(totalNutrients: totalNutrients));
   }
 
