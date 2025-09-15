@@ -29,136 +29,143 @@ class DatabaseHelper {
   Future<void> _createTables(Database db) async {
     // --- Tabel untuk Kamus Makanan ---
     await db.execute('''
-    CREATE TABLE foods (
-      id INTEGER PRIMARY KEY,
-      name TEXT NOT NULL UNIQUE,
-      calories REAL, protein REAL, fat REAL, carbohydrates REAL,
-      fiber REAL, water REAL, calcium REAL, phosphorus REAL,
-      iron REAL, sodium REAL, potassium REAL, copper REAL,
-      zinc REAL, vit_a REAL, carotene_b REAL, carotene_total REAL,
-      vit_b1 REAL, vit_b2 REAL, niacin REAL, vit_c REAL
-    )
-  ''');
+      CREATE TABLE foods (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL,
+        category TEXT,
+        priority INTEGER DEFAULT 0,
+        calories REAL, protein REAL, fat REAL, carbohydrates REAL,
+        fiber REAL, water REAL, calcium REAL, phosphorus REAL,
+        iron REAL, sodium REAL, potassium REAL, copper REAL,
+        zinc REAL, vit_a REAL, carotene_b REAL, carotene_total REAL,
+        vit_b1 REAL, vit_b2 REAL, niacin REAL, vit_c REAL
+      )
+    ''');
 
     await db.execute('''
-    CREATE TABLE urt_conversions (
-      id INTEGER PRIMARY KEY,
-      urt_name TEXT NOT NULL UNIQUE,
-      grams REAL NOT NULL
-    )
-  ''');
+      CREATE TABLE urt_conversions (
+        id INTEGER PRIMARY KEY,
+        urt_name TEXT NOT NULL UNIQUE,
+        grams REAL NOT NULL
+      )
+    ''');
 
     await db.execute('''
-    CREATE TABLE food_serving_options (
-      food_id INTEGER,
-      urt_id INTEGER,
-      FOREIGN KEY (food_id) REFERENCES foods(id) ON DELETE CASCADE,
-      FOREIGN KEY (urt_id) REFERENCES urt_conversions(id) ON DELETE CASCADE,
-      PRIMARY KEY (food_id, urt_id)
-    )
-  ''');
+      CREATE TABLE food_serving_options (
+        food_id INTEGER,
+        urt_id INTEGER,
+        FOREIGN KEY (food_id) REFERENCES foods(id) ON DELETE CASCADE,
+        FOREIGN KEY (urt_id) REFERENCES urt_conversions(id) ON DELETE CASCADE,
+        PRIMARY KEY (food_id, urt_id)
+      )
+    ''');
 
     await db.execute('''
-    CREATE TABLE meal_histories (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      timestamp INTEGER NOT NULL,
-      is_synced INTEGER NOT NULL DEFAULT 0
-    )
-  ''');
+      CREATE TABLE meal_histories (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        timestamp INTEGER NOT NULL,
+        is_synced INTEGER NOT NULL DEFAULT 0
+      )
+    ''');
 
     await db.execute('''
-    CREATE TABLE meal_components (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      meal_history_id INTEGER NOT NULL,
-      food_name TEXT NOT NULL,
-      quantity REAL NOT NULL,
-      urt_name TEXT NOT NULL,
-      total_grams REAL NOT NULL,
-      FOREIGN KEY (meal_history_id) REFERENCES meal_histories(id) ON DELETE CASCADE
-    )
-  ''');
+      CREATE TABLE meal_components (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        meal_history_id INTEGER,
+        group_name TEXT,
+        food_name TEXT NOT NULL,
+        quantity REAL NOT NULL,
+        urt_name TEXT NOT NULL,
+        total_grams REAL NOT NULL,
+        FOREIGN KEY (meal_history_id) REFERENCES meal_histories(id) ON DELETE CASCADE
+      )
+    ''');
 
     await db.execute('''
-    CREATE TABLE meal_eaters (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      meal_history_id INTEGER NOT NULL,
-      parent_name TEXT,
-      child_name TEXT,
-      FOREIGN KEY (meal_history_id) REFERENCES meal_histories(id) ON DELETE CASCADE,
-      CHECK (parent_name IS NOT NULL OR child_name IS NOT NULL)
-    )
-  ''');
+      CREATE TABLE meal_eaters (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        meal_history_id INTEGER NOT NULL,
+        parent_name TEXT,
+        child_name TEXT,
+        FOREIGN KEY (meal_history_id) REFERENCES meal_histories(id) ON DELETE CASCADE,
+        CHECK (parent_name IS NOT NULL OR child_name IS NOT NULL)
+      )
+    ''');
 
     // AKG
     await db.execute('''
-    CREATE TABLE akg_standards (
-      id INTEGER PRIMARY KEY,
-      category TEXT NOT NULL,
-      gender TEXT NOT NULL,
-      start_month INTEGER NOT NULL,
-      end_month INTEGER NOT NULL,
-      calories REAL,
-      protein REAL,
-      fat REAL,
-      carbohydrates REAL,
-      fiber REAL,
-      water REAL
-    )
-  ''');
+      CREATE TABLE akg_standards (
+        id INTEGER PRIMARY KEY,
+        category TEXT NOT NULL,
+        gender TEXT NOT NULL,
+        start_month INTEGER NOT NULL,
+        end_month INTEGER NOT NULL,
+        calories REAL,
+        protein REAL,
+        fat REAL,
+        carbohydrates REAL,
+        fiber REAL,
+        water REAL
+      )
+    ''');
 
     await db.execute('''
-    CREATE TABLE who_haz_boys (
-      unit TEXT NOT NULL,
-      value INTEGER NOT NULL,
-      L REAL NOT NULL,
-      M REAL NOT NULL,
-      S REAL NOT NULL,
-      PRIMARY KEY (unit, value)
-    )
-  ''');
-    await db.execute('''
-    CREATE TABLE who_haz_girls (
-      unit TEXT NOT NULL,
-      value INTEGER NOT NULL,
-      L REAL NOT NULL,
-      M REAL NOT NULL,
-      S REAL NOT NULL,
-      PRIMARY KEY (unit, value)
-    )
-  ''');
+      CREATE TABLE who_haz_boys (
+        unit TEXT NOT NULL,
+        value INTEGER NOT NULL,
+        L REAL NOT NULL,
+        M REAL NOT NULL,
+        S REAL NOT NULL,
+        PRIMARY KEY (unit, value)
+      )
+    ''');
 
     await db.execute('''
-    CREATE TABLE who_whz_boys_0_2_years (
-      height_cm REAL PRIMARY KEY,
-      L REAL NOT NULL,
-      M REAL NOT NULL,
-      S REAL NOT NULL
-    )
-  ''');
+      CREATE TABLE who_haz_girls (
+        unit TEXT NOT NULL,
+        value INTEGER NOT NULL,
+        L REAL NOT NULL,
+        M REAL NOT NULL,
+        S REAL NOT NULL,
+        PRIMARY KEY (unit, value)
+      )
+    ''');
+
     await db.execute('''
-    CREATE TABLE who_whz_boys_2_5_years (
-      height_cm REAL PRIMARY KEY,
-      L REAL NOT NULL,
-      M REAL NOT NULL,
-      S REAL NOT NULL
-    )
-  ''');
+      CREATE TABLE who_whz_boys_0_2_years (
+        height_cm REAL PRIMARY KEY,
+        L REAL NOT NULL,
+        M REAL NOT NULL,
+        S REAL NOT NULL
+      )
+    ''');
+
     await db.execute('''
-    CREATE TABLE who_whz_girls_0_2_years (
-      height_cm REAL PRIMARY KEY,
-      L REAL NOT NULL,
-      M REAL NOT NULL,
-      S REAL NOT NULL
-    )
-  ''');
+      CREATE TABLE who_whz_boys_2_5_years (
+        height_cm REAL PRIMARY KEY,
+        L REAL NOT NULL,
+        M REAL NOT NULL,
+        S REAL NOT NULL
+      )
+    ''');
+
     await db.execute('''
-    CREATE TABLE who_whz_girls_2_5_years (
-      height_cm REAL PRIMARY KEY,
-      L REAL NOT NULL,
-      M REAL NOT NULL,
-      S REAL NOT NULL
-    )
-  ''');
+      CREATE TABLE who_whz_girls_0_2_years (
+        height_cm REAL PRIMARY KEY,
+        L REAL NOT NULL,
+        M REAL NOT NULL,
+        S REAL NOT NULL
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE who_whz_girls_2_5_years (
+        height_cm REAL PRIMARY KEY,
+        L REAL NOT NULL,
+        M REAL NOT NULL,
+        S REAL NOT NULL
+      )
+    ''');
   }
 
   Future<void> _seedDatabase(Database db) async {
