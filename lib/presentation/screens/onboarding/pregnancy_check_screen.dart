@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mobile_tumbuh_sehat_v2/core/theme/ts_shadow.dart';
-import 'package:mobile_tumbuh_sehat_v2/core/theme/ts_text_style.dart';
 
 import '../../../core/theme/ts_color.dart';
+import '../../../core/theme/ts_shadow.dart';
+import '../../../core/theme/ts_text_style.dart';
 import '../../../data/models/parent_model.dart';
 import '../../cubit/onboarding/onboarding_cubit.dart';
 import '../../widgets/common/ts_button.dart';

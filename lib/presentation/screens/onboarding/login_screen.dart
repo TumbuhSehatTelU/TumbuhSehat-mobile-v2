@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mobile_tumbuh_sehat_v2/core/theme/ts_shadow.dart';
-import 'package:mobile_tumbuh_sehat_v2/presentation/screens/onboarding/welcome_screen.dart';
 
 import '../../../core/network/network_info.dart';
 import '../../../core/theme/ts_color.dart';
+import '../../../core/theme/ts_shadow.dart';
 import '../../../core/theme/ts_text_style.dart';
 import '../../../injection_container.dart';
 import '../../cubit/login/login_cubit.dart';
@@ -13,6 +12,7 @@ import '../../widgets/common/ts_button.dart';
 import '../../widgets/layouts/ts_page_scaffold.dart';
 import '../../widgets/common/ts_text_field.dart';
 import 'join_or_create_screen.dart';
+import 'welcome_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});

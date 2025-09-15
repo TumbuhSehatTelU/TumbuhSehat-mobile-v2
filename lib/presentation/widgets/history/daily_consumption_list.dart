@@ -1,8 +1,11 @@
+// ignore_for_file: constant_identifier_names
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:mobile_tumbuh_sehat_v2/core/theme/ts_shadow.dart';
-import 'package:mobile_tumbuh_sehat_v2/core/theme/ts_text_style.dart';
+
 import '../../../core/theme/ts_color.dart';
+import '../../../core/theme/ts_shadow.dart';
+import '../../../core/theme/ts_text_style.dart';
 import '../../../data/models/weekly_summary_model.dart';
 import '../../screens/main/daily_consumption_detail_screen.dart';
 import '../common/ts_button.dart';

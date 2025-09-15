@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_tumbuh_sehat_v2/core/theme/ts_color.dart';
-import 'package:mobile_tumbuh_sehat_v2/core/theme/ts_text_style.dart';
+
+import '../../../core/theme/ts_color.dart';
 import '../../../core/theme/ts_shadow.dart';
+import '../../../core/theme/ts_text_style.dart';
 
 class TSAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;

@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:mesh_gradient/mesh_gradient.dart';
-import 'package:mobile_tumbuh_sehat_v2/core/theme/ts_text_style.dart';
-import 'package:mobile_tumbuh_sehat_v2/presentation/widgets/layouts/ts_app_bar.dart';
 
 import '../../../core/theme/ts_color.dart';
 import '../../../core/theme/ts_shadow.dart';
+import '../../../core/theme/ts_text_style.dart';
 import '../../../data/models/child_model.dart';
 import '../../../data/models/daily_detail_model.dart';
 import '../../../injection_container.dart';
@@ -14,6 +13,7 @@ import '../../cubit/daily_detail/daily_detail_cubit.dart';
 import '../../widgets/common/ts_button.dart';
 import '../../widgets/detail/meal_time_expansion_tile.dart';
 import '../../widgets/history/member_carousel_header.dart';
+import '../../widgets/layouts/ts_app_bar.dart';
 
 class DailyConsumptionDetailScreen extends StatefulWidget {
   final dynamic member;

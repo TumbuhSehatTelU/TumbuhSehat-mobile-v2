@@ -1,8 +1,9 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
-import 'package:mobile_tumbuh_sehat_v2/core/theme/ts_color.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+
+import '../../../core/theme/ts_color.dart';
 import 'member_card.dart';
 
 class MemberCarousel extends StatelessWidget {

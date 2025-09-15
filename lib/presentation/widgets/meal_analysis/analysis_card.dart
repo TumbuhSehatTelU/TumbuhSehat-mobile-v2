@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:mobile_tumbuh_sehat_v2/core/theme/ts_shadow.dart';
-import 'package:mobile_tumbuh_sehat_v2/core/theme/ts_text_style.dart';
+
 import '../../../core/theme/ts_color.dart';
+import '../../../core/theme/ts_shadow.dart';
+import '../../../core/theme/ts_text_style.dart';
 
 class AnalysisCard extends StatelessWidget {
   final String assetPath;
