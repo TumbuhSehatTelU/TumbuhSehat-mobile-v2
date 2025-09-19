@@ -9,6 +9,7 @@ import '../../../data/models/recommendation_model.dart';
 import '../../../injection_container.dart';
 import '../../cubit/recommendation/recommendation_cubit.dart';
 import '../../widgets/history/member_carousel_header.dart';
+import '../../widgets/layouts/ts_app_bar.dart';
 import '../../widgets/recommendation/day_selector.dart';
 import '../../widgets/recommendation/meal_recommendation_card.dart';
 
@@ -73,11 +74,7 @@ class _NutritionDetailRecommendationScreenState
           sl<RecommendationCubit>()..loadInitialData(widget.initialMemberName),
       child: Scaffold(
         extendBodyBehindAppBar: true,
-        appBar: AppBar(
-          title: const Text('Rekomendasi Gizi'),
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-        ),
+        appBar: TSAppBar(title: "Rekomendasi Gizi"),
         body: BlocConsumer<RecommendationCubit, RecommendationState>(
           listener: (context, state) {
             if (state is RecommendationLoaded && _allMembers.isEmpty) {

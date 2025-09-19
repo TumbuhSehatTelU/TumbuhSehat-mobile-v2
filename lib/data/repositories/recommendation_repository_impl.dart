@@ -148,71 +148,78 @@ class RecommendationRepositoryImpl implements RecommendationRepository {
     Map<String, double> target,
   ) async {
     List<RecommendedFood> recommendations = [];
-    double caloriesUsed = 0;
+    double caloriesRemaining = target['calories']!;
 
-    final carbTargetCalories = target['calories']! * 0.5;
-    final carbRec = await _findFoodForNutrient(
-      db,
-      'sumber_karbohidrat',
-      'calories',
-      carbTargetCalories,
-    );
-    if (carbRec != null) {
-      recommendations.add(carbRec);
-      caloriesUsed +=
-          carbRec.food.calories * (carbRec.quantity * carbRec.urt.grams / 100);
-    }
-
-    final proteinTargetCalories = target['calories']! * 0.3;
-    final hewaniCandidates = await db.query(
-      'foods',
-      where: 'category = ? AND calories > 0',
-      whereArgs: ['protein_hewani'],
-      orderBy: 'priority DESC',
-      limit: 3,
-    );
-    final nabatiCandidates = await db.query(
-      'foods',
-      where: 'category = ? AND calories > 0',
-      whereArgs: ['protein_nabati'],
-      orderBy: 'priority DESC',
-      limit: 3,
-    );
-
-    final allProteinCandidates = [...hewaniCandidates, ...nabatiCandidates];
-    if (allProteinCandidates.isNotEmpty) {
-      allProteinCandidates.shuffle();
-      final selectedFoodMap = allProteinCandidates.first;
-      final selectedFood = FoodModel.fromMap(selectedFoodMap);
-      final selectedCategory = selectedFoodMap['category'] as String;
-
-      final proteinRec = await _findFoodForNutrient(
+    if (caloriesRemaining > 0) {
+      final carbTargetCalories = caloriesRemaining * 0.5;
+      final carbRec = await _findFoodForNutrient(
         db,
-        selectedCategory,
+        'sumber_karbohidrat',
         'calories',
-        proteinTargetCalories,
-        specificFoodId: selectedFood.id,
+        carbTargetCalories,
       );
-
-      if (proteinRec != null) {
-        recommendations.add(proteinRec);
-        caloriesUsed +=
-            proteinRec.food.calories *
-            (proteinRec.quantity * proteinRec.urt.grams / 100);
+      if (carbRec != null) {
+        recommendations.add(carbRec);
+        final grams = carbRec.quantity * carbRec.urt.grams;
+        final caloriesUsed = (carbRec.food.calories * (grams / 100.0));
+        caloriesRemaining -= caloriesUsed; 
       }
     }
 
-    final fiberTargetCalories = max(50, target['calories']! - caloriesUsed);
-    final fiberRec = await _findFoodForNutrient(
-      db,
-      'sayuran',
-      'calories',
-      fiberTargetCalories.roundToDouble(),
-    );
-    if (fiberRec != null) {
-      recommendations.add(fiberRec);
+    if (caloriesRemaining > 50) {
+      final proteinTargetCalories = caloriesRemaining * 0.6;
+      final hewaniCandidates = await db.query(
+        'foods',
+        where: 'category = ?',
+        whereArgs: ['protein_hewani'],
+        orderBy: 'priority DESC',
+        limit: 3,
+      );
+      final nabatiCandidates = await db.query(
+        'foods',
+        where: 'category = ?',
+        whereArgs: ['protein_nabati'],
+        orderBy: 'priority DESC',
+        limit: 3,
+      );
+      final allProteinCandidates = [...hewaniCandidates, ...nabatiCandidates];
+
+      if (allProteinCandidates.isNotEmpty) {
+        allProteinCandidates.shuffle();
+        final selectedFoodMap = allProteinCandidates.first;
+        
+        final proteinRec = await _findFoodForNutrient(
+          db,
+          selectedFoodMap['category'] as String,
+          'calories',
+          proteinTargetCalories,
+          specificFoodId: selectedFoodMap['id'] as int,
+        );
+
+        if (proteinRec != null) {
+          recommendations.add(proteinRec);
+          final grams = proteinRec.quantity * proteinRec.urt.grams;
+          final caloriesUsed = (proteinRec.food.calories * (grams / 100.0));
+          caloriesRemaining -= caloriesUsed;
+        }
+      } 
     }
 
+    if (caloriesRemaining > 50) {
+      final fiberTargetCalories = caloriesRemaining;
+      final fiberRec = await _findFoodForNutrient(
+        db,
+        'sayuran',
+        'calories',
+        fiberTargetCalories,
+      );
+      if (fiberRec != null) {
+        recommendations.add(fiberRec);
+        final grams = fiberRec.quantity * fiberRec.urt.grams;
+        final caloriesUsed = (fiberRec.food.calories * (grams / 100.0));
+        caloriesRemaining -= caloriesUsed;
+      } 
+    }
     return recommendations;
   }
 
@@ -226,6 +233,7 @@ class RecommendationRepositoryImpl implements RecommendationRepository {
     if (targetValue <= 0) return null;
 
     List<Map<String, dynamic>> mainFoodMaps;
+
     if (specificFoodId != null) {
       mainFoodMaps = await db.query(
         'foods',
@@ -242,29 +250,32 @@ class RecommendationRepositoryImpl implements RecommendationRepository {
         limit: 1,
       );
     }
+
     if (mainFoodMaps.isEmpty) return null;
     final mainFood = FoodModel.fromMap(mainFoodMaps.first);
 
     final urtMaps = await db.rawQuery(
-      'SELECT T2.* FROM food_serving_options T1 JOIN urt_conversions T2 ON T1.urt_id = T2.id WHERE T1.food_id = ?',
+      'SELECT T2.* FROM food_serving_options T1 JOIN urt_conversions T2 ON T1.urt_id = T2.id WHERE T1.food_id = ? ORDER BY T2.grams DESC', // Ambil URT terbesar dulu
       [mainFood.id],
     );
-    if (urtMaps.isEmpty) return null;
-    final availableUrts = urtMaps.map((map) => UrtModel.fromMap(map)).toList();
-    final bestUrt = availableUrts.first;
+    if (urtMaps.isEmpty) {
+      return null;
+    }
+    final bestUrt = UrtModel.fromMap(urtMaps.first);
 
-    final nutrientValuePer100g =
-        (mainFood.nutrients[targetNutrient] as num?)?.toDouble() ?? 0.0;
-    if (nutrientValuePer100g <= 0) return null;
+    final caloriesPer100g = mainFood.calories;
+    if (caloriesPer100g <= 0) return null;
 
-    final requiredGrams = (targetValue / nutrientValuePer100g) * 100.0;
+    final requiredGrams = (targetValue / caloriesPer100g) * 100.0;
     final quantity = requiredGrams / bestUrt.grams;
+
+    if (quantity < 0.1) return null;
 
     final alternatives = await _findAlternatives(db, category, mainFood.id);
 
     return RecommendedFood(
       food: mainFood,
-      quantity: quantity.isNaN ? 1.0 : quantity,
+      quantity: quantity.isNaN || quantity.isInfinite ? 1.0 : quantity,
       urt: bestUrt,
       alternatives: alternatives,
     );

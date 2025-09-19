@@ -185,6 +185,7 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  const SizedBox(height: 24),
                   if (!widget.isJoiningFamily) ...[
                     _buildSectionHeader(context, "No Handphone"),
                     TSTextField(

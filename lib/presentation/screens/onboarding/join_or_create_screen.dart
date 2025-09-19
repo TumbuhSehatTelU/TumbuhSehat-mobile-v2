@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-
 import '../../../core/theme/ts_color.dart';
 import '../../../core/theme/ts_shadow.dart';
 import '../../../core/theme/ts_text_style.dart';
@@ -46,7 +45,7 @@ class _JoinOrCreateScreenState extends State<JoinOrCreateScreen> {
           AuthHeader(),
           Spacer(flex: 1),
           Text(
-            "Apakah anggota keluarga Anda\nsudah ada yang menggunakan\nTumbuhSehat?",
+            "Apakah anggota keluarga\nAnda sudah ada\nyang menggunakan\nTumbuhSehat?",
             style: getResponsiveTextStyle(
               context,
               TSFont.bold.h2.withColor(TSColor.monochrome.black),
