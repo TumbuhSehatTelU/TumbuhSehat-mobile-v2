@@ -30,7 +30,9 @@ class RecommendationRepositoryImpl implements RecommendationRepository {
       final db = await dbHelper.database;
 
       final akgResult = await nutritionRepository.getAkgForMember(member);
-      if (akgResult == null) return Left(CacheFailure('AKG tidak ditemukan.'));
+      if (akgResult == null) {
+        return Left(CacheFailure('AKG tidak ditemukan.'));
+      }
 
       var remainingAkg = akgResult;
 

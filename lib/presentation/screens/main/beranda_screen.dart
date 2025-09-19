@@ -53,11 +53,11 @@ class _BerandaScreenState extends State<BerandaScreen> {
     if (_allMembers.isNotEmpty) {
       final memberIndex = _currentPageIndex % _allMembers.length;
       final currentMember = _allMembers[memberIndex];
-
       Navigator.of(context).push(
         MaterialPageRoute(
+          // Kirim NAMA-nya (String), bukan seluruh objek
           builder: (_) => NutritionDetailRecommendationScreen(
-            initialMember: currentMember.name,
+            initialMemberName: currentMember.name,
           ),
         ),
       );

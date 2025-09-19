@@ -13,11 +13,11 @@ import '../../widgets/recommendation/day_selector.dart';
 import '../../widgets/recommendation/meal_recommendation_card.dart';
 
 class NutritionDetailRecommendationScreen extends StatefulWidget {
-  final dynamic initialMember;
+  final String initialMemberName;
 
   const NutritionDetailRecommendationScreen({
     super.key,
-    required this.initialMember,
+    required this.initialMemberName,
   });
 
   @override
@@ -29,11 +29,35 @@ class _NutritionDetailRecommendationScreenState
     extends State<NutritionDetailRecommendationScreen> {
   late final PageController _pageController;
   List<dynamic> _allMembers = [];
+  int _currentMemberIndex = 0;
+  List<Color> _gradientColors = [];
+  List<Color> _getGradientColors({required bool isChild}) {
+    if (isChild) {
+      return [
+        TSColor.mainTosca.shade100,
+        TSColor.mainTosca.shade400,
+        TSColor.mainTosca.shade200,
+        TSColor.mainTosca.primary,
+        TSColor.secondaryGreen.shade200,
+        TSColor.mainTosca.primary,
+      ];
+    } else {
+      return [
+        TSColor.secondaryGreen.primary,
+        TSColor.secondaryGreen.shade200,
+        TSColor.secondaryGreen.shade400,
+        TSColor.secondaryGreen.shade500,
+        TSColor.mainTosca.shade200,
+        TSColor.secondaryGreen.shade100,
+      ];
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    _pageController = PageController();
+    _pageController = PageController(initialPage: 0);
+    _gradientColors = _getGradientColors(isChild: true);
   }
 
   @override
@@ -46,7 +70,7 @@ class _NutritionDetailRecommendationScreenState
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) =>
-          sl<RecommendationCubit>()..loadInitialData(widget.initialMember),
+          sl<RecommendationCubit>()..loadInitialData(widget.initialMemberName),
       child: Scaffold(
         extendBodyBehindAppBar: true,
         appBar: AppBar(
@@ -59,13 +83,13 @@ class _NutritionDetailRecommendationScreenState
             if (state is RecommendationLoaded && _allMembers.isEmpty) {
               _allMembers = state.allMembers;
               final initialIndex = _allMembers.indexWhere(
-                (m) => m.name == widget.initialMember.name,
+                (member) => member.name == widget.initialMemberName,
               );
-              final validIndex = initialIndex != -1 ? initialIndex : 0;
-              final initialPage = _allMembers.length * 100 + validIndex;
-
+              _currentMemberIndex = (initialIndex != -1) ? initialIndex : 0;
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 if (mounted && _pageController.hasClients) {
+                  final initialPage =
+                      _allMembers.length * 100 + _currentMemberIndex;
                   _pageController.jumpToPage(initialPage);
                 }
               });
@@ -73,16 +97,6 @@ class _NutritionDetailRecommendationScreenState
             }
           },
           builder: (context, state) {
-            final isChild =
-                state is RecommendationLoaded &&
-                state.currentMember is ChildModel;
-            final color1 = isChild
-                ? TSColor.mainTosca.shade500
-                : TSColor.secondaryGreen.shade500;
-            final color2 = isChild
-                ? TSColor.secondaryGreen.shade500
-                : TSColor.mainTosca.shade500;
-
             return Stack(
               children: [
                 Positioned.fill(
@@ -90,14 +104,30 @@ class _NutritionDetailRecommendationScreenState
                     points: [
                       MeshGradientPoint(
                         position: const Offset(0.1, 0.2),
-                        color: color1,
+                        color: _gradientColors[0],
+                      ),
+                      MeshGradientPoint(
+                        position: const Offset(0.8, 0.5),
+                        color: _gradientColors[1],
+                      ),
+                      MeshGradientPoint(
+                        position: const Offset(0.5, 0.5),
+                        color: _gradientColors[2],
                       ),
                       MeshGradientPoint(
                         position: const Offset(0.9, 0.8),
-                        color: color2,
+                        color: _gradientColors[3],
+                      ),
+                      MeshGradientPoint(
+                        position: const Offset(0.2, 0.85),
+                        color: _gradientColors[4],
+                      ),
+                      MeshGradientPoint(
+                        position: const Offset(0.6, 0.0),
+                        color: _gradientColors[5],
                       ),
                     ],
-                    options: MeshGradientOptions(blend: 5),
+                    options: MeshGradientOptions(blend: 3),
                   ),
                 ),
 
@@ -124,9 +154,19 @@ class _NutritionDetailRecommendationScreenState
                             pageController: _pageController,
                             onPageChanged: (index) {
                               final memberIndex = index % _allMembers.length;
-                              context.read<RecommendationCubit>().changeMember(
-                                _allMembers[memberIndex],
-                              );
+                              if (_currentMemberIndex != memberIndex) {
+                                setState(() {
+                                  _currentMemberIndex = memberIndex;
+                                  final currentMember =
+                                      _allMembers[memberIndex];
+                                  _gradientColors = _getGradientColors(
+                                    isChild: currentMember is ChildModel,
+                                  );
+                                });
+                                context
+                                    .read<RecommendationCubit>()
+                                    .changeMember(_allMembers[memberIndex]);
+                              }
                             },
                           ),
                         ),

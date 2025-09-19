@@ -95,7 +95,9 @@ class NutritionRepositoryImpl implements NutritionRepository {
         );
       }
 
-      final foodNutrientLookup = await dbHelper.getFoodNutrientLookup(historyMaps);
+      final foodNutrientLookup = await dbHelper.getFoodNutrientLookup(
+        historyMaps,
+      );
       final weeklyTotals = <int, double>{1: 0, 2: 0, 3: 0, 4: 0, 5: 0};
 
       for (final map in historyMaps) {
@@ -201,7 +203,9 @@ class NutritionRepositoryImpl implements NutritionRepository {
         return Right(DailyDetailModel.empty());
       }
 
-      final foodNutrientLookup = await dbHelper.getFoodNutrientLookup(historyMaps);
+      final foodNutrientLookup = await dbHelper.getFoodNutrientLookup(
+        historyMaps,
+      );
       final Map<MealTime, List<FoodDetail>> meals = {};
 
       for (final map in historyMaps) {
@@ -247,14 +251,137 @@ class NutritionRepositoryImpl implements NutritionRepository {
 
   @override
   Future<AkgModel?> getAkgForMember(dynamic member) async {
-    final baseAkg = await _getBaseAkgForMember(member);
-    if (baseAkg == null) return null;
-
-    if (member is! ChildModel) {
-      return baseAkg;
+    if (member is! ParentModel && member is! ChildModel) {
+      return null;
     }
 
-    final child = member;
+    try {
+      final baseAkg = await _getBaseAkg(member);
+      if (baseAkg == null) {
+        return null;
+      }
+
+      if (member is ParentModel) {
+        return await _addParentConditions(baseAkg, member);
+      } else if (member is ChildModel) {
+        return await _addChildConditions(baseAkg, member);
+      }
+
+      return baseAkg;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // HELPER
+  Future<AkgModel?> _getBaseAkg(dynamic member) async {
+    final db = await dbHelper.database;
+    final now = DateTime.now();
+    if (member.dateOfBirth == null) {
+      return null;
+    }
+
+    final ageInMonths = (now.difference(member.dateOfBirth).inDays / 30)
+        .floor();
+
+    String whereClause;
+    List<dynamic> whereArgs;
+
+    if (member is ParentModel) {
+      final genderString = member.gender == Gender.male ? 'male' : 'female';
+      whereClause = 'gender = ? AND ? BETWEEN start_month AND end_month';
+      whereArgs = [genderString, ageInMonths];
+    } else if (member is ChildModel) {
+      if (ageInMonths <= 108) {
+        whereClause = 'category = ? AND ? BETWEEN start_month AND end_month';
+        whereArgs = ['child', ageInMonths];
+      } else {
+        final genderString = member.gender == Gender.male ? 'male' : 'female';
+        whereClause = 'gender = ? AND ? BETWEEN start_month AND end_month';
+        whereArgs = [genderString, ageInMonths];
+      }
+    } else {
+      return null;
+    }
+
+    final List<Map<String, dynamic>> maps = await db.query(
+      'akg_standards',
+      where: whereClause,
+      whereArgs: whereArgs,
+      limit: 1,
+    );
+
+    if (maps.isEmpty) {
+      return null;
+    }
+
+    return AkgModel.fromMap(maps.first);
+  }
+
+  Future<AkgModel> _addParentConditions(
+    AkgModel baseAkg,
+    ParentModel parent,
+  ) async {
+    
+    final db = await dbHelper.database;
+    var finalAkg = baseAkg;
+
+    if (parent.isPregnant && parent.gestationalAge != GestationalAge.none) {
+      String category;
+      switch (parent.gestationalAge) {
+        case GestationalAge.month1:
+        case GestationalAge.month2:
+        case GestationalAge.month3:
+          category = 'pregnancy_t1';
+          break;
+        case GestationalAge.month4:
+        case GestationalAge.month5:
+        case GestationalAge.month6:
+          category = 'pregnancy_t2';
+          break;
+        default:
+          category = 'pregnancy_t3';
+          break;
+      }
+      final maps = await db.query(
+        'akg_standards',
+        where: 'category = ?',
+        whereArgs: [category],
+      );
+      if (maps.isNotEmpty) finalAkg += AkgModel.fromMap(maps.first);
+    }
+
+    if (parent.isLactating && parent.lactationPeriod != LactationPeriod.none) {
+      String category;
+      switch (parent.lactationPeriod) {
+        case LactationPeriod.oneToSixMonths:
+          category = 'lactation_m1_6';
+          break;
+        case LactationPeriod.sevenToTwelveMonths:
+          category = 'lactation_m7_12';
+          break;
+        default:
+          category = '';
+          break;
+      }
+      if (category.isNotEmpty) {
+        final maps = await db.query(
+          'akg_standards',
+          where: 'category = ?',
+          whereArgs: [category],
+        );
+        if (maps.isNotEmpty) finalAkg += AkgModel.fromMap(maps.first);
+      }
+    }
+    
+    return finalAkg;
+  }
+
+  Future<AkgModel> _addChildConditions(
+    AkgModel baseAkg,
+    ChildModel child,
+  ) async {
+    
     final ageInDays = DateTime.now().difference(child.dateOfBirth).inDays;
 
     final haz = await _computeHAZ(ageInDays, child.height, child.gender);
@@ -280,102 +407,12 @@ class NutritionRepositoryImpl implements NutritionRepository {
       extraProtein += baseAkg.protein * 0.32;
     }
 
-    return baseAkg.copyWith(
+    final finalAkg = baseAkg.copyWith(
       calories: baseAkg.calories + extraCalories,
       protein: baseAkg.protein + extraProtein,
-      fat: baseAkg.fat,
-      carbohydrates: baseAkg.carbohydrates,
-      fiber: baseAkg.fiber,
-      water: baseAkg.water,
-    );
-  }
-
-  // HELPER
-  Future<AkgModel?> _getBaseAkgForMember(dynamic member) async {
-    final db = await dbHelper.database;
-    final now = DateTime.now();
-    int ageInMonths;
-    String genderString;
-    String category;
-
-    if (member is ParentModel) {
-      ageInMonths = (now.difference(member.dateOfBirth).inDays / 30).floor();
-      genderString = member.gender == Gender.male ? 'male' : 'female';
-      category = genderString;
-    } else if (member is ChildModel) {
-      ageInMonths = (now.difference(member.dateOfBirth).inDays / 30).floor();
-      genderString = 'unspecified';
-      category = 'child';
-    } else {
-      return null;
-    }
-
-    final List<Map<String, dynamic>> maps = await db.query(
-      'akg_standards',
-      where:
-          '(category = ? OR gender = ?) AND ? BETWEEN start_month AND end_month',
-      whereArgs: [category, genderString, ageInMonths],
-      limit: 1,
     );
 
-    if (maps.isEmpty) return null;
-    var baseAkg = AkgModel.fromMap(maps.first);
-
-    if (member is ParentModel) {
-      if (member.isPregnant && member.gestationalAge != GestationalAge.none) {
-        String pregnancyCategory;
-        switch (member.gestationalAge) {
-          case GestationalAge.month1:
-          case GestationalAge.month2:
-          case GestationalAge.month3:
-            pregnancyCategory = 'pregnancy_t1';
-            break;
-          case GestationalAge.month4:
-          case GestationalAge.month5:
-          case GestationalAge.month6:
-            pregnancyCategory = 'pregnancy_t2';
-            break;
-          default:
-            pregnancyCategory = 'pregnancy_t3';
-            break;
-        }
-        final pregMaps = await db.query(
-          'akg_standards',
-          where: 'category = ?',
-          whereArgs: [pregnancyCategory],
-        );
-        if (pregMaps.isNotEmpty) {
-          baseAkg += AkgModel.fromMap(pregMaps.first);
-        }
-      }
-      if (member.isLactating &&
-          member.lactationPeriod != LactationPeriod.none) {
-        String lactationCategory;
-        switch (member.lactationPeriod) {
-          case LactationPeriod.oneToSixMonths:
-            lactationCategory = 'lactation_m1_6';
-            break;
-          case LactationPeriod.sevenToTwelveMonths:
-            lactationCategory = 'lactation_m7_12';
-            break;
-          default:
-            lactationCategory = '';
-            break;
-        }
-        if (lactationCategory.isNotEmpty) {
-          final lactMaps = await db.query(
-            'akg_standards',
-            where: 'category = ?',
-            whereArgs: [lactationCategory],
-          );
-          if (lactMaps.isNotEmpty) {
-            baseAkg += AkgModel.fromMap(lactMaps.first);
-          }
-        }
-      }
-    }
-
-    return baseAkg;
+    return finalAkg;
   }
 
   Future<WeeklySummaryModel> _processHistoryData(

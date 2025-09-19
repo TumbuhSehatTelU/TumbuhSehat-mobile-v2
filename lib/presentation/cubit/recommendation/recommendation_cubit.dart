@@ -24,10 +24,10 @@ class RecommendationCubit extends Cubit<RecommendationState> {
     _selectedDate = DateTime.now();
   }
 
-  Future<void> loadInitialData(dynamic initialMember) async {
+  Future<void> loadInitialData(String initialMemberName) async {
     emit(RecommendationLoading());
-    _currentMember = initialMember;
 
+    // Muat daftar anggota keluarga terlebih dahulu
     if (_allMembersCache.isEmpty) {
       final familyResult = await onboardingRepository.getCachedFamily();
       if (familyResult.isLeft()) {
@@ -37,6 +37,18 @@ class RecommendationCubit extends Cubit<RecommendationState> {
       final family = familyResult.getOrElse(() => throw Exception());
       _allMembersCache = [...family.children, ...family.parents];
     }
+
+    // Cari objek member yang sebenarnya berdasarkan nama
+    _currentMember = _allMembersCache.firstWhere(
+      (m) => m.name == initialMemberName,
+      orElse: () => _allMembersCache.isNotEmpty ? _allMembersCache.first : null,
+    );
+
+    if (_currentMember == null) {
+      emit(const RecommendationError('Anggota keluarga tidak ditemukan.'));
+      return;
+    }
+
     await _fetchRecommendation();
   }
 
@@ -88,8 +100,12 @@ class RecommendationCubit extends Cubit<RecommendationState> {
   }
 
   Future<void> _fetchRecommendation() async {
-    if (_currentMember == null) return;
-    emit(RecommendationLoading());
+    if (_currentMember == null) {
+      return;
+    }
+    if (state is! RecommendationLoaded) {
+      emit(RecommendationLoading());
+    }
 
     final result = await recommendationRepository.getMealRecommendation(
       member: _currentMember,
