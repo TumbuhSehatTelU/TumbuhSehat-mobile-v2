@@ -35,6 +35,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => di.sl<BerandaCubit>()),
       ],
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'Tumbuh Sehat',
         theme: ThemeData(
           useMaterial3: true,

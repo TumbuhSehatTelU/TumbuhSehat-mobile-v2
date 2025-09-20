@@ -37,7 +37,7 @@ class TSAppBar extends StatelessWidget implements PreferredSizeWidget {
                 title,
                 style: getResponsiveTextStyle(
                   context,
-                  tsFont ?? TSFont.bold.h1,
+                  tsFont ?? TSFont.bold.h2,
                 ),
               ),
 
@@ -45,13 +45,15 @@ class TSAppBar extends StatelessWidget implements PreferredSizeWidget {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Container(
+                    height: 40,
+                    width: 40,
                     decoration: BoxDecoration(
                       color: TSColor.monochrome.white,
                       borderRadius: BorderRadius.circular(12),
-                      boxShadow: TSShadow.shadows.weight400,
+                      boxShadow: TSShadow.shadows.weight500,
                     ),
                     child: IconButton(
-                      icon: const Icon(Icons.arrow_back),
+                      icon: Icon(Icons.arrow_back),
                       onPressed:
                           onBackButtonPressed ??
                           () => Navigator.of(context).pop(),
@@ -75,5 +77,5 @@ class TSAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight + 16);
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight + 8);
 }

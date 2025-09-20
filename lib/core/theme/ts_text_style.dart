@@ -40,43 +40,36 @@ class Regular {
   final TextStyle h0 = const TextStyle(
     fontSize: 36,
     fontWeight: FontWeight.normal,
-    letterSpacing: 0.5,
   );
 
   final TextStyle h1 = const TextStyle(
     fontSize: 28,
     fontWeight: FontWeight.normal,
-    letterSpacing: 0.5,
   );
 
   final TextStyle h2 = const TextStyle(
     fontSize: 22,
     fontWeight: FontWeight.normal,
-    letterSpacing: 0.5,
   );
 
   final TextStyle h3 = const TextStyle(
     fontSize: 18,
     fontWeight: FontWeight.normal,
-    letterSpacing: 0.5,
   );
 
   final TextStyle large = const TextStyle(
     fontSize: 16,
     fontWeight: FontWeight.normal,
-    letterSpacing: 0,
   );
 
   final TextStyle body = const TextStyle(
     fontSize: 14,
     fontWeight: FontWeight.normal,
-    letterSpacing: 0.5,
   );
 
   final TextStyle small = const TextStyle(
     fontSize: 12,
     fontWeight: FontWeight.normal,
-    letterSpacing: 1,
   );
 }
 
@@ -85,43 +78,36 @@ class Medium {
   final TextStyle h0 = const TextStyle(
     fontSize: 36,
     fontWeight: FontWeight.w500,
-    letterSpacing: 0.5,
   );
 
   final TextStyle h1 = const TextStyle(
     fontSize: 28,
     fontWeight: FontWeight.w500,
-    letterSpacing: 0.5,
   );
 
   final TextStyle h2 = const TextStyle(
     fontSize: 22,
     fontWeight: FontWeight.w500,
-    letterSpacing: 0.5,
   );
 
   final TextStyle h3 = const TextStyle(
     fontSize: 18,
     fontWeight: FontWeight.w500,
-    letterSpacing: 0.5,
   );
 
   final TextStyle large = const TextStyle(
     fontSize: 16,
     fontWeight: FontWeight.w500,
-    letterSpacing: 0,
   );
 
   final TextStyle body = const TextStyle(
     fontSize: 14,
     fontWeight: FontWeight.w500,
-    letterSpacing: 0.5,
   );
 
   final TextStyle small = const TextStyle(
     fontSize: 12,
     fontWeight: FontWeight.w500,
-    letterSpacing: 1,
   );
 }
 
@@ -130,43 +116,36 @@ class SemiBold {
   final TextStyle h0 = const TextStyle(
     fontSize: 36,
     fontWeight: FontWeight.w600,
-    letterSpacing: 0.5,
   );
 
   final TextStyle h1 = const TextStyle(
     fontSize: 28,
     fontWeight: FontWeight.w600,
-    letterSpacing: 0.5,
   );
 
   final TextStyle h2 = const TextStyle(
     fontSize: 22,
     fontWeight: FontWeight.w600,
-    letterSpacing: 0.5,
   );
 
   final TextStyle h3 = const TextStyle(
     fontSize: 18,
     fontWeight: FontWeight.w600,
-    letterSpacing: 0.5,
   );
 
   final TextStyle large = const TextStyle(
     fontSize: 16,
     fontWeight: FontWeight.w600,
-    letterSpacing: 0,
   );
 
   final TextStyle body = const TextStyle(
     fontSize: 14,
     fontWeight: FontWeight.w600,
-    letterSpacing: 0.5,
   );
 
   final TextStyle small = const TextStyle(
     fontSize: 12,
     fontWeight: FontWeight.w600,
-    letterSpacing: 1,
   );
 }
 
@@ -175,43 +154,36 @@ class Bold {
   final TextStyle h0 = const TextStyle(
     fontSize: 36,
     fontWeight: FontWeight.bold,
-    letterSpacing: 0.5,
   );
 
   final TextStyle h1 = const TextStyle(
     fontSize: 28,
     fontWeight: FontWeight.bold,
-    letterSpacing: 0.5,
   );
 
   final TextStyle h2 = const TextStyle(
     fontSize: 22,
     fontWeight: FontWeight.bold,
-    letterSpacing: 0.5,
   );
 
   final TextStyle h3 = const TextStyle(
     fontSize: 18,
     fontWeight: FontWeight.bold,
-    letterSpacing: 0.5,
   );
 
   final TextStyle large = const TextStyle(
     fontSize: 16,
     fontWeight: FontWeight.bold,
-    letterSpacing: 0,
   );
 
   final TextStyle body = const TextStyle(
     fontSize: 14,
     fontWeight: FontWeight.bold,
-    letterSpacing: 0.5,
   );
 
   final TextStyle small = const TextStyle(
     fontSize: 12,
     fontWeight: FontWeight.bold,
-    letterSpacing: 1,
   );
 }
 
@@ -220,42 +192,35 @@ class ExtraBold {
   final TextStyle h0 = const TextStyle(
     fontSize: 36,
     fontWeight: FontWeight.w800,
-    letterSpacing: 1.5,
   );
 
   final TextStyle h1 = const TextStyle(
     fontSize: 28,
     fontWeight: FontWeight.w800,
-    letterSpacing: 0.5,
   );
 
   final TextStyle h2 = const TextStyle(
     fontSize: 22,
     fontWeight: FontWeight.w800,
-    letterSpacing: 0.5,
   );
 
   final TextStyle h3 = const TextStyle(
     fontSize: 18,
     fontWeight: FontWeight.w800,
-    letterSpacing: 0.5,
   );
 
   final TextStyle large = const TextStyle(
     fontSize: 16,
     fontWeight: FontWeight.w800,
-    letterSpacing: 0,
   );
 
   final TextStyle body = const TextStyle(
     fontSize: 14,
     fontWeight: FontWeight.w800,
-    letterSpacing: 0.5,
   );
 
   final TextStyle small = const TextStyle(
     fontSize: 12,
     fontWeight: FontWeight.w800,
-    letterSpacing: 1,
   );
 }

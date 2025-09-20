@@ -34,10 +34,10 @@ class _SplashScreenState extends State<SplashScreen>
     context.read<SplashCubit>().checkAuthStatus();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 500),
+      duration: const Duration(seconds: 5),
     )..forward();
 
-    _timer = Timer(const Duration(seconds: 500), _navigate);
+    _timer = Timer(const Duration(seconds: 5), _navigate);
   }
 
   void _navigate() {
