@@ -1,3 +1,7 @@
+import 'dart:convert';
+
+import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../../core/database/database_helper.dart';
 import '../../models/child_model.dart';
 import '../../models/food_model.dart';
@@ -13,12 +17,21 @@ abstract class FoodLocalDataSource {
     List<ParentModel> parents,
     List<ChildModel> children,
   );
+  Future<void> saveRecommendationOverride(
+    String key,
+    Map<String, int> overrides,
+  );
+  Future<Map<String, int>> getRecommendationOverrides(String key);
 }
 
 class FoodLocalDataSourceImpl implements FoodLocalDataSource {
   final DatabaseHelper dbHelper;
+  final SharedPreferences sharedPreferences;
 
-  FoodLocalDataSourceImpl({required this.dbHelper});
+  FoodLocalDataSourceImpl({
+    required this.dbHelper,
+    required this.sharedPreferences,
+  });
 
   @override
   Future<List<FoodModel>> searchFoods(String query) async {
@@ -90,5 +103,24 @@ class FoodLocalDataSourceImpl implements FoodLocalDataSource {
         });
       }
     });
+  }
+
+  @override
+  Future<void> saveRecommendationOverride(
+    String key,
+    Map<String, int> overrides,
+  ) async {
+    final jsonString = json.encode(overrides);
+    await sharedPreferences.setString(key, jsonString);
+  }
+
+  @override
+  Future<Map<String, int>> getRecommendationOverrides(String key) async {
+    final jsonString = sharedPreferences.getString(key);
+    if (jsonString != null) {
+      final decodedMap = json.decode(jsonString) as Map<String, dynamic>;
+      return decodedMap.map((key, value) => MapEntry(key, value as int));
+    }
+    return {};
   }
 }

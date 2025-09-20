@@ -60,7 +60,7 @@ Future<void> init() async {
     () => FoodRemoteDataSourceImpl(client: sl()),
   );
   sl.registerLazySingleton<FoodLocalDataSource>(
-    () => FoodLocalDataSourceImpl(dbHelper: sl()),
+    () => FoodLocalDataSourceImpl(dbHelper: sl(), sharedPreferences: sl()),
   );
 
   // Repository
