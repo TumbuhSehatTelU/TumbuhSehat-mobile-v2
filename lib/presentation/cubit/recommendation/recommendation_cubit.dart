@@ -81,10 +81,12 @@ class RecommendationCubit extends Cubit<RecommendationState> {
     final newMeals = Map<MealTime, List<RecommendedFood>>.from(
       currentState.recommendation.meals,
     );
+    final mealList = newMeals[mealTime];
 
-    if (newMeals.containsKey(mealTime) &&
-        newMeals[mealTime]!.length > foodIndex) {
-      newMeals[mealTime]![foodIndex] = newFood;
+    if (mealList != null && mealList.length > foodIndex) {
+      final updatedMealList = List<RecommendedFood>.from(mealList);
+      updatedMealList[foodIndex] = newFood;
+      newMeals[mealTime] = updatedMealList;
     }
 
     final newRecommendation = RecommendationModel(meals: newMeals);

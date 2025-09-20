@@ -132,51 +132,101 @@ class _RecommendedFoodItem extends StatelessWidget {
   void _showAlternativesModal(BuildContext context) {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
       builder: (_) {
-        return Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Pilih Pengganti untuk ${recommendedFood.food.name}',
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const Divider(height: 24),
-              if (recommendedFood.alternatives.isEmpty)
-                const Text('Tidak ada alternatif lain.'),
-              ...recommendedFood.alternatives.map((altFood) {
-                // Sederhanakan kalkulasi kuantitas alternatif
-                final newRec = recommendedFood.copyWith(food: altFood);
-                return ListTile(
-                  title: Text(altFood.name),
-                  trailing: TSButton(
-                    onPressed: () {
-                      onReplace(newRec);
-                      Navigator.of(context).pop();
-                    },
-                    text: 'Pilih',
-                    size: ButtonSize.small,
-                    backgroundColor: Colors.green,
+        return DraggableScrollableSheet(
+          expand: false,
+          initialChildSize: 0.5,
+          minChildSize: 0.3,
+          maxChildSize: 0.8,
+          builder: (BuildContext context, ScrollController scrollController) {
+            return Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                children: [
+                  Text(
+                    'Pilih Pengganti untuk ${recommendedFood.food.name}',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const Divider(height: 24),
+                  Expanded(
+                    child: recommendedFood.alternatives.isEmpty
+                        ? const Center(
+                            child: Text('Tidak ada alternatif lain.'),
+                          )
+                        : ListView.builder(
+                            controller: scrollController,
+                            itemCount: recommendedFood.alternatives.length,
+                            itemBuilder: (context, index) {
+                              final altFood =
+                                  recommendedFood.alternatives[index];
+                              final newRec = recommendedFood.copyWith(
+                                food: altFood,
+                              );
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 8.0,
+                                ),
+                                child: Row(
+                                  children: [
+                                    // Kolom untuk Teks (Nama & URT)
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            altFood.name,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          Text(
+                                            '${newRec.quantity.toStringAsFixed(1)} ${newRec.urt.urtName}',
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+
+                                    // Tombol Pilih
+                                    TSButton(
+                                      onPressed: () {
+                                        onReplace(newRec);
+                                        Navigator.of(context).pop();
+                                      },
+                                      text: 'Pilih',
+                                      size: ButtonSize.small,
+                                      backgroundColor: Colors.green,
+                                      contentColor: Colors.white,
+                                      borderColor: Colors.transparent,
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                  ),
+
+                  // Tombol Batal
+                  const SizedBox(height: 16),
+                  TSButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    text: 'Batal',
+                    backgroundColor: Colors.red,
                     contentColor: Colors.white,
                     borderColor: Colors.transparent,
+                    width: double.infinity,
                   ),
-                );
-              }),
-              const SizedBox(height: 16),
-              TSButton(
-                onPressed: () => Navigator.of(context).pop(),
-                text: 'Batal',
-                backgroundColor: Colors.red,
-                contentColor: Colors.white,
-                borderColor: Colors.transparent,
-                width: double.infinity,
+                ],
               ),
-            ],
-          ),
+            );
+          },
         );
       },
     );
