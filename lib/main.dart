@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'core/bloc/bloc_observer.dart';
 import 'core/network/network_info.dart';
 import 'core/theme/ts_color.dart';
 import 'injection_container.dart' as di;
@@ -16,6 +17,7 @@ Future<void> main() async {
   await di.init();
   await initializeDateFormatting('id_ID', null);
   NetworkInfoImpl.setForceOffline(true);
+  Bloc.observer = SimpleBlocObserver();
   runApp(const MyApp());
 }
 
