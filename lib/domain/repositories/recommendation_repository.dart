@@ -7,4 +7,8 @@ abstract class RecommendationRepository {
     required dynamic member,
     required DateTime forDate,
   });
+
+  Future<Either<Failure, List<RecommendedFood>>> getAlternatives({
+    required RecommendedFood originalFood,
+  });
 }

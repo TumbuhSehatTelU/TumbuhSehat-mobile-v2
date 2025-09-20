@@ -49,13 +49,6 @@ class MealRecommendationCard extends StatelessWidget {
           ...List.generate(recommendedFoods.length, (index) {
             return _RecommendedFoodItem(
               recommendedFood: recommendedFoods[index],
-              onReplace: (newFood) {
-                context.read<RecommendationCubit>().replaceFood(
-                  mealTime,
-                  index,
-                  newFood,
-                );
-              },
             );
           }),
         ],
@@ -86,12 +79,8 @@ class MealRecommendationCard extends StatelessWidget {
 
 class _RecommendedFoodItem extends StatelessWidget {
   final RecommendedFood recommendedFood;
-  final Function(RecommendedFood) onReplace;
 
-  const _RecommendedFoodItem({
-    required this.recommendedFood,
-    required this.onReplace,
-  });
+  const _RecommendedFoodItem({required this.recommendedFood});
 
   @override
   Widget build(BuildContext context) {
@@ -130,13 +119,15 @@ class _RecommendedFoodItem extends StatelessWidget {
   }
 
   void _showAlternativesModal(BuildContext context) {
+    final cubit = context.read<RecommendationCubit>();
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      builder: (_) {
+      builder: (modalContext) {
         return DraggableScrollableSheet(
           expand: false,
           initialChildSize: 0.5,
@@ -156,64 +147,73 @@ class _RecommendedFoodItem extends StatelessWidget {
                   ),
                   const Divider(height: 24),
                   Expanded(
-                    child: recommendedFood.alternatives.isEmpty
-                        ? const Center(
-                            child: Text('Tidak ada alternatif lain.'),
-                          )
-                        : ListView.builder(
-                            controller: scrollController,
-                            itemCount: recommendedFood.alternatives.length,
-                            itemBuilder: (context, index) {
-                              final altFood =
-                                  recommendedFood.alternatives[index];
-                              final newRec = recommendedFood.copyWith(
-                                food: altFood,
-                              );
-                              return Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 8.0,
-                                ),
-                                child: Row(
+                    child: ListView.builder(
+                      controller: scrollController,
+                      itemCount: recommendedFood.alternatives.length,
+                      itemBuilder: (context, index) {
+                        final altRec = recommendedFood.alternatives[index];
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    // Kolom untuk Teks (Nama & URT)
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            altFood.name,
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          Text(
-                                            '${newRec.quantity.toStringAsFixed(1)} ${newRec.urt.urtName}',
-                                          ),
-                                        ],
+                                    Text(
+                                      altRec.food.name,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
-
-                                    // Tombol Pilih
-                                    TSButton(
-                                      onPressed: () {
-                                        onReplace(newRec);
-                                        Navigator.of(context).pop();
-                                      },
-                                      text: 'Pilih',
-                                      size: ButtonSize.small,
-                                      backgroundColor: Colors.green,
-                                      contentColor: Colors.white,
-                                      borderColor: Colors.transparent,
+                                    Text(
+                                      '${altRec.quantity.toStringAsFixed(1)} ${altRec.urt.urtName}',
                                     ),
                                   ],
                                 ),
-                              );
-                            },
+                              ),
+
+                              TSButton(
+                                onPressed: () {
+                                  final currentState = cubit.state;
+                                  if (currentState is RecommendationLoaded) {
+                                    for (var entry
+                                        in currentState
+                                            .recommendation
+                                            .meals
+                                            .entries) {
+                                      final mealTime = entry.key;
+                                      final foods = entry.value;
+                                      final foodIndex = foods.indexWhere(
+                                        (f) =>
+                                            f.food.id ==
+                                            recommendedFood.food.id,
+                                      );
+                                      if (foodIndex != -1) {
+                                        cubit.replaceFood(
+                                          mealTime,
+                                          foodIndex,
+                                          altRec,
+                                        );
+                                        break;
+                                      }
+                                    }
+                                  }
+                                  Navigator.of(context).pop();
+                                },
+                                text: 'Pilih',
+                                size: ButtonSize.small,
+                                backgroundColor: Colors.green,
+                                contentColor: Colors.white,
+                                borderColor: Colors.transparent,
+                              ),
+                            ],
                           ),
+                        );
+                      },
+                    ),
                   ),
 
-                  // Tombol Batal
                   const SizedBox(height: 16),
                   TSButton(
                     onPressed: () => Navigator.of(context).pop(),

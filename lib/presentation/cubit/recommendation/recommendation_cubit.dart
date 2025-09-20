@@ -74,10 +74,41 @@ class RecommendationCubit extends Cubit<RecommendationState> {
     await _fetchRecommendation();
   }
 
-  void replaceFood(MealTime mealTime, int foodIndex, RecommendedFood newFood) {
-    if (state is! RecommendationLoaded) return;
+  Future<void> replaceFood(
+    MealTime mealTime,
+    int foodIndex,
+    RecommendedFood newFood,
+  ) async {
+    if (state is! RecommendationLoaded) {
+      return;
+    }
     final currentState = state as RecommendationLoaded;
+    final alternativesResult = await recommendationRepository.getAlternatives(
+      originalFood: newFood,
+    );
 
+    alternativesResult.fold(
+      (failure) {
+        _updateStateWithNewFood(
+          currentState,
+          mealTime,
+          foodIndex,
+          newFood.copyWith(alternatives: []),
+        );
+      },
+      (newAlternatives) {
+        final finalFood = newFood.copyWith(alternatives: newAlternatives);
+        _updateStateWithNewFood(currentState, mealTime, foodIndex, finalFood);
+      },
+    );
+  }
+
+  void _updateStateWithNewFood(
+    RecommendationLoaded currentState,
+    MealTime mealTime,
+    int foodIndex,
+    RecommendedFood finalFood,
+  ) {
     final newMeals = Map<MealTime, List<RecommendedFood>>.from(
       currentState.recommendation.meals,
     );
@@ -85,7 +116,7 @@ class RecommendationCubit extends Cubit<RecommendationState> {
 
     if (mealList != null && mealList.length > foodIndex) {
       final updatedMealList = List<RecommendedFood>.from(mealList);
-      updatedMealList[foodIndex] = newFood;
+      updatedMealList[foodIndex] = finalFood;
       newMeals[mealTime] = updatedMealList;
     }
 

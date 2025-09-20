@@ -66,6 +66,52 @@ class RecommendationRepositoryImpl implements RecommendationRepository {
     }
   }
 
+  @override
+  Future<Either<Failure, List<RecommendedFood>>> getAlternatives({
+    required RecommendedFood originalFood,
+  }) async {
+    try {
+      final db = await dbHelper.database;
+      final categoryResult = await db.query(
+        'foods',
+        columns: ['category'],
+        where: 'id = ?',
+        whereArgs: [originalFood.food.id],
+      );
+      if (categoryResult.isEmpty || categoryResult.first['category'] == null) {
+        return const Right([]);
+      }
+      final category = categoryResult.first['category'] as String;
+      final originalGrams = originalFood.quantity * originalFood.urt.grams;
+      final targetValue = (originalFood.food.calories / 100.0) * originalGrams;
+      
+      final maps = await db.query(
+        'foods',
+        where: 'category = ? AND id != ? AND calories > 0',
+        whereArgs: [category, originalFood.food.id],
+        orderBy: 'priority DESC',
+        limit: 3,
+      );
+      final List<RecommendedFood> alternativeRecs = [];
+      for (final map in maps) {
+        final altFood = FoodModel.fromMap(map);
+        final altRec = await _calculateRecommendationForFood(
+          db,
+          altFood,
+          'calories',
+          targetValue,
+        );
+        if (altRec != null) {
+          alternativeRecs.add(altRec);
+        }
+      }
+
+      return Right(alternativeRecs);
+    } catch (e) {
+      return Left(CacheFailure('Gagal mencari alternatif: $e'));
+    }
+  }
+
   Future<AkgModel> _getRemainingAkgForToday(
     Database db,
     dynamic member,
@@ -162,7 +208,7 @@ class RecommendationRepositoryImpl implements RecommendationRepository {
         recommendations.add(carbRec);
         final grams = carbRec.quantity * carbRec.urt.grams;
         final caloriesUsed = (carbRec.food.calories * (grams / 100.0));
-        caloriesRemaining -= caloriesUsed; 
+        caloriesRemaining -= caloriesUsed;
       }
     }
 
@@ -187,7 +233,7 @@ class RecommendationRepositoryImpl implements RecommendationRepository {
       if (allProteinCandidates.isNotEmpty) {
         allProteinCandidates.shuffle();
         final selectedFoodMap = allProteinCandidates.first;
-        
+
         final proteinRec = await _findFoodForNutrient(
           db,
           selectedFoodMap['category'] as String,
@@ -202,7 +248,7 @@ class RecommendationRepositoryImpl implements RecommendationRepository {
           final caloriesUsed = (proteinRec.food.calories * (grams / 100.0));
           caloriesRemaining -= caloriesUsed;
         }
-      } 
+      }
     }
 
     if (caloriesRemaining > 50) {
@@ -218,7 +264,7 @@ class RecommendationRepositoryImpl implements RecommendationRepository {
         final grams = fiberRec.quantity * fiberRec.urt.grams;
         final caloriesUsed = (fiberRec.food.calories * (grams / 100.0));
         caloriesRemaining -= caloriesUsed;
-      } 
+      }
     }
     return recommendations;
   }
@@ -226,12 +272,10 @@ class RecommendationRepositoryImpl implements RecommendationRepository {
   Future<RecommendedFood?> _findFoodForNutrient(
     Database db,
     String category,
-    String targetNutrient,
+    String targetNutrient, // e.g., 'calories'
     double targetValue, {
     int? specificFoodId,
   }) async {
-    if (targetValue <= 0) return null;
-
     List<Map<String, dynamic>> mainFoodMaps;
 
     if (specificFoodId != null) {
@@ -254,45 +298,103 @@ class RecommendationRepositoryImpl implements RecommendationRepository {
     if (mainFoodMaps.isEmpty) return null;
     final mainFood = FoodModel.fromMap(mainFoodMaps.first);
 
-    final urtMaps = await db.rawQuery(
-      'SELECT T2.* FROM food_serving_options T1 JOIN urt_conversions T2 ON T1.urt_id = T2.id WHERE T1.food_id = ? ORDER BY T2.grams DESC', // Ambil URT terbesar dulu
-      [mainFood.id],
+    final calculatedRecommendation = await _calculateRecommendationForFood(
+      db,
+      mainFood,
+      targetNutrient,
+      targetValue,
     );
-    if (urtMaps.isEmpty) {
-      return null;
-    }
-    final bestUrt = UrtModel.fromMap(urtMaps.first);
+    if (calculatedRecommendation == null) return null;
 
-    final caloriesPer100g = mainFood.calories;
-    if (caloriesPer100g <= 0) return null;
+    final originalGrams =
+        calculatedRecommendation.quantity * calculatedRecommendation.urt.grams;
+    final actualCalories =
+        (calculatedRecommendation.food.calories / 100.0) * originalGrams;
 
-    final requiredGrams = (targetValue / caloriesPer100g) * 100.0;
-    final quantity = requiredGrams / bestUrt.grams;
-
-    if (quantity < 0.1) return null;
-
-    final alternatives = await _findAlternatives(db, category, mainFood.id);
-
-    return RecommendedFood(
-      food: mainFood,
-      quantity: quantity.isNaN || quantity.isInfinite ? 1.0 : quantity,
-      urt: bestUrt,
-      alternatives: alternatives,
+    final alternatives = await _findAlternatives(
+      db,
+      mainFood,
+      targetNutrient,
+      actualCalories,
     );
+
+    return calculatedRecommendation.copyWith(alternatives: alternatives);
   }
 
-  Future<List<FoodModel>> _findAlternatives(
+  double _roundToHalf(double value) {
+    return (value * 2).round() / 2.0;
+  }
+
+  Future<List<RecommendedFood>> _findAlternatives(
     Database db,
-    String category,
-    int excludeId,
+    FoodModel originalFood,
+    String targetNutrient,
+    double targetValue,
   ) async {
+    final categoryResult = await db.query(
+      'foods',
+      columns: ['category'],
+      where: 'id = ?',
+      whereArgs: [originalFood.id],
+    );
+    if (categoryResult.isEmpty || categoryResult.first['category'] == null) {
+      return [];
+    }
+    final category = categoryResult.first['category'] as String;
+
     final maps = await db.query(
       'foods',
-      where: 'category = ? AND id != ?',
-      whereArgs: [category, excludeId],
+      where: 'category = ? AND id != ? AND calories > 0',
+      whereArgs: [category, originalFood.id],
       orderBy: 'priority DESC',
       limit: 3,
     );
-    return maps.map((map) => FoodModel.fromMap(map)).toList();
+
+    final List<RecommendedFood> alternativeRecs = [];
+    for (final map in maps) {
+      final altFood = FoodModel.fromMap(map);
+      final altRec = await _calculateRecommendationForFood(
+        db,
+        altFood,
+        targetNutrient,
+        targetValue,
+      );
+      if (altRec != null) {
+        alternativeRecs.add(altRec);
+      }
+    }
+    return alternativeRecs;
+  }
+
+  Future<RecommendedFood?> _calculateRecommendationForFood(
+    Database db,
+    FoodModel food,
+    String targetNutrient,
+    double targetValue,
+  ) async {
+    final urtMaps = await db.rawQuery(
+      'SELECT T2.* FROM food_serving_options T1 JOIN urt_conversions T2 ON T1.urt_id = T2.id WHERE T1.food_id = ? ORDER BY T2.grams DESC',
+      [food.id],
+    );
+    if (urtMaps.isEmpty) return null;
+    final bestUrt = UrtModel.fromMap(urtMaps.first);
+
+    final nutrientValuePer100g =
+        (food.nutrients[targetNutrient] as num?)?.toDouble() ?? 0.0;
+    if (nutrientValuePer100g <= 0) return null;
+
+    final requiredGrams = (targetValue / nutrientValuePer100g) * 100.0;
+    final rawQuantity = requiredGrams / bestUrt.grams;
+
+    final roundedQuantity = _roundToHalf(rawQuantity);
+
+    if (roundedQuantity < 0.5) return null;
+
+    return RecommendedFood(
+      food: food,
+      quantity: roundedQuantity,
+      urt: bestUrt,
+      alternatives: [],
+    );
   }
 }

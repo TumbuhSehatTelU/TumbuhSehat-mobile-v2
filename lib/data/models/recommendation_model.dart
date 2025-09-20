@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-import 'daily_detail_model.dart'; 
+import 'daily_detail_model.dart';
 import 'food_model.dart';
 import 'urt_model.dart';
 
@@ -22,7 +22,7 @@ class RecommendedFood extends Equatable {
   final double quantity;
   final UrtModel urt;
 
-  final List<FoodModel> alternatives;
+  final List<RecommendedFood> alternatives;
 
   const RecommendedFood({
     required this.food,
@@ -35,7 +35,7 @@ class RecommendedFood extends Equatable {
     FoodModel? food,
     double? quantity,
     UrtModel? urt,
-    List<FoodModel>? alternatives,
+    List<RecommendedFood>? alternatives,
   }) {
     return RecommendedFood(
       food: food ?? this.food,
