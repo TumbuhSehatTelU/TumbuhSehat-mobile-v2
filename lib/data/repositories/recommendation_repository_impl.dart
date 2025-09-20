@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:dartz/dartz.dart';
+import 'package:intl/intl.dart';
 import 'package:sqflite/sqflite.dart';
 import '../../core/database/database_helper.dart';
 import '../../core/error/failures.dart';
@@ -11,14 +12,17 @@ import '../../data/models/recommendation_model.dart';
 import '../../data/models/urt_model.dart';
 import '../../domain/repositories/nutrition_repository.dart';
 import '../../domain/repositories/recommendation_repository.dart';
+import '../datasources/local/food_local_data_source.dart';
 
 class RecommendationRepositoryImpl implements RecommendationRepository {
   final DatabaseHelper dbHelper;
   final NutritionRepository nutritionRepository;
+  final FoodLocalDataSource localDataSource;
 
   RecommendationRepositoryImpl({
     required this.dbHelper,
     required this.nutritionRepository,
+    required this.localDataSource,
   });
 
   @override
@@ -43,14 +47,33 @@ class RecommendationRepositoryImpl implements RecommendationRepository {
         remainingAkg = await _getRemainingAkgForToday(db, member, remainingAkg);
       }
 
+      final dateKey = DateFormat('yyyy-MM-dd').format(forDate);
+      final key = 'recommendation_overrides_${member.name}_$dateKey';
+      final overrides = await localDataSource.getRecommendationOverrides(key);
+
       // MEAL SLOT PERCENTAGE
       final breakfastTarget = _getMealTarget(remainingAkg, 0.25);
       final lunchTarget = _getMealTarget(remainingAkg, 0.40);
       final dinnerTarget = _getMealTarget(remainingAkg, 0.35);
 
-      final breakfastRecs = await _generateRecsForMeal(db, breakfastTarget);
-      final lunchRecs = await _generateRecsForMeal(db, lunchTarget);
-      final dinnerRecs = await _generateRecsForMeal(db, dinnerTarget);
+      final breakfastRecs = await _generateRecsForMeal(
+        db,
+        breakfastTarget,
+        overrides,
+        MealTime.Sarapan,
+      );
+      final lunchRecs = await _generateRecsForMeal(
+        db,
+        lunchTarget,
+        overrides,
+        MealTime.MakanSiang,
+      );
+      final dinnerRecs = await _generateRecsForMeal(
+        db,
+        dinnerTarget,
+        overrides,
+        MealTime.MakanMalam,
+      );
 
       final recommendation = RecommendationModel(
         meals: {
@@ -84,7 +107,7 @@ class RecommendationRepositoryImpl implements RecommendationRepository {
       final category = categoryResult.first['category'] as String;
       final originalGrams = originalFood.quantity * originalFood.urt.grams;
       final targetValue = (originalFood.food.calories / 100.0) * originalGrams;
-      
+
       final maps = await db.query(
         'foods',
         where: 'category = ? AND id != ? AND calories > 0',
@@ -109,6 +132,31 @@ class RecommendationRepositoryImpl implements RecommendationRepository {
       return Right(alternativeRecs);
     } catch (e) {
       return Left(CacheFailure('Gagal mencari alternatif: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> saveRecommendationChoice({
+    required String memberName,
+    required DateTime forDate,
+    required String mealIdentifier,
+    required int newFoodId,
+  }) async {
+    try {
+      final dateKey = DateFormat('yyyy-MM-dd').format(forDate);
+      final key = 'recommendation_overrides_${memberName}_$dateKey';
+
+      final currentOverrides = await localDataSource.getRecommendationOverrides(
+        key,
+      );
+
+      currentOverrides[mealIdentifier] = newFoodId;
+
+      await localDataSource.saveRecommendationOverride(key, currentOverrides);
+
+      return const Right(null);
+    } catch (e) {
+      return Left(CacheFailure('Gagal menyimpan pilihan rekomendasi: $e'));
     }
   }
 
@@ -192,78 +240,94 @@ class RecommendationRepositoryImpl implements RecommendationRepository {
   Future<List<RecommendedFood>> _generateRecsForMeal(
     Database db,
     Map<String, double> target,
+    Map<String, int> overrides,
+    MealTime mealTime,
   ) async {
     List<RecommendedFood> recommendations = [];
     double caloriesRemaining = target['calories']!;
+    int foodIndex = 0;
 
     if (caloriesRemaining > 0) {
-      final carbTargetCalories = caloriesRemaining * 0.5;
+      final carbOverrideId = overrides['${mealTime.name}_$foodIndex'];
       final carbRec = await _findFoodForNutrient(
         db,
         'sumber_karbohidrat',
         'calories',
-        carbTargetCalories,
+        caloriesRemaining * 0.5,
+        specificFoodId: carbOverrideId,
       );
       if (carbRec != null) {
         recommendations.add(carbRec);
         final grams = carbRec.quantity * carbRec.urt.grams;
-        final caloriesUsed = (carbRec.food.calories * (grams / 100.0));
-        caloriesRemaining -= caloriesUsed;
+        caloriesRemaining -= (carbRec.food.calories * (grams / 100.0));
       }
     }
+    foodIndex++;
 
     if (caloriesRemaining > 50) {
+      final proteinOverrideId = overrides['${mealTime.name}_$foodIndex'];
       final proteinTargetCalories = caloriesRemaining * 0.6;
-      final hewaniCandidates = await db.query(
-        'foods',
-        where: 'category = ?',
-        whereArgs: ['protein_hewani'],
-        orderBy: 'priority DESC',
-        limit: 3,
-      );
-      final nabatiCandidates = await db.query(
-        'foods',
-        where: 'category = ?',
-        whereArgs: ['protein_nabati'],
-        orderBy: 'priority DESC',
-        limit: 3,
-      );
-      final allProteinCandidates = [...hewaniCandidates, ...nabatiCandidates];
 
-      if (allProteinCandidates.isNotEmpty) {
-        allProteinCandidates.shuffle();
-        final selectedFoodMap = allProteinCandidates.first;
-
+      if (proteinOverrideId != null) {
         final proteinRec = await _findFoodForNutrient(
           db,
-          selectedFoodMap['category'] as String,
+          'protein',
           'calories',
           proteinTargetCalories,
-          specificFoodId: selectedFoodMap['id'] as int,
+          specificFoodId: proteinOverrideId,
         );
+        if (proteinRec != null) recommendations.add(proteinRec);
+      } else {
+        final hewaniCandidates = await db.query(
+          'foods',
+          where: 'category = ?',
+          whereArgs: ['protein_hewani'],
+          orderBy: 'priority DESC',
+          limit: 3,
+        );
+        final nabatiCandidates = await db.query(
+          'foods',
+          where: 'category = ?',
+          whereArgs: ['protein_nabati'],
+          orderBy: 'priority DESC',
+          limit: 3,
+        );
+        final allProteinCandidates = [...hewaniCandidates, ...nabatiCandidates];
 
-        if (proteinRec != null) {
-          recommendations.add(proteinRec);
-          final grams = proteinRec.quantity * proteinRec.urt.grams;
-          final caloriesUsed = (proteinRec.food.calories * (grams / 100.0));
-          caloriesRemaining -= caloriesUsed;
+        if (allProteinCandidates.isNotEmpty) {
+          allProteinCandidates.shuffle();
+          final selectedFoodMap = allProteinCandidates.first;
+          final proteinRec = await _findFoodForNutrient(
+            db,
+            selectedFoodMap['category'] as String,
+            'calories',
+            proteinTargetCalories,
+            specificFoodId: selectedFoodMap['id'] as int,
+          );
+          if (proteinRec != null) recommendations.add(proteinRec);
         }
       }
+
+      if (recommendations.length > 1) {
+        final latestRec = recommendations.last;
+        final grams = latestRec.quantity * latestRec.urt.grams;
+        caloriesRemaining -= (latestRec.food.calories * (grams / 100.0));
+      }
     }
+    foodIndex++;
 
     if (caloriesRemaining > 50) {
+      final fiberOverrideId = overrides['${mealTime.name}_$foodIndex'];
       final fiberTargetCalories = caloriesRemaining;
       final fiberRec = await _findFoodForNutrient(
         db,
         'sayuran',
         'calories',
         fiberTargetCalories,
+        specificFoodId: fiberOverrideId,
       );
       if (fiberRec != null) {
         recommendations.add(fiberRec);
-        final grams = fiberRec.quantity * fiberRec.urt.grams;
-        final caloriesUsed = (fiberRec.food.calories * (grams / 100.0));
-        caloriesRemaining -= caloriesUsed;
       }
     }
     return recommendations;

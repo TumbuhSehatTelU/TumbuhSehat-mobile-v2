@@ -11,4 +11,11 @@ abstract class RecommendationRepository {
   Future<Either<Failure, List<RecommendedFood>>> getAlternatives({
     required RecommendedFood originalFood,
   });
+
+  Future<Either<Failure, void>> saveRecommendationChoice({
+    required String memberName,
+    required DateTime forDate,
+    required String mealIdentifier, // e.g., "Sarapan_0"
+    required int newFoodId,
+  });
 }

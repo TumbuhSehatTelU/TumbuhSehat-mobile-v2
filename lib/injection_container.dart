@@ -83,8 +83,11 @@ Future<void> init() async {
     () => NutritionRepositoryImpl(dbHelper: sl()),
   );
   sl.registerLazySingleton<RecommendationRepository>(
-    () =>
-        RecommendationRepositoryImpl(dbHelper: sl(), nutritionRepository: sl()),
+    () => RecommendationRepositoryImpl(
+      dbHelper: sl(),
+      nutritionRepository: sl(),
+      localDataSource: sl(),
+    ),
   );
 
   // FEATURES
