@@ -7,6 +7,7 @@ import 'core/network/network_info.dart';
 import 'core/utils/constants.dart';
 import 'data/datasources/local/food_local_data_source.dart';
 import 'data/datasources/local/onboarding_local_data_source.dart';
+import 'data/datasources/remote/analysis_remote_datasource.dart';
 import 'data/datasources/remote/food_remote_data_source.dart';
 import 'data/datasources/remote/onboarding_remote_data_source.dart';
 import 'data/repositories/food_repository_impl.dart';
@@ -20,6 +21,7 @@ import 'domain/repositories/recommendation_repository.dart';
 import 'presentation/cubit/beranda/beranda_cubit.dart';
 import 'presentation/cubit/calory_history/calory_history_cubit.dart';
 import 'presentation/cubit/daily_detail/daily_detail_cubit.dart';
+import 'presentation/cubit/food_prediction/food_prediction_cubit.dart';
 import 'presentation/cubit/login/login_cubit.dart';
 import 'presentation/cubit/meal_analysis/meal_analysis_cubit.dart';
 import 'presentation/cubit/onboarding/onboarding_cubit.dart';
@@ -61,6 +63,9 @@ Future<void> init() async {
   );
   sl.registerLazySingleton<FoodLocalDataSource>(
     () => FoodLocalDataSourceImpl(dbHelper: sl(), sharedPreferences: sl()),
+  );
+  sl.registerLazySingleton<AnalysisRemoteDataSource>(
+    () => AnalysisRemoteDataSourceImpl(client: sl()),
   );
 
   // Repository
@@ -125,4 +130,5 @@ Future<void> init() async {
       onboardingRepository: sl(),
     ),
   );
+  sl.registerFactory(() => FoodPredictionCubit(remoteDataSource: sl()));
 }
