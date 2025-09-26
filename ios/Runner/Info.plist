@@ -45,5 +45,9 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Aplikasi ini membutuhkan akses kamera untuk fitur analisis foto makanan.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Aplikasi ini membutuhkan akses galeri untuk memilih foto makanan.</string>
 </dict>
 </plist>
