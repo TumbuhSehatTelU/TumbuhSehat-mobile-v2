@@ -154,7 +154,7 @@ class _AddChildScreenState extends State<AddChildScreen> {
               TSButton(
                 onPressed: _addNewChildForm,
                 text: 'Tambah Data Anak Lain',
-                textStyle: getResponsiveTextStyle(context, TSFont.bold.h3),
+                textStyle: TSFont.getStyle(context, TSFont.bold.h3),
                 backgroundColor: TSColor.monochrome.white,
                 borderColor: TSColor.mainTosca.shade400,
                 contentColor: TSColor.mainTosca.shade400,
@@ -165,7 +165,7 @@ class _AddChildScreenState extends State<AddChildScreen> {
               TSButton(
                 onPressed: () => _submitForms(context),
                 text: 'Selesai & Simpan Data Anak',
-                textStyle: getResponsiveTextStyle(context, TSFont.bold.h3),
+                textStyle: TSFont.getStyle(context, TSFont.bold.h3),
                 backgroundColor: TSColor.mainTosca.shade400,
                 borderColor: Colors.transparent,
                 contentColor: TSColor.monochrome.white,

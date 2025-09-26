@@ -193,7 +193,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 return TSButton(
                   onPressed: isLoading ? null : _submitLogin,
                   text: isLoading ? 'Memproses...' : 'Masuk',
-                  textStyle: getResponsiveTextStyle(context, TSFont.bold.large),
+                  textStyle: TSFont.getStyle(context, TSFont.bold.large),
                   customBorderRadius: 240,
                   boxShadow: TSShadow.shadows.weight500,
                   size: ButtonSize.medium,
@@ -233,7 +233,7 @@ Widget _buildSectionHeader(BuildContext context, String title) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text(title, style: getResponsiveTextStyle(context, TSFont.bold.body)),
+      Text(title, style: TSFont.getStyle(context, TSFont.bold.body)),
       const SizedBox(height: 8),
     ],
   );

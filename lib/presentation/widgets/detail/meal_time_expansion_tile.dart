@@ -45,7 +45,7 @@ class _MealTimeExpansionTileState extends State<MealTimeExpansionTile> {
               children: [
                 Text(
                   '${widget.title} - ${widget.time}',
-                  style: getResponsiveTextStyle(context, TSFont.bold.h3),
+                  style: TSFont.getStyle(context, TSFont.bold.h3),
                 ),
                 Icon(
                   _isExpanded

@@ -61,7 +61,7 @@ class MealRecommendationCard extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(title, style: getResponsiveTextStyle(context, TSFont.bold.h2)),
+        Text(title, style: TSFont.getStyle(context, TSFont.bold.h2)),
         Text(
           '${calories.toStringAsFixed(0)} kkal',
           style: getResponsiveTextStyle(
@@ -143,7 +143,7 @@ class _RecommendedFoodItem extends StatelessWidget {
                   children: [
                     Text(
                       recommendedFood.food.name,
-                      style: getResponsiveTextStyle(context, TSFont.bold.body),
+                      style: TSFont.getStyle(context, TSFont.bold.body),
                     ),
                     Text(
                       '${recommendedFood.quantity.toStringAsFixed(1)} ${recommendedFood.urt.urtName}',

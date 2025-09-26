@@ -110,7 +110,7 @@ class _SplashScreenState extends State<SplashScreen>
           TSButton(
             onPressed: _navigate,
             text: 'Mulai Sekarang',
-            textStyle: getResponsiveTextStyle(context, TSFont.bold.large),
+            textStyle: TSFont.getStyle(context, TSFont.bold.large),
             backgroundColor: TSColor.secondaryGreen.primary,
             borderColor: Colors.transparent,
             contentColor: TSColor.monochrome.black,

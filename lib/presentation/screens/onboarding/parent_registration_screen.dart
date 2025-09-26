@@ -452,7 +452,7 @@ Widget _buildSectionHeader(BuildContext context, String title) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text(title, style: getResponsiveTextStyle(context, TSFont.bold.body)),
+      Text(title, style: TSFont.getStyle(context, TSFont.bold.body)),
       const SizedBox(height: 8),
     ],
   );

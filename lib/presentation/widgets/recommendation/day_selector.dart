@@ -50,21 +50,21 @@ class _DaySelectorState extends State<DaySelector> {
             padding: EdgeInsets.symmetric(horizontal: 24),
             child: Text(
               'Hari Ini',
-              style: getResponsiveTextStyle(context, TSFont.bold.large),
+              style: TSFont.getStyle(context, TSFont.bold.large),
             ),
           ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 24),
             child: Text(
               'Besok',
-              style: getResponsiveTextStyle(context, TSFont.bold.large),
+              style: TSFont.getStyle(context, TSFont.bold.large),
             ),
           ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 24),
             child: Text(
               'Lusa',
-              style: getResponsiveTextStyle(context, TSFont.bold.large),
+              style: TSFont.getStyle(context, TSFont.bold.large),
             ),
           ),
         ],

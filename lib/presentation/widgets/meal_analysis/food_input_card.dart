@@ -69,7 +69,7 @@ class FoodInputCard extends StatelessWidget {
                         controller: controller,
                         focusNode: focusNode,
                         textAlign: TextAlign.center,
-                        style: getResponsiveTextStyle(context, TSFont.bold.h2),
+                        style: TSFont.getStyle(context, TSFont.bold.h2),
                         decoration: InputDecoration(
                           hintText: 'Cari Nama Makanan',
                           hintStyle: getResponsiveTextStyle(

@@ -76,7 +76,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
             TSButton(
               onPressed: _navigateToHome,
               text: 'Mulai Sekarang',
-              textStyle: getResponsiveTextStyle(context, TSFont.bold.large),
+              textStyle: TSFont.getStyle(context, TSFont.bold.large),
               backgroundColor: TSColor.secondaryGreen.primary,
               borderColor: Colors.transparent,
               contentColor: TSColor.monochrome.black,

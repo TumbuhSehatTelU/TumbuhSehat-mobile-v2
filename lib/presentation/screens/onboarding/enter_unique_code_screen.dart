@@ -233,7 +233,7 @@ class _EnterUniqueCodeScreenState extends State<EnterUniqueCodeScreen> {
                 TSButton(
                   onPressed: () => _handleSubmit(context, isLoading),
                   text: isLoading ? 'Memeriksa...' : 'Lanjutkan',
-                  textStyle: getResponsiveTextStyle(context, TSFont.bold.large),
+                  textStyle: TSFont.getStyle(context, TSFont.bold.large),
                   backgroundColor: (isLoading || isPenalized)
                       ? TSColor.monochrome.grey
                       : TSColor.secondaryGreen.primary,

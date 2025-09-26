@@ -131,7 +131,7 @@ class _ScanScreenState extends State<ScanScreen> {
           TSButton(
             onPressed: _onContinue,
             text: 'Selanjutnya',
-            textStyle: getResponsiveTextStyle(context, TSFont.bold.large),
+            textStyle: TSFont.getStyle(context, TSFont.bold.large),
             boxShadow: TSShadow.shadows.weight400,
             backgroundColor: TSColor.secondaryGreen.primary,
             borderColor: Colors.transparent,

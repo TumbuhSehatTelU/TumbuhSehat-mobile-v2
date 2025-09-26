@@ -124,11 +124,11 @@ class _ManualInputScreenState extends State<ManualInputScreen> {
             children: [
               Text(
                 'Total Kalori',
-                style: getResponsiveTextStyle(context, TSFont.regular.h3),
+                style: TSFont.getStyle(context, TSFont.regular.h3),
               ),
               Text(
                 '$totalCalories kal',
-                style: getResponsiveTextStyle(context, TSFont.bold.h2),
+                style: TSFont.getStyle(context, TSFont.bold.h2),
               ),
             ],
           ),

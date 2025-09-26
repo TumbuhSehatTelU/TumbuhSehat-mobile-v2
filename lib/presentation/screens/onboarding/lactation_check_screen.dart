@@ -156,7 +156,7 @@ class _LactationCheckScreenState extends State<LactationCheckScreen> {
               TSButton(
                 onPressed: () => _triggerSubmit(context, isLactating: false),
                 text: 'Tidak',
-                textStyle: getResponsiveTextStyle(context, TSFont.extraBold.h3),
+                textStyle: TSFont.getStyle(context, TSFont.extraBold.h3),
                 backgroundColor: TSColor.monochrome.white,
                 borderColor: TSColor.mainTosca.shade400,
                 contentColor: TSColor.mainTosca.shade400,

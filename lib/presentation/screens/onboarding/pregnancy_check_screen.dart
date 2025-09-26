@@ -79,7 +79,7 @@ class _PregnancyCheckScreenState extends State<PregnancyCheckScreen> {
                 const SizedBox(height: 48),
                 Text(
                   'Pilih usia kehamilan:',
-                  style: getResponsiveTextStyle(context, TSFont.bold.body),
+                  style: TSFont.getStyle(context, TSFont.bold.body),
                 ),
                 const SizedBox(height: 16),
                 TSDropdown<GestationalAge>(
@@ -166,7 +166,7 @@ class _PregnancyCheckScreenState extends State<PregnancyCheckScreen> {
               TSButton(
                 onPressed: () => _handleNoPressed(context),
                 text: 'Tidak',
-                textStyle: getResponsiveTextStyle(context, TSFont.extraBold.h3),
+                textStyle: TSFont.getStyle(context, TSFont.extraBold.h3),
                 backgroundColor: TSColor.monochrome.white,
                 borderColor: TSColor.mainTosca.shade400,
                 contentColor: TSColor.mainTosca.shade400,

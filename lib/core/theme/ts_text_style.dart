@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../utils/responsive_helper.dart';
+
 // Extension untuk TextStyle
 extension TextStyleExtension on TextStyle {
   TextStyle withColor(Color color) {
@@ -18,7 +20,7 @@ TextStyle getResponsiveTextStyle(BuildContext context, TextStyle mobileStyle) {
 // Penggunaan di widget:
 // Text(
 //   'ini tulisan',
-//   style: getResponsiveTextStyle(context, TSFont.regular.h1),
+//   style: TSFont.getStyle(context, TSFont.regular.h1),
 // );
 
 // contoh penggunaan
@@ -33,6 +35,21 @@ class TSFont {
   static SemiBold semiBold = SemiBold();
   static Bold bold = Bold();
   static ExtraBold extraBold = ExtraBold();
+
+  static TextStyle getStyle(BuildContext context, TextStyle standardStyle) {
+    final helper = ResponsiveHelper(context);
+
+    final double scaleFactor = helper.value(
+      small: 0.9,
+      standard: 1.0,
+      large: 1.1,
+      tablet: 1.25,
+    );
+
+    return standardStyle.copyWith(
+      fontSize: standardStyle.fontSize! * scaleFactor,
+    );
+  }
 }
 
 class Regular {
