@@ -57,13 +57,12 @@ class _BerandaScreenState extends State<BerandaScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: context.watch<BerandaCubit>().state is BerandaLoaded
-          // Dapatkan currentUser yang sedang login (selalu Parent) dan member yang ditampilkan
           ? GreetingAppBar(
               loggedInUser:
                   (context.read<BerandaCubit>().state as BerandaLoaded)
                       .family
                       .parents
-                      .first, // Asumsi user yg login ada di state
+                      .first,
               displayedMember:
                   (context.read<BerandaCubit>().state as BerandaLoaded)
                       .currentUser,
@@ -183,7 +182,6 @@ class _BerandaScreenState extends State<BerandaScreen> {
     required bool isForToday,
     required String currentMemberName,
   }) {
-    // Panggil helper time dengan parameter baru
     final relevantMealTime = getNextRelevantMealTime(
       recommendation,
       isForToday: isForToday,
@@ -221,7 +219,7 @@ class _BerandaScreenState extends State<BerandaScreen> {
                 child: Text(
                   isForToday
                       ? 'Rekomendasi untuk hari ini sudah selesai.'
-                      : 'Sarapan untuk esok hari.', // atau pesan lain
+                      : 'Sarapan untuk esok hari.',
                 ),
               ),
             ),

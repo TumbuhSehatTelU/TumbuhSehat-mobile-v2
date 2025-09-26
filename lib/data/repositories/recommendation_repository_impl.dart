@@ -56,7 +56,7 @@ class RecommendationRepositoryImpl implements RecommendationRepository {
       final meals = <MealTime, List<RecommendedFood>>{};
 
       final extraCalories = totalAkg.calories - baseAkg.calories;
-      final hasExtraNutrition = extraCalories > 10; 
+      final hasExtraNutrition = extraCalories > 10;
 
       AkgModel primaryMealsAkg;
       if (hasExtraNutrition) {
@@ -177,7 +177,6 @@ class RecommendationRepositoryImpl implements RecommendationRepository {
       );
 
       currentOverrides[mealIdentifier] = newFoodId;
-
       await localDataSource.saveRecommendationOverride(key, currentOverrides);
 
       return const Right(null);
@@ -274,12 +273,15 @@ class RecommendationRepositoryImpl implements RecommendationRepository {
     int foodIndex = 0;
 
     if (caloriesRemaining > 0) {
-      final carbOverrideId = overrides['${mealTime.name}_$foodIndex'];
+      final carbIdentifier = '${mealTime.name}_$foodIndex';
+      final carbOverrideId = overrides[carbIdentifier];
+      final carbTargetCalories = caloriesRemaining * 0.5;
+
       final carbRec = await _findFoodForNutrient(
         db,
         'sumber_karbohidrat',
         'calories',
-        caloriesRemaining * 0.5,
+        carbTargetCalories,
         specificFoodId: carbOverrideId,
       );
       if (carbRec != null) {
@@ -287,64 +289,72 @@ class RecommendationRepositoryImpl implements RecommendationRepository {
         final grams = carbRec.quantity * carbRec.urt.grams;
         caloriesRemaining -= (carbRec.food.calories * (grams / 100.0));
       }
+      foodIndex++;
     }
-    foodIndex++;
 
     if (caloriesRemaining > 50) {
-      final proteinOverrideId = overrides['${mealTime.name}_$foodIndex'];
+      final mealIdentifier = '${mealTime.name}_$foodIndex';
+      final proteinOverrideId = overrides[mealIdentifier];
       final proteinTargetCalories = caloriesRemaining * 0.6;
 
+      String selectedCategory;
+      int? finalProteinId = proteinOverrideId;
+
       if (proteinOverrideId != null) {
-        final proteinRec = await _findFoodForNutrient(
-          db,
-          'protein',
-          'calories',
-          proteinTargetCalories,
-          specificFoodId: proteinOverrideId,
+        final foodData = await db.query(
+          'foods',
+          columns: ['category'],
+          where: 'id = ?',
+          whereArgs: [proteinOverrideId],
         );
-        if (proteinRec != null) recommendations.add(proteinRec);
+        if (foodData.isNotEmpty) {
+          selectedCategory = foodData.first['category'] as String;
+        } else {
+          finalProteinId = null;
+          selectedCategory = 'protein_hewani';
+        }
       } else {
         final hewaniCandidates = await db.query(
           'foods',
           where: 'category = ?',
           whereArgs: ['protein_hewani'],
-          orderBy: 'priority DESC',
-          limit: 3,
         );
         final nabatiCandidates = await db.query(
           'foods',
           where: 'category = ?',
           whereArgs: ['protein_nabati'],
-          orderBy: 'priority DESC',
-          limit: 3,
         );
-        final allProteinCandidates = [...hewaniCandidates, ...nabatiCandidates];
-
-        if (allProteinCandidates.isNotEmpty) {
-          allProteinCandidates.shuffle();
-          final selectedFoodMap = allProteinCandidates.first;
-          final proteinRec = await _findFoodForNutrient(
-            db,
-            selectedFoodMap['category'] as String,
-            'calories',
-            proteinTargetCalories,
-            specificFoodId: selectedFoodMap['id'] as int,
-          );
-          if (proteinRec != null) recommendations.add(proteinRec);
+        final allCandidates = [...hewaniCandidates, ...nabatiCandidates];
+        if (allCandidates.isNotEmpty) {
+          allCandidates.shuffle();
+          final selectedMap = allCandidates.first;
+          selectedCategory = selectedMap['category'] as String;
+        } else {
+          selectedCategory = 'protein_hewani';
         }
       }
 
-      if (recommendations.length > 1) {
-        final latestRec = recommendations.last;
-        final grams = latestRec.quantity * latestRec.urt.grams;
-        caloriesRemaining -= (latestRec.food.calories * (grams / 100.0));
+      final proteinRec = await _findFoodForNutrient(
+        db,
+        selectedCategory,
+        'calories',
+        proteinTargetCalories,
+        specificFoodId: finalProteinId,
+      );
+
+      if (proteinRec != null) {
+        recommendations.add(proteinRec);
+        final grams = proteinRec.quantity * proteinRec.urt.grams;
+        caloriesRemaining -= (proteinRec.food.calories * (grams / 100.0));
       }
+      foodIndex++;
     }
-    foodIndex++;
 
     if (caloriesRemaining > 50) {
-      final fiberOverrideId = overrides['${mealTime.name}_$foodIndex'];
+      final fiberIdentifier = '${mealTime.name}_$foodIndex';
+      final fiberOverrideId = overrides[fiberIdentifier];
       final fiberTargetCalories = caloriesRemaining;
+
       final fiberRec = await _findFoodForNutrient(
         db,
         'sayuran',
@@ -356,6 +366,7 @@ class RecommendationRepositoryImpl implements RecommendationRepository {
         recommendations.add(fiberRec);
       }
     }
+
     return recommendations;
   }
 

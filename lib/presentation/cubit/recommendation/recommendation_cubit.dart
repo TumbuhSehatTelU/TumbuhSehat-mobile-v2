@@ -27,7 +27,6 @@ class RecommendationCubit extends Cubit<RecommendationState> {
   Future<void> loadInitialData(String initialMemberName) async {
     emit(RecommendationLoading());
 
-    // Muat daftar anggota keluarga terlebih dahulu
     if (_allMembersCache.isEmpty) {
       final familyResult = await onboardingRepository.getCachedFamily();
       if (familyResult.isLeft()) {
@@ -38,7 +37,6 @@ class RecommendationCubit extends Cubit<RecommendationState> {
       _allMembersCache = [...family.children, ...family.parents];
     }
 
-    // Cari objek member yang sebenarnya berdasarkan nama
     _currentMember = _allMembersCache.firstWhere(
       (m) => m.name == initialMemberName,
       orElse: () => _allMembersCache.isNotEmpty ? _allMembersCache.first : null,
@@ -79,57 +77,16 @@ class RecommendationCubit extends Cubit<RecommendationState> {
     int foodIndex,
     RecommendedFood newFood,
   ) async {
-    if (state is! RecommendationLoaded) {
-      return;
-    }
+    if (state is! RecommendationLoaded) return;
     final currentState = state as RecommendationLoaded;
-    final alternativesResult = await recommendationRepository.getAlternatives(
-      originalFood: newFood,
+
+    await recommendationRepository.saveRecommendationChoice(
+      memberName: currentState.currentMember.name,
+      forDate: currentState.displayedDate,
+      mealIdentifier: '${mealTime.name}_$foodIndex',
+      newFoodId: newFood.food.id,
     );
-
-    alternativesResult.fold(
-      (failure) {
-        _updateStateWithNewFood(
-          currentState,
-          mealTime,
-          foodIndex,
-          newFood.copyWith(alternatives: []),
-        );
-      },
-      (newAlternatives) {
-        final finalFood = newFood.copyWith(alternatives: newAlternatives);
-        _updateStateWithNewFood(currentState, mealTime, foodIndex, finalFood);
-      },
-    );
-  }
-
-  void _updateStateWithNewFood(
-    RecommendationLoaded currentState,
-    MealTime mealTime,
-    int foodIndex,
-    RecommendedFood finalFood,
-  ) {
-    final newMeals = Map<MealTime, List<RecommendedFood>>.from(
-      currentState.recommendation.meals,
-    );
-    final mealList = newMeals[mealTime];
-
-    if (mealList != null && mealList.length > foodIndex) {
-      final updatedMealList = List<RecommendedFood>.from(mealList);
-      updatedMealList[foodIndex] = finalFood;
-      newMeals[mealTime] = updatedMealList;
-    }
-
-    final newRecommendation = RecommendationModel(meals: newMeals);
-
-    emit(
-      RecommendationLoaded(
-        recommendation: newRecommendation,
-        displayedDate: currentState.displayedDate,
-        currentMember: currentState.currentMember,
-        allMembers: currentState.allMembers,
-      ),
-    );
+    await _fetchRecommendation();
   }
 
   Future<void> _fetchRecommendation() async {
