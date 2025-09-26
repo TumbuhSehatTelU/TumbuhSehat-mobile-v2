@@ -14,11 +14,16 @@ class BerandaLoading extends BerandaState {}
 class BerandaLoaded extends BerandaState {
   final FamilyModel family;
   final ParentModel currentUser;
+  final RecommendationModel recommendation;
 
-  const BerandaLoaded({required this.family, required this.currentUser});
+  const BerandaLoaded({
+    required this.family,
+    required this.currentUser,
+    required this.recommendation,
+  });
 
   @override
-  List<Object> get props => [family, currentUser];
+  List<Object> get props => [family, currentUser, recommendation];
 }
 
 class BerandaError extends BerandaState {

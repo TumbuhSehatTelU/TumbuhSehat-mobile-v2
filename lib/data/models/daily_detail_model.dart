@@ -21,6 +21,24 @@ extension MealTimeExtension on MealTime {
   }
 }
 
+MealTime getCurrentMealTime() {
+  final hour = DateTime.now().hour;
+
+  if (hour >= 4 && hour < 11) {
+    return MealTime.Sarapan;
+  }
+  if (hour >= 11 && hour < 15) {
+    return MealTime.MakanSiang;
+  }
+  if (hour >= 15 && hour < 18) {
+    return MealTime.CamilanSore;
+  }
+  if (hour >= 18 && hour < 22) {
+    return MealTime.MakanMalam;
+  }
+  return MealTime.CamilanMalam;
+}
+
 class DailyDetailModel extends Equatable {
   final Map<MealTime, List<FoodDetail>> meals;
 

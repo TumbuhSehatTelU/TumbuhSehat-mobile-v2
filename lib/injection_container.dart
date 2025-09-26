@@ -101,7 +101,11 @@ Future<void> init() async {
   );
   sl.registerFactory(() => ScanCubit(onboardingRepository: sl()));
   sl.registerFactory(
-    () => BerandaCubit(onboardingRepository: sl(), sharedPreferences: sl()),
+    () => BerandaCubit(
+      onboardingRepository: sl(),
+      sharedPreferences: sl(),
+      recommendationRepository: sl(),
+    ),
   );
   sl.registerFactory(() => MealAnalysisCubit(foodRepository: sl()));
   sl.registerFactory(
