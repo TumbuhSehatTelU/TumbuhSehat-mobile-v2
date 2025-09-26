@@ -2,10 +2,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mobile_tumbuh_sehat_v2/core/theme/ts_shadow.dart';
+import 'package:mobile_tumbuh_sehat_v2/core/theme/ts_text_style.dart';
 
 import '../../../core/theme/ts_color.dart';
 import '../../../data/models/daily_detail_model.dart';
 import '../../../data/models/recommendation_model.dart';
+import '../../../gen/assets.gen.dart';
 import '../../cubit/recommendation/recommendation_cubit.dart';
 import '../common/ts_button.dart';
 
@@ -32,20 +35,18 @@ class MealRecommendationCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 8),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: 10,
-            spreadRadius: 2,
-          ),
-        ],
+        color: TSColor.monochrome.white,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: TSShadow.shadows.weight400,
       ),
       child: Column(
         children: [
-          _buildHeader(mealTime.name, totalCalories),
-          const Divider(height: 24),
+          _buildHeader(mealTime.displayName, totalCalories, context),
+          Divider(
+            height: 16,
+            thickness: 2,
+            color: TSColor.monochrome.lightGrey,
+          ),
           ...List.generate(recommendedFoods.length, (index) {
             return _RecommendedFoodItem(
               recommendedFood: recommendedFoods[index],
@@ -56,20 +57,16 @@ class MealRecommendationCard extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(String title, double calories) {
+  Widget _buildHeader(String title, double calories, BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          title,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
+        Text(title, style: getResponsiveTextStyle(context, TSFont.bold.h2)),
         Text(
           '${calories.toStringAsFixed(0)} kkal',
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.green,
+          style: getResponsiveTextStyle(
+            context,
+            TSFont.bold.h3.withColor(TSColor.secondaryGreen.shade500),
           ),
         ),
       ],
@@ -82,36 +79,98 @@ class _RecommendedFoodItem extends StatelessWidget {
 
   const _RecommendedFoodItem({required this.recommendedFood});
 
+  ({String label, String icon, Color color}) _getCategoryInfo() {
+    final category = recommendedFood.food.nutrients['category'] as String?;
+    switch (category) {
+      case 'sumber_karbohidrat':
+        return (
+          label: 'Karbohidrat',
+          icon: '🍚',
+          color: TSColor.additionalColor.orange,
+        );
+      case 'protein_hewani':
+      case 'protein_nabati':
+        return (
+          label: 'Protein & Lemak',
+          icon: '🍗',
+          color: TSColor.additionalColor.red,
+        );
+      case 'sayuran':
+      case 'buah':
+        return (
+          label: 'Serat',
+          icon: '🥬',
+          color: TSColor.additionalColor.green,
+        );
+      default:
+        return (
+          label: 'Lainnya',
+          icon: '🍴',
+          color: TSColor.additionalColor.blue,
+        );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final categoryInfo = _getCategoryInfo();
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // TODO: Add category icon
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          Text.rich(
+            TextSpan(
               children: [
-                Text(
-                  recommendedFood.food.name,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  '${recommendedFood.quantity.toStringAsFixed(1)} ${recommendedFood.urt.urtName}',
-                  style: TextStyle(color: TSColor.monochrome.grey),
+                TextSpan(text: '${categoryInfo.icon} '),
+                TextSpan(
+                  text: categoryInfo.label,
+                  style: getResponsiveTextStyle(
+                    context,
+                    TSFont.bold.h3.withColor(categoryInfo.color),
+                  ),
                 ),
               ],
             ),
           ),
-          const SizedBox(width: 8),
-          TSButton(
-            onPressed: () => _showAlternativesModal(context),
-            text: 'Ganti',
-            size: ButtonSize.small,
-            backgroundColor: TSColor.secondaryGreen.primary,
-            contentColor: Colors.black,
-            borderColor: Colors.transparent,
+          const SizedBox(height: 4),
+          Row(
+            children: [
+              const SizedBox(height: 4),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      recommendedFood.food.name,
+                      style: getResponsiveTextStyle(context, TSFont.bold.body),
+                    ),
+                    Text(
+                      '${recommendedFood.quantity.toStringAsFixed(1)} ${recommendedFood.urt.urtName}',
+                      style: getResponsiveTextStyle(
+                        context,
+                        TSFont.regular.body,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              TSButton(
+                onPressed: () => _showAlternativesModal(context),
+                text: 'Ganti',
+                size: ButtonSize.small,
+                style: ButtonStyleType.leftIcon,
+                textStyle: getResponsiveTextStyle(
+                  context,
+                  TSFont.medium.body.withColor(TSColor.monochrome.black),
+                ),
+                svgIconPath: Assets.icons.changeIcon.path,
+                backgroundColor: TSColor.secondaryGreen.shade200,
+                contentColor: TSColor.monochrome.black,
+                borderColor: Colors.transparent,
+              ),
+            ],
           ),
         ],
       ),

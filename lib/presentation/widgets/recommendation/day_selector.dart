@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
+import 'package:mobile_tumbuh_sehat_v2/core/theme/ts_text_style.dart';
 import '../../../core/theme/ts_color.dart';
 import '../../cubit/recommendation/recommendation_cubit.dart';
 
@@ -25,8 +26,9 @@ class _DaySelectorState extends State<DaySelector> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: TSColor.monochrome.lightGrey.withOpacity(0.5),
-        borderRadius: BorderRadius.circular(24),
+        color: TSColor.monochrome.lightGrey.withOpacity(0.32),
+        borderRadius: BorderRadius.circular(48),
+        border: BoxBorder.all(color: TSColor.mainTosca.shade100, width: 4),
       ),
       child: ToggleButtons(
         isSelected: _isSelected,
@@ -39,22 +41,31 @@ class _DaySelectorState extends State<DaySelector> {
           widget.onDaySelected(_days[index]);
         },
         borderRadius: BorderRadius.circular(24),
-        selectedColor: Colors.white,
+        selectedColor: TSColor.monochrome.black,
         color: TSColor.monochrome.grey,
-        fillColor: TSColor.mainTosca.primary,
+        fillColor: TSColor.mainTosca.shade100,
         renderBorder: false,
-        children: const [
+        children: [
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 24),
-            child: Text('Hari Ini'),
+            child: Text(
+              'Hari Ini',
+              style: getResponsiveTextStyle(context, TSFont.bold.large),
+            ),
           ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 24),
-            child: Text('Besok'),
+            child: Text(
+              'Besok',
+              style: getResponsiveTextStyle(context, TSFont.bold.large),
+            ),
           ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 24),
-            child: Text('Lusa'),
+            child: Text(
+              'Lusa',
+              style: getResponsiveTextStyle(context, TSFont.bold.large),
+            ),
           ),
         ],
       ),

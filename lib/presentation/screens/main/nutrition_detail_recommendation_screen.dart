@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mesh_gradient/mesh_gradient.dart';
+import 'package:mobile_tumbuh_sehat_v2/core/theme/ts_text_style.dart';
 
 import '../../../core/theme/ts_color.dart';
 import '../../../data/models/child_model.dart';
@@ -221,13 +222,19 @@ class _NutritionDetailRecommendationScreenState
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Text(
+        Text(
           'Total Kalori',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          style: getResponsiveTextStyle(
+            context,
+            TSFont.regular.h2.withColor(TSColor.monochrome.black),
+          ),
         ),
         Text(
           '${totalCalories.toStringAsFixed(0)} kkal',
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          style: getResponsiveTextStyle(
+            context,
+            TSFont.bold.h2.withColor(TSColor.monochrome.black),
+          ),
         ),
       ],
     );

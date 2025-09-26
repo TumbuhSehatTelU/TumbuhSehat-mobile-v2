@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 enum ButtonSize { large, medium, small }
 
@@ -22,6 +23,7 @@ class TSButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final String? text;
   final IconData? icon;
+  final String? svgIconPath;
   final Color backgroundColor;
   final Color borderColor;
   final Color contentColor;
@@ -38,6 +40,7 @@ class TSButton extends StatelessWidget {
     required this.onPressed,
     this.text,
     this.icon,
+    this.svgIconPath,
     required this.backgroundColor,
     required this.borderColor,
     required this.contentColor,
@@ -86,6 +89,13 @@ class TSButton extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (icon != null) Icon(icon, color: contentColor),
+            if (svgIconPath != null)
+              SvgPicture.asset(
+                svgIconPath!,
+                colorFilter: ColorFilter.mode(contentColor, BlendMode.srcIn),
+                width: 20,
+                height: 20,
+              ),
             const SizedBox(width: 8),
             if (text != null)
               Text(text!, style: textStyle?.copyWith(color: contentColor)),
@@ -100,6 +110,13 @@ class TSButton extends StatelessWidget {
               Text(text!, style: textStyle?.copyWith(color: contentColor)),
             const SizedBox(width: 8),
             if (icon != null) Icon(icon, color: contentColor),
+            if (svgIconPath != null)
+              SvgPicture.asset(
+                svgIconPath!,
+                colorFilter: ColorFilter.mode(contentColor, BlendMode.srcIn),
+                width: 20,
+                height: 20,
+              ),
           ],
         );
         break;

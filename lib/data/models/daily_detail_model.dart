@@ -4,6 +4,23 @@ import 'package:equatable/equatable.dart';
 
 enum MealTime { Sarapan, MakanSiang, CamilanSore, MakanMalam, CamilanMalam }
 
+extension MealTimeExtension on MealTime {
+  String get displayName {
+    switch (this) {
+      case MealTime.MakanSiang:
+        return 'Makan Siang';
+      case MealTime.CamilanSore:
+        return 'Camilan Sore';
+      case MealTime.MakanMalam:
+        return 'Makan Malam';
+      case MealTime.CamilanMalam:
+        return 'Camilan Malam';
+      default:
+        return name;
+    }
+  }
+}
+
 class DailyDetailModel extends Equatable {
   final Map<MealTime, List<FoodDetail>> meals;
 
