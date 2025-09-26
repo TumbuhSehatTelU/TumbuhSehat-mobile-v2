@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -7,6 +9,8 @@ import '../../../core/theme/ts_text_style.dart';
 import '../../../data/models/daily_detail_model.dart';
 import '../../../data/models/recommendation_model.dart';
 import '../../cubit/beranda/beranda_cubit.dart';
+import '../../widgets/home/skeletons/recommendation_card_skeleton.dart';
+import '../../widgets/home/skeletons/weekly_chart_skeleton.dart';
 import '../../widgets/home/weekly_calory_chart.dart';
 import '../../widgets/layouts/greeting_app_bar.dart';
 import '../../widgets/home/member_carousel.dart';
@@ -23,7 +27,7 @@ class BerandaScreen extends StatefulWidget {
 }
 
 class _BerandaScreenState extends State<BerandaScreen> {
-  PageController _pageController = PageController();
+  PageController? _pageController;
   int _currentPageIndex = 0;
   List<dynamic> _allMembers = [];
 
@@ -35,7 +39,7 @@ class _BerandaScreenState extends State<BerandaScreen> {
 
   @override
   void dispose() {
-    _pageController.dispose();
+    _pageController?.dispose();
     super.dispose();
   }
 
@@ -71,32 +75,18 @@ class _BerandaScreenState extends State<BerandaScreen> {
           : null,
       body: BlocConsumer<BerandaCubit, BerandaState>(
         listener: (context, state) {
-          if (state is BerandaLoaded) {
-            if (_allMembers.isEmpty) {
-              setState(() {
-                _allMembers = [
-                  ...state.family.children,
-                  ...state.family.parents,
-                ];
-                int initialPage = 0;
-                if (_allMembers.isNotEmpty) {
-                  final int itemCount = _allMembers.length * 1000;
-                  initialPage = (itemCount / 2).floor();
-
-                  final remainder = initialPage % _allMembers.length;
-                  initialPage -= remainder;
-                }
-                _pageController = PageController(
-                  viewportFraction: 1.0,
-                  initialPage: initialPage,
-                );
-                _currentPageIndex = 0;
-              });
-            }
+          if (state is BerandaLoaded && _pageController == null) {
+            _allMembers = [...state.family.children, ...state.family.parents];
+            _currentPageIndex = state.initialMemberIndex;
+            _pageController = PageController(
+              viewportFraction: 1.0,
+              initialPage: _allMembers.length * 100 + _currentPageIndex,
+            );
+            setState(() {});
           }
         },
         builder: (context, state) {
-          if (state is BerandaLoading) {
+          if (_pageController == null || state is BerandaInitial) {
             return const Center(child: CircularProgressIndicator());
           }
           if (state is BerandaError) {
@@ -108,6 +98,9 @@ class _BerandaScreenState extends State<BerandaScreen> {
             );
           }
           if (state is BerandaLoaded) {
+            if (_pageController == null) {
+              return const Center(child: CircularProgressIndicator());
+            }
             final hour = DateTime.now().hour;
             String title;
             RecommendationModel recommendationToShow;
@@ -137,14 +130,9 @@ class _BerandaScreenState extends State<BerandaScreen> {
                     ),
                     child: MemberCarousel(
                       members: _allMembers,
-                      pageController: _pageController,
+                      pageController: _pageController!,
                       onPageChanged: (index) {
                         final memberIndex = index % _allMembers.length;
-
-                        setState(() {
-                          _currentPageIndex = memberIndex;
-                        });
-
                         context.read<BerandaCubit>().changeMember(
                           _allMembers[memberIndex],
                         );
@@ -152,21 +140,37 @@ class _BerandaScreenState extends State<BerandaScreen> {
                     ),
                   ),
                   const SizedBox(height: 32),
-
-                  _buildContentSection(
-                    context: context,
-                    title: 'Kebutuhan Kalori Mingguan',
-                    buttonText: 'Lihat Riwayat Kalori',
-                    onPressed: _navigateToHistory,
-                  ),
-                  const SizedBox(height: 24),
-                  _buildRecommendationSection(
-                    context,
-                    title: title,
-                    recommendation: recommendationToShow,
-                    isForToday: isForToday,
-                    currentMemberName: state.currentUser.name,
-                  ),
+                  if (state.isChangingMember)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 24),
+                      child: Column(
+                        children: [
+                          WeeklyChartSkeleton(),
+                          SizedBox(height: 24),
+                          RecommendationCardSkeleton(),
+                        ],
+                      ),
+                    )
+                  else
+                    Column(
+                      children: [
+                        _buildWeeklyHistorySection(
+                          context: context,
+                          title: 'Kebutuhan Kalori Mingguan',
+                          buttonText: 'Lihat Riwayat Kalori',
+                          onPressed: _navigateToHistory,
+                        ),
+                        const SizedBox(height: 48),
+                        _buildRecommendationSection(
+                          context,
+                          title: title,
+                          recommendation: recommendationToShow,
+                          isForToday: isForToday,
+                          currentMemberName: state.currentUser.name,
+                        ),
+                        const SizedBox(height: 124),
+                      ],
+                    ),
                 ],
               ),
             );
@@ -196,11 +200,15 @@ class _BerandaScreenState extends State<BerandaScreen> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
             title,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            style: TSFont.getStyle(
+              context,
+              TSFont.bold.h2.withColor(TSColor.monochrome.black),
+            ),
+            textAlign: TextAlign.center,
           ),
           const SizedBox(height: 16),
 
@@ -214,14 +222,17 @@ class _BerandaScreenState extends State<BerandaScreen> {
               height: 120,
               width: double.infinity,
               decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(16),
+                color: TSColor.monochrome.white,
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: TSShadow.shadows.weight400,
               ),
               child: Center(
                 child: Text(
                   isForToday
-                      ? 'Rekomendasi untuk hari ini sudah selesai.'
+                      ? 'Anda telah memenuhi\nkebutuhan gizi hari ini.'
                       : 'Sarapan untuk esok hari.',
+                  style: TSFont.getStyle(context, TSFont.semiBold.large),
+                  textAlign: TextAlign.center,
                 ),
               ),
             ),
@@ -254,7 +265,7 @@ class _BerandaScreenState extends State<BerandaScreen> {
     );
   }
 
-  Widget _buildContentSection({
+  Widget _buildWeeklyHistorySection({
     required BuildContext context,
     required String title,
     required String buttonText,
@@ -263,11 +274,14 @@ class _BerandaScreenState extends State<BerandaScreen> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
             title,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            style: TSFont.getStyle(
+              context,
+              TSFont.bold.h2.withColor(TSColor.monochrome.black),
+            ),
           ),
           const SizedBox(height: 16),
 

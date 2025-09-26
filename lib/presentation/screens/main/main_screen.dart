@@ -1,26 +1,43 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 
 import '../../../core/theme/ts_color.dart';
 import '../../../core/theme/ts_text_style.dart';
 import '../../../gen/assets.gen.dart';
+import '../../../injection_container.dart' as di;
+import '../../cubit/beranda/beranda_cubit.dart';
 import 'beranda_screen.dart';
 import 'chatbot_screen.dart';
 import 'komunitas_screen.dart';
 import 'profil_screen.dart';
 import 'scan_screen.dart';
 
-class MainScreen extends StatefulWidget {
+class MainScreen extends StatelessWidget {
   const MainScreen({super.key});
 
   @override
-  State<MainScreen> createState() => _MainScreenState();
+  Widget build(BuildContext context) {
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => di.sl<BerandaCubit>()),
+      ],
+      child: const _MainScreenContent(),
+    );
+  }
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _MainScreenContent extends StatefulWidget {
+  const _MainScreenContent();
+
+  @override
+  State<_MainScreenContent> createState() => __MainScreenContentState();
+}
+
+class __MainScreenContentState extends State<_MainScreenContent> {
   int _activeIndex = 0;
 
   final List<Widget> _pages = const [

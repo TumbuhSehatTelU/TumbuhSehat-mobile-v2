@@ -17,6 +17,8 @@ class BerandaLoaded extends BerandaState {
   final RecommendationModel recommendationForToday;
   final RecommendationModel recommendationForTomorrow;
   final WeeklySummaryModel weeklySummary;
+  final bool isChangingMember;
+  final int initialMemberIndex;
 
   const BerandaLoaded({
     required this.family,
@@ -24,7 +26,31 @@ class BerandaLoaded extends BerandaState {
     required this.recommendationForToday,
     required this.recommendationForTomorrow,
     required this.weeklySummary,
+    this.isChangingMember = false,
+    required this.initialMemberIndex,
   });
+
+  BerandaLoaded copyWith({
+    FamilyModel? family,
+    dynamic currentUser,
+    RecommendationModel? recommendationForToday,
+    RecommendationModel? recommendationForTomorrow,
+    WeeklySummaryModel? weeklySummary,
+    bool? isChangingMember,
+    int? initialMemberIndex,
+  }) {
+    return BerandaLoaded(
+      family: family ?? this.family,
+      currentUser: currentUser ?? this.currentUser,
+      recommendationForToday:
+          recommendationForToday ?? this.recommendationForToday,
+      recommendationForTomorrow:
+          recommendationForTomorrow ?? this.recommendationForTomorrow,
+      weeklySummary: weeklySummary ?? this.weeklySummary,
+      isChangingMember: isChangingMember ?? this.isChangingMember,
+      initialMemberIndex: initialMemberIndex ?? this.initialMemberIndex,
+    );
+  }
 
   @override
   List<Object> get props => [
@@ -33,6 +59,8 @@ class BerandaLoaded extends BerandaState {
     recommendationForToday,
     recommendationForTomorrow,
     weeklySummary,
+    isChangingMember,
+    initialMemberIndex,
   ];
 }
 

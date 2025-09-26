@@ -39,17 +39,25 @@ class BerandaCubit extends Cubit<BerandaState> {
     }
 
     final familyResult = await onboardingRepository.getCachedFamily();
+
     if (familyResult.isLeft()) {
       emit(BerandaError(familyResult.fold((l) => l.message, (r) => '')));
       return;
     }
 
     final family = familyResult.getOrElse(() => throw Exception());
+
+    final allMembers = [...family.children, ...family.parents];
+    int initialIndex = allMembers.indexWhere(
+      (m) => (m as dynamic).name == loggedInUserName,
+    );
+    if (initialIndex == -1) initialIndex = 0;
+
     ParentModel currentUser;
     try {
-      currentUser = family.parents.firstWhere(
-        (p) => p.name == loggedInUserName,
-      );
+      currentUser =
+          allMembers.firstWhere((m) => (m as dynamic).name == loggedInUserName)
+              as ParentModel;
     } catch (e) {
       emit(BerandaError('Data pengguna "$loggedInUserName" tidak cocok.'));
       return;
@@ -67,7 +75,7 @@ class BerandaCubit extends Cubit<BerandaState> {
       nutritionRepository.getWeeklySummary(
         member: currentUser,
         targetDate: DateTime.now(),
-      )
+      ),
     ]);
 
     final todayResult = results[0] as Either<Failure, RecommendationModel>;
@@ -80,20 +88,26 @@ class BerandaCubit extends Cubit<BerandaState> {
       emit(const BerandaError('Gagal memuat data beranda.'));
       return;
     }
-
-    emit(
-      BerandaLoaded(
-        family: family,
-        currentUser: currentUser,
-        recommendationForToday: todayResult.getOrElse(
-          () => RecommendationModel.empty(),
+    if (todayResult.isRight() &&
+        tomorrowResult.isRight() &&
+        summaryResult.isRight()) {
+      emit(
+        BerandaLoaded(
+          family: family,
+          currentUser: currentUser,
+          recommendationForToday: todayResult.getOrElse(
+            () => RecommendationModel.empty(),
+          ),
+          recommendationForTomorrow: tomorrowResult.getOrElse(
+            () => RecommendationModel.empty(),
+          ),
+          weeklySummary: summaryResult.getOrElse(() => throw Exception()),
+          initialMemberIndex: initialIndex,
         ),
-        recommendationForTomorrow: tomorrowResult.getOrElse(
-          () => RecommendationModel.empty(),
-        ),
-        weeklySummary: summaryResult.getOrElse(() => throw Exception()),
-      ),
-    );
+      );
+    } else {
+      emit(const BerandaError('Gagal memuat data beranda.'));
+    }
   }
 
   Future<void> changeMember(dynamic newMember) async {
@@ -101,6 +115,8 @@ class BerandaCubit extends Cubit<BerandaState> {
     final currentState = state as BerandaLoaded;
 
     if (currentState.currentUser.name == newMember.name) return;
+
+    emit(currentState.copyWith(isChangingMember: true, currentUser: newMember));
 
     final results = await Future.wait([
       recommendationRepository.getMealRecommendation(
@@ -114,7 +130,7 @@ class BerandaCubit extends Cubit<BerandaState> {
       nutritionRepository.getWeeklySummary(
         member: newMember,
         targetDate: DateTime.now(),
-      )
+      ),
     ]);
 
     final todayResult = results[0] as Either<Failure, RecommendationModel>;
@@ -128,19 +144,35 @@ class BerandaCubit extends Cubit<BerandaState> {
       return;
     }
 
-    emit(
-      BerandaLoaded(
-        family: currentState.family,
-        currentUser: newMember,
-        recommendationForToday: todayResult.getOrElse(
-          () => RecommendationModel.empty(),
+    if (todayResult.isRight() &&
+        tomorrowResult.isRight() &&
+        summaryResult.isRight()) {
+      final allMembers = [
+        ...currentState.family.children,
+        ...currentState.family.parents,
+      ];
+      final newIndex = allMembers.indexWhere(
+        (m) => (m as dynamic).name == newMember.name,
+      );
+
+      emit(
+        BerandaLoaded(
+          family: currentState.family,
+          currentUser: newMember,
+          recommendationForToday: todayResult.getOrElse(
+            () => RecommendationModel.empty(),
+          ),
+          recommendationForTomorrow: tomorrowResult.getOrElse(
+            () => RecommendationModel.empty(),
+          ),
+          weeklySummary: summaryResult.getOrElse(() => throw Exception()),
+          isChangingMember: false,
+          initialMemberIndex: newIndex != -1 ? newIndex : 0,
         ),
-        recommendationForTomorrow: tomorrowResult.getOrElse(
-          () => RecommendationModel.empty(),
-        ),
-        weeklySummary: summaryResult.getOrElse(() => throw Exception()),
-      ),
-    );
+      );
+    } else {
+      emit(currentState.copyWith(isChangingMember: false));
+    }
   }
 
   Future<void> refreshBeranda() async {
