@@ -65,7 +65,7 @@ class _ChildFormCardState extends State<ChildFormCard> {
                 children: [
                   Text(
                     'Data Anak ke-${widget.index + 1}',
-                    style: getResponsiveTextStyle(
+                    style: TSFont.getStyle(
                       context,
                       TSFont.bold.body.withColor(TSColor.monochrome.black),
                     ),

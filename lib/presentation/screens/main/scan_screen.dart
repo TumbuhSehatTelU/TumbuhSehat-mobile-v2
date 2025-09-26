@@ -77,7 +77,7 @@ class _ScanScreenState extends State<ScanScreen> {
           const SizedBox(height: 24),
           Text(
             'Pilih cara menganalisis makanan',
-            style: getResponsiveTextStyle(
+            style: TSFont.getStyle(
               context,
               TSFont.bold.h3.withColor(TSColor.monochrome.black),
             ),

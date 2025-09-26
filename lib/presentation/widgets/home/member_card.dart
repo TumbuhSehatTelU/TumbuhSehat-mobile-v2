@@ -55,7 +55,7 @@ class MemberCard extends StatelessWidget {
             children: [
               Text(
                 DateFormat('EEEE, d MMMM yyyy', 'id_ID').format(DateTime.now()),
-                style: getResponsiveTextStyle(
+                style: TSFont.getStyle(
                   context,
                   TSFont.regular.h3.withColor(TSColor.monochrome.black),
                 ),
@@ -78,7 +78,7 @@ class MemberCard extends StatelessWidget {
                   Flexible(
                     child: Text(
                       member.name,
-                      style: getResponsiveTextStyle(
+                      style: TSFont.getStyle(
                         context,
                         TSFont.bold.h1.withColor(TSColor.monochrome.black),
                       ),

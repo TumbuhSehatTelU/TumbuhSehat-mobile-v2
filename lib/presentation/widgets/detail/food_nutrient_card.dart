@@ -47,7 +47,7 @@ class FoodNutrientCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     '${foodDetail.foodName} - ${foodDetail.quantity.toStringAsFixed(0)} ${foodDetail.urtName}',
-                    style: getResponsiveTextStyle(
+                    style: TSFont.getStyle(
                       context,
                       TSFont.semiBold.large.withColor(TSColor.monochrome.black),
                     ),
@@ -55,7 +55,7 @@ class FoodNutrientCard extends StatelessWidget {
                 ),
                 Text(
                   '${foodDetail.calories.toStringAsFixed(0)} Kkal',
-                  style: getResponsiveTextStyle(
+                  style: TSFont.getStyle(
                     context,
                     TSFont.bold.large.withColor(TSColor.mainTosca.shade400),
                   ),
@@ -81,7 +81,7 @@ class FoodNutrientCard extends StatelessWidget {
                 child: ExpansionTile(
                   title: Text(
                     'Lihat Detail Vitamin',
-                    style: getResponsiveTextStyle(
+                    style: TSFont.getStyle(
                       context,
                       TSFont.medium.large.withColor(TSColor.monochrome.black),
                     ),
@@ -102,7 +102,7 @@ class FoodNutrientCard extends StatelessWidget {
                 child: ExpansionTile(
                   title: Text(
                     'Lihat Detail Mineral',
-                    style: getResponsiveTextStyle(
+                    style: TSFont.getStyle(
                       context,
                       TSFont.medium.large.withColor(TSColor.monochrome.black),
                     ),
@@ -128,14 +128,14 @@ class FoodNutrientCard extends StatelessWidget {
         children: [
           Text(
             name,
-            style: getResponsiveTextStyle(
+            style: TSFont.getStyle(
               context,
               TSFont.regular.body.withColor(TSColor.monochrome.black),
             ),
           ),
           Text(
             value,
-            style: getResponsiveTextStyle(
+            style: TSFont.getStyle(
               context,
               TSFont.bold.body.withColor(TSColor.secondaryGreen.shade600),
             ),

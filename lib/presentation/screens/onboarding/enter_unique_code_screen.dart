@@ -170,7 +170,7 @@ class _EnterUniqueCodeScreenState extends State<EnterUniqueCodeScreen> {
                 Spacer(flex: 1),
                 Text(
                   "Masukkan Kode Unik\nKeluarga Anda",
-                  style: getResponsiveTextStyle(
+                  style: TSFont.getStyle(
                     context,
                     TSFont.bold.h2.withColor(TSColor.monochrome.black),
                   ),
@@ -179,7 +179,7 @@ class _EnterUniqueCodeScreenState extends State<EnterUniqueCodeScreen> {
                 SizedBox(height: 12),
                 Text(
                   "Gunakan Kode Unik dari keluarga anda\nagar saling terhubung",
-                  style: getResponsiveTextStyle(
+                  style: TSFont.getStyle(
                     context,
                     TSFont.regular.large.withColor(TSColor.monochrome.black),
                   ),
@@ -188,7 +188,7 @@ class _EnterUniqueCodeScreenState extends State<EnterUniqueCodeScreen> {
                 SizedBox(height: 12),
                 Text(
                   "Tidak tahu cara melihat kode unik? klik di sini",
-                  style: getResponsiveTextStyle(
+                  style: TSFont.getStyle(
                     context,
                     TSFont.regular.body.withColor(TSColor.monochrome.black),
                   ),
@@ -197,7 +197,7 @@ class _EnterUniqueCodeScreenState extends State<EnterUniqueCodeScreen> {
                 Spacer(flex: 1),
                 Text(
                   "Kode Unik",
-                  style: getResponsiveTextStyle(
+                  style: TSFont.getStyle(
                     context,
                     TSFont.bold.large.withColor(TSColor.monochrome.black),
                   ),

@@ -236,7 +236,7 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
                           ),
                           Text(
                             'Laki-laki',
-                            style: getResponsiveTextStyle(
+                            style: TSFont.getStyle(
                               context,
                               TSFont.regular.body.withColor(
                                 TSColor.monochrome.black,
@@ -252,7 +252,7 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
                           ),
                           Text(
                             'Perempuan',
-                            style: getResponsiveTextStyle(
+                            style: TSFont.getStyle(
                               context,
                               TSFont.regular.body.withColor(
                                 TSColor.monochrome.black,
@@ -424,10 +424,7 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
                   TSButton(
                     onPressed: onButtonPress,
                     text: getButtonText(),
-                    textStyle: getResponsiveTextStyle(
-                      context,
-                      TSFont.bold.large,
-                    ),
+                    textStyle: TSFont.getStyle(context, TSFont.bold.large),
                     customBorderRadius: 240,
                     boxShadow: TSShadow.shadows.weight500,
                     size: ButtonSize.medium,

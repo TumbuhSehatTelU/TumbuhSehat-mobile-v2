@@ -49,14 +49,14 @@ class GreetingAppBar extends StatelessWidget implements PreferredSizeWidget {
           children: [
             Text(
               _greeting,
-              style: getResponsiveTextStyle(
+              style: TSFont.getStyle(
                 context,
                 TSFont.regular.body.withColor(TSColor.monochrome.black),
               ),
             ),
             Text(
               _displayName,
-              style: getResponsiveTextStyle(
+              style: TSFont.getStyle(
                 context,
                 TSFont.bold.large.withColor(TSColor.monochrome.black),
               ),

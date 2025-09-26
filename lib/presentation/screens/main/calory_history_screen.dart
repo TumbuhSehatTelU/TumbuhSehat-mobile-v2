@@ -192,7 +192,7 @@ class _CaloryHistoryScreenState extends State<CaloryHistoryScreen> {
                                 const SizedBox(height: 24),
                                 Text(
                                   "Tren Kalori Bulanan",
-                                  style: getResponsiveTextStyle(
+                                  style: TSFont.getStyle(
                                     context,
                                     TSFont.bold.h2.withColor(
                                       TSColor.monochrome.black,

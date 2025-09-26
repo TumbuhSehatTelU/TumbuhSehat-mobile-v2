@@ -176,7 +176,7 @@ class _AddChildScreenState extends State<AddChildScreen> {
                 onPressed: _skipAndContinue,
                 child: Text(
                   'Lewati untuk sekarang',
-                  style: getResponsiveTextStyle(
+                  style: TSFont.getStyle(
                     context,
                     TSFont.medium.large.withColor(TSColor.additionalColor.blue),
                   ),

@@ -72,7 +72,7 @@ class FoodInputCard extends StatelessWidget {
                         style: TSFont.getStyle(context, TSFont.bold.h2),
                         decoration: InputDecoration(
                           hintText: 'Cari Nama Makanan',
-                          hintStyle: getResponsiveTextStyle(
+                          hintStyle: TSFont.getStyle(
                             context,
                             TSFont.bold.h2.withColor(
                               TSColor.monochrome.lightGrey,
@@ -101,7 +101,7 @@ class FoodInputCard extends StatelessWidget {
                           textAlign: TextAlign.center,
                           decoration: InputDecoration(
                             labelText: 'Jumlah',
-                            labelStyle: getResponsiveTextStyle(
+                            labelStyle: TSFont.getStyle(
                               context,
                               TSFont.bold.large,
                             ),
@@ -124,7 +124,7 @@ class FoodInputCard extends StatelessWidget {
                           isExpanded: true,
                           decoration: InputDecoration(
                             labelText: 'Ukuran Rumah Tangga (URT)',
-                            labelStyle: getResponsiveTextStyle(
+                            labelStyle: TSFont.getStyle(
                               context,
                               TSFont.bold.large,
                             ),
@@ -163,7 +163,7 @@ class FoodInputCard extends StatelessWidget {
                       const SizedBox(width: 8),
                       Text(
                         'Hapus',
-                        style: getResponsiveTextStyle(
+                        style: TSFont.getStyle(
                           context,
                           TSFont.bold.large.withColor(
                             TSColor.monochrome.pureWhite,

@@ -82,7 +82,7 @@ class _SplashScreenState extends State<SplashScreen>
               const Spacer(),
               Text(
                 "Bantu Ibu Pantau Gizi,\n Jaga Tumbuh\n Kembang Anak!",
-                style: getResponsiveTextStyle(
+                style: TSFont.getStyle(
                   context,
                   TSFont.bold.h1.withColor(TSColor.monochrome.black),
                 ),

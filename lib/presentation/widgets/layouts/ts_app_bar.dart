@@ -35,10 +35,7 @@ class TSAppBar extends StatelessWidget implements PreferredSizeWidget {
             children: [
               Text(
                 title,
-                style: getResponsiveTextStyle(
-                  context,
-                  tsFont ?? TSFont.bold.h2,
-                ),
+                style: TSFont.getStyle(context, tsFont ?? TSFont.bold.h2),
               ),
 
               if (showBackButton)

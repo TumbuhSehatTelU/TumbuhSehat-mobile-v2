@@ -64,7 +64,7 @@ class MealRecommendationCard extends StatelessWidget {
         Text(title, style: TSFont.getStyle(context, TSFont.bold.h2)),
         Text(
           '${calories.toStringAsFixed(0)} kkal',
-          style: getResponsiveTextStyle(
+          style: TSFont.getStyle(
             context,
             TSFont.bold.h3.withColor(TSColor.secondaryGreen.shade500),
           ),
@@ -125,7 +125,7 @@ class _RecommendedFoodItem extends StatelessWidget {
                 TextSpan(text: '${categoryInfo.icon} '),
                 TextSpan(
                   text: categoryInfo.label,
-                  style: getResponsiveTextStyle(
+                  style: TSFont.getStyle(
                     context,
                     TSFont.bold.h3.withColor(categoryInfo.color),
                   ),
@@ -147,10 +147,7 @@ class _RecommendedFoodItem extends StatelessWidget {
                     ),
                     Text(
                       '${recommendedFood.quantity.toStringAsFixed(1)} ${recommendedFood.urt.urtName}',
-                      style: getResponsiveTextStyle(
-                        context,
-                        TSFont.regular.body,
-                      ),
+                      style: TSFont.getStyle(context, TSFont.regular.body),
                     ),
                   ],
                 ),
@@ -161,7 +158,7 @@ class _RecommendedFoodItem extends StatelessWidget {
                 text: 'Ganti',
                 size: ButtonSize.small,
                 style: ButtonStyleType.leftIcon,
-                textStyle: getResponsiveTextStyle(
+                textStyle: TSFont.getStyle(
                   context,
                   TSFont.medium.body.withColor(TSColor.monochrome.black),
                 ),

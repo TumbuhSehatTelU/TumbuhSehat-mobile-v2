@@ -47,7 +47,7 @@ class MemberCarouselHeader extends StatelessWidget {
                     Flexible(
                       child: Text(
                         member.name,
-                        style: getResponsiveTextStyle(
+                        style: TSFont.getStyle(
                           context,
                           TSFont.bold.h1.withColor(TSColor.monochrome.black),
                         ),

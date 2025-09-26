@@ -88,7 +88,7 @@ class CaloryTrendChart extends StatelessWidget {
           ),
           Text(
             DateFormat('MMMM yyyy', 'id_ID').format(displayedMonth),
-            style: getResponsiveTextStyle(
+            style: TSFont.getStyle(
               context,
               TSFont.bold.large.withColor(TSColor.monochrome.black),
             ),
@@ -171,7 +171,7 @@ class CaloryTrendChart extends StatelessWidget {
           getTooltipItem: (group, groupIndex, rod, rodIndex) {
             return BarTooltipItem(
               '${rod.toY.round()} kkal',
-              getResponsiveTextStyle(
+              TSFont.getStyle(
                 context,
                 TSFont.bold.large.withColor(TSColor.monochrome.pureWhite),
               ),
@@ -321,7 +321,7 @@ class CaloryTrendChart extends StatelessWidget {
         const SizedBox(width: 8),
         Text(
           text,
-          style: getResponsiveTextStyle(
+          style: TSFont.getStyle(
             context,
             TSFont.regular.body.withColor(TSColor.monochrome.black),
           ),

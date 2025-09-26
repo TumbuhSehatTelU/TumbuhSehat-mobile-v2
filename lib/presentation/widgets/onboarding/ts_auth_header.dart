@@ -29,7 +29,7 @@ class AuthHeader extends StatelessWidget {
                       children: [
                         Text(
                           "T",
-                          style: getResponsiveTextStyle(
+                          style: TSFont.getStyle(
                             context,
                             TSFont.extraBold.h0.withColor(
                               TSColor.mainTosca.primary,
@@ -38,7 +38,7 @@ class AuthHeader extends StatelessWidget {
                         ),
                         Text(
                           "umbuh",
-                          style: getResponsiveTextStyle(
+                          style: TSFont.getStyle(
                             context,
                             TSFont.extraBold.h0.withColor(
                               TSColor.monochrome.black,
@@ -53,7 +53,7 @@ class AuthHeader extends StatelessWidget {
                         children: [
                           Text(
                             "S",
-                            style: getResponsiveTextStyle(
+                            style: TSFont.getStyle(
                               context,
                               TSFont.extraBold.h0.withColor(
                                 TSColor.secondaryGreen.shade400,
@@ -62,7 +62,7 @@ class AuthHeader extends StatelessWidget {
                           ),
                           Text(
                             "ehat",
-                            style: getResponsiveTextStyle(
+                            style: TSFont.getStyle(
                               context,
                               TSFont.extraBold.h0.withColor(
                                 TSColor.monochrome.black,

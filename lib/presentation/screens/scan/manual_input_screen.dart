@@ -149,7 +149,7 @@ class _ManualInputScreenState extends State<ManualInputScreen> {
             onPressed: () =>
                 context.read<MealAnalysisCubit>().addFoodComponent(),
             text: 'Tambah Komponen Makanan',
-            textStyle: getResponsiveTextStyle(
+            textStyle: TSFont.getStyle(
               context,
               TSFont.bold.large.withColor(TSColor.mainTosca.primary),
             ),
@@ -170,7 +170,7 @@ class _ManualInputScreenState extends State<ManualInputScreen> {
               );
             },
             text: 'Simpan Makanan',
-            textStyle: getResponsiveTextStyle(
+            textStyle: TSFont.getStyle(
               context,
               TSFont.bold.large.withColor(TSColor.monochrome.black),
             ),

@@ -46,7 +46,7 @@ class _JoinOrCreateScreenState extends State<JoinOrCreateScreen> {
           Spacer(flex: 1),
           Text(
             "Apakah anggota keluarga\nAnda sudah ada\nyang menggunakan\nTumbuhSehat?",
-            style: getResponsiveTextStyle(
+            style: TSFont.getStyle(
               context,
               TSFont.bold.h2.withColor(TSColor.monochrome.black),
             ),
@@ -56,7 +56,7 @@ class _JoinOrCreateScreenState extends State<JoinOrCreateScreen> {
           TSButton(
             onPressed: () => _onJoinFamilyPressed(context),
             text: 'Ya, Sudah Ada',
-            textStyle: getResponsiveTextStyle(
+            textStyle: TSFont.getStyle(
               context,
               TSFont.bold.h2.withColor(TSColor.monochrome.pureWhite),
             ),
@@ -71,7 +71,7 @@ class _JoinOrCreateScreenState extends State<JoinOrCreateScreen> {
           TSButton(
             onPressed: () => _onCreateFamilyPressed(context),
             text: 'Tidak ada',
-            textStyle: getResponsiveTextStyle(
+            textStyle: TSFont.getStyle(
               context,
               TSFont.bold.h2.withColor(TSColor.additionalColor.red),
             ),

@@ -197,7 +197,7 @@ class _DailyConsumptionDetailScreenState
                               children: [
                                 Text(
                                   'Konsumsi Gizi Harian',
-                                  style: getResponsiveTextStyle(
+                                  style: TSFont.getStyle(
                                     context,
                                     TSFont.bold.h2.withColor(
                                       TSColor.monochrome.black,
@@ -207,7 +207,7 @@ class _DailyConsumptionDetailScreenState
                                 const SizedBox(height: 8),
                                 Text(
                                   'Pilih Tanggal untuk Melihat Konsumsi Gizi',
-                                  style: getResponsiveTextStyle(
+                                  style: TSFont.getStyle(
                                     context,
                                     TSFont.regular.large.withColor(
                                       TSColor.monochrome.black,
@@ -223,7 +223,7 @@ class _DailyConsumptionDetailScreenState
                                   ).format(_selectedDate),
                                   icon: Icons.calendar_month_rounded,
                                   style: ButtonStyleType.rightIcon,
-                                  textStyle: getResponsiveTextStyle(
+                                  textStyle: TSFont.getStyle(
                                     context,
                                     TSFont.bold.large.withColor(
                                       TSColor.monochrome.black,

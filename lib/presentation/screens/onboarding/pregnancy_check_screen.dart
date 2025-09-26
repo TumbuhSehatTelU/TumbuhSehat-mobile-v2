@@ -68,7 +68,7 @@ class _PregnancyCheckScreenState extends State<PregnancyCheckScreen> {
             children: [
               Text(
                 'Apakah Ibu $parentFirstName sedang hamil?',
-                style: getResponsiveTextStyle(
+                style: TSFont.getStyle(
                   context,
                   TSFont.bold.h2.withColor(TSColor.monochrome.black),
                 ),
@@ -138,10 +138,7 @@ class _PregnancyCheckScreenState extends State<PregnancyCheckScreen> {
                 TSButton(
                   onPressed: () => _handleContinuePressed(context),
                   text: 'Lanjutkan',
-                  textStyle: getResponsiveTextStyle(
-                    context,
-                    TSFont.extraBold.h3,
-                  ),
+                  textStyle: TSFont.getStyle(context, TSFont.extraBold.h3),
                   backgroundColor: TSColor.mainTosca.shade400,
                   borderColor: Colors.transparent,
                   contentColor: TSColor.monochrome.white,
@@ -151,10 +148,7 @@ class _PregnancyCheckScreenState extends State<PregnancyCheckScreen> {
                 TSButton(
                   onPressed: _handleYesPressed,
                   text: 'Ya',
-                  textStyle: getResponsiveTextStyle(
-                    context,
-                    TSFont.extraBold.h3,
-                  ),
+                  textStyle: TSFont.getStyle(context, TSFont.extraBold.h3),
                   backgroundColor: TSColor.mainTosca.shade400,
                   borderColor: Colors.transparent,
                   contentColor: TSColor.monochrome.white,

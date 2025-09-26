@@ -84,7 +84,7 @@ class _DailyConsumptionListState extends State<DailyConsumptionList> {
       children: [
         Text(
           'Konsumsi Gizi Harian',
-          style: getResponsiveTextStyle(
+          style: TSFont.getStyle(
             context,
             TSFont.bold.h2.withColor(TSColor.monochrome.black),
           ),
@@ -92,7 +92,7 @@ class _DailyConsumptionListState extends State<DailyConsumptionList> {
         const SizedBox(height: 8),
         Text(
           'Pilih Tanggal untuk Melihat Konsumsi Gizi',
-          style: getResponsiveTextStyle(
+          style: TSFont.getStyle(
             context,
             TSFont.regular.large.withColor(TSColor.monochrome.black),
           ),
@@ -103,7 +103,7 @@ class _DailyConsumptionListState extends State<DailyConsumptionList> {
           text: DateFormat('EEEE, d MMMM yyyy', 'id_ID').format(_selectedDate),
           icon: Icons.calendar_month_rounded,
           style: ButtonStyleType.rightIcon,
-          textStyle: getResponsiveTextStyle(
+          textStyle: TSFont.getStyle(
             context,
             TSFont.bold.large.withColor(TSColor.monochrome.black),
           ),
@@ -127,7 +127,7 @@ class _DailyConsumptionListState extends State<DailyConsumptionList> {
             );
           },
           text: 'Lihat Detail',
-          textStyle: getResponsiveTextStyle(
+          textStyle: TSFont.getStyle(
             context,
             TSFont.bold.large.withColor(TSColor.monochrome.pureWhite),
           ),
@@ -148,7 +148,7 @@ class _DailyConsumptionListState extends State<DailyConsumptionList> {
               padding: EdgeInsets.only(top: 48, bottom: 120),
               child: Text(
                 'Tidak ada riwayat makan\npada tanggal ini.',
-                style: getResponsiveTextStyle(
+                style: TSFont.getStyle(
                   context,
                   TSFont.medium.h3.withColor(TSColor.mainTosca.shade500),
                 ),
@@ -229,7 +229,7 @@ class _MealEntryCard extends StatelessWidget {
                     Expanded(
                       child: Text(
                         '$title - $timeFormatted',
-                        style: getResponsiveTextStyle(
+                        style: TSFont.getStyle(
                           context,
                           TSFont.bold.h3.withColor(TSColor.monochrome.black),
                         ),
@@ -237,7 +237,7 @@ class _MealEntryCard extends StatelessWidget {
                     ),
                     Text(
                       '${totalCalories.toStringAsFixed(0)} Kkal',
-                      style: getResponsiveTextStyle(
+                      style: TSFont.getStyle(
                         context,
                         TSFont.bold.h3.withColor(TSColor.mainTosca.shade400),
                       ),
@@ -258,7 +258,7 @@ class _MealEntryCard extends StatelessWidget {
                       children: [
                         Text(
                           '${component.foodName} - ${component.quantity.toStringAsFixed(0)} ${component.urtName}',
-                          style: getResponsiveTextStyle(
+                          style: TSFont.getStyle(
                             context,
                             TSFont.regular.body.withColor(
                               TSColor.monochrome.black,
@@ -267,7 +267,7 @@ class _MealEntryCard extends StatelessWidget {
                         ),
                         Text(
                           '${component.calories.toStringAsFixed(0)} Kkal',
-                          style: getResponsiveTextStyle(
+                          style: TSFont.getStyle(
                             context,
                             TSFont.bold.body.withColor(
                               TSColor.secondaryGreen.shade600,

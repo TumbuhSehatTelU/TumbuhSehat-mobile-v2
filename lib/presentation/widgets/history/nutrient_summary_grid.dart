@@ -96,7 +96,7 @@ class _NutrientSummaryCard extends StatelessWidget {
 
           Text(
             '$title Mingguan',
-            style: getResponsiveTextStyle(
+            style: TSFont.getStyle(
               context,
               TSFont.medium.small.withColor(TSColor.monochrome.black),
             ),
@@ -105,7 +105,7 @@ class _NutrientSummaryCard extends StatelessWidget {
 
           Text(
             '${percentage.toStringAsFixed(0)}%',
-            style: getResponsiveTextStyle(
+            style: TSFont.getStyle(
               context,
               TSFont.bold.h2.withColor(TSColor.monochrome.black),
             ),
@@ -113,7 +113,7 @@ class _NutrientSummaryCard extends StatelessWidget {
 
           Text(
             statusText,
-            style: getResponsiveTextStyle(
+            style: TSFont.getStyle(
               context,
               TSFont.bold.large.withColor(statusColor),
             ),

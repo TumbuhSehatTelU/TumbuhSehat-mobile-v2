@@ -48,7 +48,7 @@ class AnalysisCard extends StatelessWidget {
                 const SizedBox(width: 24),
                 Text(
                   text,
-                  style: getResponsiveTextStyle(
+                  style: TSFont.getStyle(
                     context,
                     TSFont.bold.h2.withColor(textColor),
                   ),

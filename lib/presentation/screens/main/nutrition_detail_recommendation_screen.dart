@@ -224,14 +224,14 @@ class _NutritionDetailRecommendationScreenState
       children: [
         Text(
           'Total Kalori',
-          style: getResponsiveTextStyle(
+          style: TSFont.getStyle(
             context,
             TSFont.regular.h2.withColor(TSColor.monochrome.black),
           ),
         ),
         Text(
           '${totalCalories.toStringAsFixed(0)} kkal',
-          style: getResponsiveTextStyle(
+          style: TSFont.getStyle(
             context,
             TSFont.bold.h2.withColor(TSColor.monochrome.black),
           ),

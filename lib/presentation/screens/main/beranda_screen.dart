@@ -192,7 +192,7 @@ class _BerandaScreenState extends State<BerandaScreen> {
               );
             },
             text: 'Lihat Detail',
-            textStyle: getResponsiveTextStyle(
+            textStyle: TSFont.getStyle(
               context,
               TSFont.bold.large.withColor(TSColor.monochrome.black),
             ),
@@ -220,7 +220,7 @@ class _BerandaScreenState extends State<BerandaScreen> {
         children: [
           Text(
             title,
-            style: getResponsiveTextStyle(
+            style: TSFont.getStyle(
               context,
               TSFont.bold.h2.withColor(TSColor.monochrome.black),
             ),
@@ -240,7 +240,7 @@ class _BerandaScreenState extends State<BerandaScreen> {
           TSButton(
             onPressed: onPressed,
             text: buttonText,
-            textStyle: getResponsiveTextStyle(
+            textStyle: TSFont.getStyle(
               context,
               TSFont.bold.large.withColor(TSColor.monochrome.black),
             ),
