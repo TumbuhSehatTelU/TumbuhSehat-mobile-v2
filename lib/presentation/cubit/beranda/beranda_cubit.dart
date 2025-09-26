@@ -24,20 +24,15 @@ class BerandaCubit extends Cubit<BerandaState> {
   Future<void> loadBerandaData() async {
     emit(BerandaLoading());
 
-    final familyResult = await onboardingRepository.getCachedFamily();
     final loggedInUserName = sharedPreferences.getString(
       LOGGED_IN_USER_NAME_KEY,
     );
-
     if (loggedInUserName == null || loggedInUserName.isEmpty) {
-      emit(
-        const BerandaError(
-          'Sesi pengguna tidak ditemukan. Silakan login kembali.',
-        ),
-      );
+      emit(const BerandaError('Sesi pengguna tidak ditemukan.'));
       return;
     }
 
+    final familyResult = await onboardingRepository.getCachedFamily();
     if (familyResult.isLeft()) {
       emit(BerandaError(familyResult.fold((l) => l.message, (r) => '')));
       return;
@@ -54,17 +49,36 @@ class BerandaCubit extends Cubit<BerandaState> {
       return;
     }
 
-    // Panggil repository rekomendasi
-    final recommendationResult = await recommendationRepository
-        .getMealRecommendation(member: currentUser, forDate: DateTime.now());
+    // Panggil kedua repository secara paralel
+    final results = await Future.wait([
+      recommendationRepository.getMealRecommendation(
+        member: currentUser,
+        forDate: DateTime.now(),
+      ),
+      recommendationRepository.getMealRecommendation(
+        member: currentUser,
+        forDate: DateTime.now().add(const Duration(days: 1)),
+      ),
+    ]);
 
-    recommendationResult.fold(
-      (failure) => emit(BerandaError(failure.message)),
-      (recommendation) => emit(
-        BerandaLoaded(
-          family: family,
-          currentUser: currentUser,
-          recommendation: recommendation,
+    final todayResult = results[0];
+    final tomorrowResult = results[1];
+
+    // Cek jika salah satu panggilan gagal
+    if (todayResult.isLeft() || tomorrowResult.isLeft()) {
+      emit(const BerandaError('Gagal memuat data rekomendasi.'));
+      return;
+    }
+
+    emit(
+      BerandaLoaded(
+        family: family,
+        currentUser: currentUser,
+        recommendationForToday: todayResult.getOrElse(
+          () => RecommendationModel.empty(),
+        ),
+        recommendationForTomorrow: tomorrowResult.getOrElse(
+          () => RecommendationModel.empty(),
         ),
       ),
     );

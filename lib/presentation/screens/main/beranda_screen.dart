@@ -5,6 +5,7 @@ import '../../../core/theme/ts_color.dart';
 import '../../../core/theme/ts_shadow.dart';
 import '../../../core/theme/ts_text_style.dart';
 import '../../../data/models/daily_detail_model.dart';
+import '../../../data/models/recommendation_model.dart';
 import '../../cubit/beranda/beranda_cubit.dart';
 import '../../widgets/layouts/greeting_app_bar.dart';
 import '../../widgets/home/member_carousel.dart';
@@ -100,6 +101,20 @@ class _BerandaScreenState extends State<BerandaScreen> {
             );
           }
           if (state is BerandaLoaded) {
+            final hour = DateTime.now().hour;
+            String title;
+            RecommendationModel recommendationToShow;
+            bool isForToday;
+
+            if (hour < 22) {
+              title = 'Rekomendasi Asupan Gizi';
+              recommendationToShow = state.recommendationForToday;
+              isForToday = true;
+            } else {
+              title = 'Rekomendasi Asupan Gizi\nHari Esok';
+              recommendationToShow = state.recommendationForTomorrow;
+              isForToday = false;
+            }
             return SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -131,7 +146,13 @@ class _BerandaScreenState extends State<BerandaScreen> {
                     onPressed: _navigateToHistory,
                   ),
                   const SizedBox(height: 24),
-                  _buildRecommendationSection(context, state),
+                  _buildRecommendationSection(
+                    context,
+                    title: title,
+                    recommendation: recommendationToShow,
+                    isForToday: isForToday,
+                    currentMemberName: state.currentUser.name,
+                  ),
                 ],
               ),
             );
@@ -143,29 +164,37 @@ class _BerandaScreenState extends State<BerandaScreen> {
   }
 
   Widget _buildRecommendationSection(
-    BuildContext context,
-    BerandaLoaded state,
-  ) {
-    final relevantMealTime = getNextRelevantMealTime(state.recommendation);
+    BuildContext context, {
+    required String title,
+    required RecommendationModel recommendation,
+    required bool isForToday,
+    required String currentMemberName,
+  }) {
+    // Panggil helper time dengan parameter baru
+    final relevantMealTime = getNextRelevantMealTime(
+      recommendation,
+      isForToday: isForToday,
+    );
 
-    final currentMemberName = state.currentUser.name;
+    final List<RecommendedFood> recommendedFoods = relevantMealTime != null
+        ? recommendation.meals[relevantMealTime] ?? []
+        : [];
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Rekomendasi Asupan Gizi',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          Text(
+            title,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
 
-          if (relevantMealTime != null)
+          if (relevantMealTime != null && recommendedFoods.isNotEmpty)
             MealRecommendationCard(
               mealTime: relevantMealTime,
-              recommendedFoods:
-                  state.recommendation.meals[relevantMealTime] ?? [],
+              recommendedFoods: recommendedFoods,
             )
           else
             Container(
@@ -175,8 +204,12 @@ class _BerandaScreenState extends State<BerandaScreen> {
                 color: Colors.grey[200],
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: const Center(
-                child: Text('Rekomendasi untuk hari ini sudah selesai.'),
+              child: Center(
+                child: Text(
+                  isForToday
+                      ? 'Rekomendasi untuk hari ini sudah selesai.'
+                      : 'Sarapan untuk esok hari.', // atau pesan lain
+                ),
               ),
             ),
 

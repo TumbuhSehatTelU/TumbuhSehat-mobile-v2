@@ -23,7 +23,16 @@ extension MealTimeExtension on MealTime {
   }
 }
 
-MealTime? getNextRelevantMealTime(RecommendationModel recommendation) {
+MealTime? getNextRelevantMealTime(
+  RecommendationModel recommendation, {
+  bool isForToday = true,
+}) {
+  if (!isForToday) {
+    return recommendation.meals.containsKey(MealTime.Sarapan)
+        ? MealTime.Sarapan
+        : null;
+  }
+
   final hour = DateTime.now().hour;
 
   if (hour < 11 && recommendation.meals.containsKey(MealTime.Sarapan)) {
@@ -38,6 +47,7 @@ MealTime? getNextRelevantMealTime(RecommendationModel recommendation) {
   if (hour < 22 && recommendation.meals.containsKey(MealTime.MakanMalam)) {
     return MealTime.MakanMalam;
   }
+
   return null;
 }
 
