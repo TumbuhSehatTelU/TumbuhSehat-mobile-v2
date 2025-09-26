@@ -256,7 +256,7 @@ class NutritionRepositoryImpl implements NutritionRepository {
     }
 
     try {
-      final baseAkg = await _getBaseAkg(member);
+      final baseAkg = await getBaseAkg(member);
       if (baseAkg == null) {
         return null;
       }
@@ -273,8 +273,8 @@ class NutritionRepositoryImpl implements NutritionRepository {
     }
   }
 
-  // HELPER
-  Future<AkgModel?> _getBaseAkg(dynamic member) async {
+  @override
+  Future<AkgModel?> getBaseAkg(dynamic member) async {
     final db = await dbHelper.database;
     final now = DateTime.now();
     if (member.dateOfBirth == null) {
@@ -318,6 +318,7 @@ class NutritionRepositoryImpl implements NutritionRepository {
     return AkgModel.fromMap(maps.first);
   }
 
+  // HELPER
   Future<AkgModel> _addParentConditions(
     AkgModel baseAkg,
     ParentModel parent,

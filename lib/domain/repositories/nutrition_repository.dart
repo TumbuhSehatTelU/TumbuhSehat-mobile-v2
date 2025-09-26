@@ -26,4 +26,6 @@ abstract class NutritionRepository {
   });
 
   Future<AkgModel?> getAkgForMember(dynamic member);
+
+  Future<AkgModel?> getBaseAkg(dynamic member);
 }

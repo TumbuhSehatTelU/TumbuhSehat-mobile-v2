@@ -33,13 +33,15 @@ class RecommendationRepositoryImpl implements RecommendationRepository {
     try {
       final db = await dbHelper.database;
 
-      final akgResult = await nutritionRepository.getAkgForMember(member);
-      if (akgResult == null) {
-        return Left(CacheFailure('AKG tidak ditemukan.'));
+      final totalAkg = await nutritionRepository.getAkgForMember(member);
+      if (totalAkg == null) return Left(CacheFailure('AKG tidak ditemukan.'));
+
+      final baseAkg = await nutritionRepository.getBaseAkg(member);
+      if (baseAkg == null) {
+        return Left(CacheFailure('AKG dasar tidak ditemukan.'));
       }
 
-      var remainingAkg = akgResult;
-
+      var remainingAkg = totalAkg;
       final now = DateTime.now();
       if (forDate.year == now.year &&
           forDate.month == now.month &&
@@ -51,39 +53,63 @@ class RecommendationRepositoryImpl implements RecommendationRepository {
       final key = 'recommendation_overrides_${member.name}_$dateKey';
       final overrides = await localDataSource.getRecommendationOverrides(key);
 
-      // MEAL SLOT PERCENTAGE
-      final breakfastTarget = _getMealTarget(remainingAkg, 0.25);
-      final lunchTarget = _getMealTarget(remainingAkg, 0.40);
-      final dinnerTarget = _getMealTarget(remainingAkg, 0.35);
+      final meals = <MealTime, List<RecommendedFood>>{};
 
-      final breakfastRecs = await _generateRecsForMeal(
+      final extraCalories = totalAkg.calories - baseAkg.calories;
+      final hasExtraNutrition = extraCalories > 10; 
+
+      AkgModel primaryMealsAkg;
+      if (hasExtraNutrition) {
+        primaryMealsAkg = baseAkg.copyWith(
+          calories: remainingAkg.calories - extraCalories,
+          protein: remainingAkg.protein - (totalAkg.protein - baseAkg.protein),
+        );
+      } else {
+        primaryMealsAkg = remainingAkg;
+      }
+
+      meals[MealTime.Sarapan] = await _generateRecsForMeal(
         db,
-        breakfastTarget,
+        _getMealTarget(primaryMealsAkg, 0.25),
         overrides,
         MealTime.Sarapan,
       );
-      final lunchRecs = await _generateRecsForMeal(
+      meals[MealTime.MakanSiang] = await _generateRecsForMeal(
         db,
-        lunchTarget,
+        _getMealTarget(primaryMealsAkg, 0.40),
         overrides,
         MealTime.MakanSiang,
       );
-      final dinnerRecs = await _generateRecsForMeal(
+      meals[MealTime.MakanMalam] = await _generateRecsForMeal(
         db,
-        dinnerTarget,
+        _getMealTarget(primaryMealsAkg, 0.35),
         overrides,
         MealTime.MakanMalam,
       );
 
-      final recommendation = RecommendationModel(
-        meals: {
-          MealTime.Sarapan: breakfastRecs,
-          MealTime.MakanSiang: lunchRecs,
-          MealTime.MakanMalam: dinnerRecs,
-        },
-      );
+      if (hasExtraNutrition) {
+        final extraAkg = AkgModel(
+          id: 0,
+          category: '',
+          gender: '',
+          startMonth: 0,
+          endMonth: 0,
+          calories: extraCalories,
+          protein: totalAkg.protein - baseAkg.protein,
+          fat: 0,
+          carbohydrates: 0,
+          fiber: 0,
+          water: 0,
+        );
+        meals[MealTime.CamilanSore] = await _generateRecsForMeal(
+          db,
+          _getMealTarget(extraAkg, 1.0),
+          overrides,
+          MealTime.CamilanSore,
+        );
+      }
 
-      return Right(recommendation);
+      return Right(RecommendationModel(meals: meals));
     } catch (e) {
       return Left(CacheFailure('Gagal membuat rekomendasi: $e'));
     }

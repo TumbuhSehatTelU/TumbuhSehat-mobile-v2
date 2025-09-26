@@ -2,6 +2,8 @@
 
 import 'package:equatable/equatable.dart';
 
+import 'recommendation_model.dart';
+
 enum MealTime { Sarapan, MakanSiang, CamilanSore, MakanMalam, CamilanMalam }
 
 extension MealTimeExtension on MealTime {
@@ -21,22 +23,22 @@ extension MealTimeExtension on MealTime {
   }
 }
 
-MealTime getCurrentMealTime() {
+MealTime? getNextRelevantMealTime(RecommendationModel recommendation) {
   final hour = DateTime.now().hour;
 
-  if (hour >= 4 && hour < 11) {
+  if (hour < 11 && recommendation.meals.containsKey(MealTime.Sarapan)) {
     return MealTime.Sarapan;
   }
-  if (hour >= 11 && hour < 15) {
+  if (hour < 15 && recommendation.meals.containsKey(MealTime.MakanSiang)) {
     return MealTime.MakanSiang;
   }
-  if (hour >= 15 && hour < 18) {
+  if (hour < 18 && recommendation.meals.containsKey(MealTime.CamilanSore)) {
     return MealTime.CamilanSore;
   }
-  if (hour >= 18 && hour < 22) {
+  if (hour < 22 && recommendation.meals.containsKey(MealTime.MakanMalam)) {
     return MealTime.MakanMalam;
   }
-  return MealTime.CamilanMalam;
+  return null;
 }
 
 class DailyDetailModel extends Equatable {

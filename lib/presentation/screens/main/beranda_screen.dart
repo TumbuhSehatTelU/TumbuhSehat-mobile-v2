@@ -4,10 +4,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/theme/ts_color.dart';
 import '../../../core/theme/ts_shadow.dart';
 import '../../../core/theme/ts_text_style.dart';
+import '../../../data/models/daily_detail_model.dart';
 import '../../cubit/beranda/beranda_cubit.dart';
 import '../../widgets/layouts/greeting_app_bar.dart';
 import '../../widgets/home/member_carousel.dart';
 import '../../widgets/common/ts_button.dart';
+import '../../widgets/recommendation/meal_recommendation_card.dart';
 import 'calory_history_screen.dart';
 import 'nutrition_detail_recommendation_screen.dart';
 
@@ -44,21 +46,6 @@ class _BerandaScreenState extends State<BerandaScreen> {
         MaterialPageRoute(
           builder: (_) =>
               CaloryHistoryScreen(initialMemberName: currentMember.name),
-        ),
-      );
-    }
-  }
-
-  void _navigateToDetailsRecommendation() {
-    if (_allMembers.isNotEmpty) {
-      final memberIndex = _currentPageIndex % _allMembers.length;
-      final currentMember = _allMembers[memberIndex];
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          // Kirim NAMA-nya (String), bukan seluruh objek
-          builder: (_) => NutritionDetailRecommendationScreen(
-            initialMemberName: currentMember.name,
-          ),
         ),
       );
     }
@@ -144,17 +131,79 @@ class _BerandaScreenState extends State<BerandaScreen> {
                     onPressed: _navigateToHistory,
                   ),
                   const SizedBox(height: 24),
-                  _buildContentSection(
-                    title: 'Rekomendasi Asupan Gizi',
-                    buttonText: 'Lihat Detail',
-                    onPressed: _navigateToDetailsRecommendation,
-                  ),
+                  _buildRecommendationSection(context, state),
                 ],
               ),
             );
           }
           return const SizedBox.shrink();
         },
+      ),
+    );
+  }
+
+  Widget _buildRecommendationSection(
+    BuildContext context,
+    BerandaLoaded state,
+  ) {
+    final relevantMealTime = getNextRelevantMealTime(state.recommendation);
+
+    final currentMemberName = state.currentUser.name;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Rekomendasi Asupan Gizi',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 16),
+
+          if (relevantMealTime != null)
+            MealRecommendationCard(
+              mealTime: relevantMealTime,
+              recommendedFoods:
+                  state.recommendation.meals[relevantMealTime] ?? [],
+            )
+          else
+            Container(
+              height: 120,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: const Center(
+                child: Text('Rekomendasi untuk hari ini sudah selesai.'),
+              ),
+            ),
+
+          const SizedBox(height: 16),
+          TSButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => NutritionDetailRecommendationScreen(
+                    initialMemberName: currentMemberName,
+                  ),
+                ),
+              );
+            },
+            text: 'Lihat Detail',
+            textStyle: getResponsiveTextStyle(
+              context,
+              TSFont.bold.large.withColor(TSColor.monochrome.black),
+            ),
+            boxShadow: TSShadow.shadows.weight400,
+            backgroundColor: TSColor.secondaryGreen.primary,
+            contentColor: TSColor.monochrome.black,
+            borderColor: Colors.transparent,
+            width: double.infinity,
+            customBorderRadius: 240,
+          ),
+        ],
       ),
     );
   }
