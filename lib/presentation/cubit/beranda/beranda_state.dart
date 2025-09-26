@@ -16,12 +16,14 @@ class BerandaLoaded extends BerandaState {
   final dynamic currentUser;
   final RecommendationModel recommendationForToday;
   final RecommendationModel recommendationForTomorrow;
+  final WeeklySummaryModel weeklySummary;
 
   const BerandaLoaded({
     required this.family,
     required this.currentUser,
     required this.recommendationForToday,
     required this.recommendationForTomorrow,
+    required this.weeklySummary,
   });
 
   @override
@@ -30,6 +32,7 @@ class BerandaLoaded extends BerandaState {
     currentUser,
     recommendationForToday,
     recommendationForTomorrow,
+    weeklySummary,
   ];
 }
 

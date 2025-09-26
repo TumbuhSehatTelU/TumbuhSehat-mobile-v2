@@ -20,8 +20,7 @@ class NutritionRepositoryImpl implements NutritionRepository {
   @override
   Future<Either<Failure, WeeklySummaryModel>> getWeeklySummary({
     required dynamic member,
-    required DateTime endDate,
-    required Duration duration,
+    required DateTime targetDate,
   }) async {
     try {
       final akgStandard = await getAkgForMember(member);
@@ -33,7 +32,10 @@ class NutritionRepositoryImpl implements NutritionRepository {
         );
       }
 
-      final startDate = endDate.subtract(duration);
+      final today = DateTime(targetDate.year, targetDate.month, targetDate.day);
+      final startDate = today.subtract(Duration(days: today.weekday - 1));
+      final endDate = startDate.add(const Duration(days: 7));
+
       final db = await dbHelper.database;
       final historyMaps = await db.query(
         'meal_histories as mh '
@@ -323,7 +325,6 @@ class NutritionRepositoryImpl implements NutritionRepository {
     AkgModel baseAkg,
     ParentModel parent,
   ) async {
-    
     final db = await dbHelper.database;
     var finalAkg = baseAkg;
 
@@ -374,7 +375,7 @@ class NutritionRepositoryImpl implements NutritionRepository {
         if (maps.isNotEmpty) finalAkg += AkgModel.fromMap(maps.first);
       }
     }
-    
+
     return finalAkg;
   }
 
@@ -382,7 +383,6 @@ class NutritionRepositoryImpl implements NutritionRepository {
     AkgModel baseAkg,
     ChildModel child,
   ) async {
-    
     final ageInDays = DateTime.now().difference(child.dateOfBirth).inDays;
 
     final haz = await _computeHAZ(ageInDays, child.height, child.gender);

@@ -100,9 +100,9 @@ class CaloryHistoryCubit extends Cubit<CaloryHistoryState> {
     final results = await Future.wait([
       nutritionRepository.getWeeklySummary(
         member: _currentMember,
-        endDate: DateTime.now(),
-        duration: const Duration(days: 7),
+        targetDate: DateTime.now(),
       ),
+
       nutritionRepository.getMonthlyTrend(
         member: _currentMember,
         month: _selectedMonth,

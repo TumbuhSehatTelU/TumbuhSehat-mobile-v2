@@ -7,6 +7,7 @@ import '../../../core/theme/ts_text_style.dart';
 import '../../../data/models/daily_detail_model.dart';
 import '../../../data/models/recommendation_model.dart';
 import '../../cubit/beranda/beranda_cubit.dart';
+import '../../widgets/home/weekly_calory_chart.dart';
 import '../../widgets/layouts/greeting_app_bar.dart';
 import '../../widgets/home/member_carousel.dart';
 import '../../widgets/common/ts_button.dart';
@@ -153,6 +154,7 @@ class _BerandaScreenState extends State<BerandaScreen> {
                   const SizedBox(height: 32),
 
                   _buildContentSection(
+                    context: context,
                     title: 'Kebutuhan Kalori Mingguan',
                     buttonText: 'Lihat Riwayat Kalori',
                     onPressed: _navigateToHistory,
@@ -253,6 +255,7 @@ class _BerandaScreenState extends State<BerandaScreen> {
   }
 
   Widget _buildContentSection({
+    required BuildContext context,
     required String title,
     required String buttonText,
     required VoidCallback onPressed,
@@ -260,25 +263,32 @@ class _BerandaScreenState extends State<BerandaScreen> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             title,
-            style: TSFont.getStyle(
-              context,
-              TSFont.bold.h2.withColor(TSColor.monochrome.black),
-            ),
-            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
-          Container(
-            height: 120,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: const Center(child: Text('Postpone')),
+
+          BlocBuilder<BerandaCubit, BerandaState>(
+            builder: (context, state) {
+              if (state is BerandaLoaded) {
+                return WeeklyCaloryChart(
+                  dailyIntakes: state.weeklySummary.dailyIntakes,
+                  akg: state.weeklySummary.akgStandard,
+                );
+              }
+              return Container(
+                height: 120,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const Center(child: Text('Memuat data chart...')),
+              );
+            },
           ),
           const SizedBox(height: 16),
           TSButton(

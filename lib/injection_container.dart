@@ -105,6 +105,7 @@ Future<void> init() async {
       onboardingRepository: sl(),
       sharedPreferences: sl(),
       recommendationRepository: sl(),
+      nutritionRepository: sl(),
     ),
   );
   sl.registerFactory(() => MealAnalysisCubit(foodRepository: sl()));

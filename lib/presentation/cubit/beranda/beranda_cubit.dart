@@ -1,9 +1,13 @@
+import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../core/error/failures.dart';
 import '../../../data/models/family_model.dart';
 import '../../../data/models/parent_model.dart';
 import '../../../data/models/recommendation_model.dart';
+import '../../../data/models/weekly_summary_model.dart';
+import '../../../domain/repositories/nutrition_repository.dart';
 import '../../../domain/repositories/onboarding_repository.dart';
 import '../../../domain/repositories/recommendation_repository.dart';
 import '../login/login_cubit.dart';
@@ -14,11 +18,13 @@ class BerandaCubit extends Cubit<BerandaState> {
   final OnboardingRepository onboardingRepository;
   final SharedPreferences sharedPreferences;
   final RecommendationRepository recommendationRepository;
+  final NutritionRepository nutritionRepository;
 
   BerandaCubit({
     required this.onboardingRepository,
     required this.sharedPreferences,
     required this.recommendationRepository,
+    required this.nutritionRepository,
   }) : super(BerandaInitial());
 
   Future<void> loadBerandaData() async {
@@ -49,7 +55,6 @@ class BerandaCubit extends Cubit<BerandaState> {
       return;
     }
 
-    // Panggil kedua repository secara paralel
     final results = await Future.wait([
       recommendationRepository.getMealRecommendation(
         member: currentUser,
@@ -59,14 +64,20 @@ class BerandaCubit extends Cubit<BerandaState> {
         member: currentUser,
         forDate: DateTime.now().add(const Duration(days: 1)),
       ),
+      nutritionRepository.getWeeklySummary(
+        member: currentUser,
+        targetDate: DateTime.now(),
+      )
     ]);
 
-    final todayResult = results[0];
-    final tomorrowResult = results[1];
+    final todayResult = results[0] as Either<Failure, RecommendationModel>;
+    final tomorrowResult = results[1] as Either<Failure, RecommendationModel>;
+    final summaryResult = results[2] as Either<Failure, WeeklySummaryModel>;
 
-    // Cek jika salah satu panggilan gagal
-    if (todayResult.isLeft() || tomorrowResult.isLeft()) {
-      emit(const BerandaError('Gagal memuat data rekomendasi.'));
+    if (todayResult.isLeft() ||
+        tomorrowResult.isLeft() ||
+        summaryResult.isLeft()) {
+      emit(const BerandaError('Gagal memuat data beranda.'));
       return;
     }
 
@@ -80,6 +91,7 @@ class BerandaCubit extends Cubit<BerandaState> {
         recommendationForTomorrow: tomorrowResult.getOrElse(
           () => RecommendationModel.empty(),
         ),
+        weeklySummary: summaryResult.getOrElse(() => throw Exception()),
       ),
     );
   }
@@ -90,29 +102,50 @@ class BerandaCubit extends Cubit<BerandaState> {
 
     if (currentState.currentUser.name == newMember.name) return;
 
-    final recommendationResult = await recommendationRepository
-        .getMealRecommendation(member: newMember, forDate: DateTime.now());
+    final results = await Future.wait([
+      recommendationRepository.getMealRecommendation(
+        member: newMember,
+        forDate: DateTime.now(),
+      ),
+      recommendationRepository.getMealRecommendation(
+        member: newMember,
+        forDate: DateTime.now().add(const Duration(days: 1)),
+      ),
+      nutritionRepository.getWeeklySummary(
+        member: newMember,
+        targetDate: DateTime.now(),
+      )
+    ]);
 
-    final tomorrowRecommendationResult = await recommendationRepository
-        .getMealRecommendation(
-          member: newMember,
-          forDate: DateTime.now().add(const Duration(days: 1)),
-        );
+    final todayResult = results[0] as Either<Failure, RecommendationModel>;
+    final tomorrowResult = results[1] as Either<Failure, RecommendationModel>;
+    final summaryResult = results[2] as Either<Failure, WeeklySummaryModel>;
 
-    if (recommendationResult.isRight() &&
-        tomorrowRecommendationResult.isRight()) {
-      emit(
-        BerandaLoaded(
-          family: currentState.family,
-          currentUser: newMember,
-          recommendationForToday: recommendationResult.getOrElse(
-            () => RecommendationModel.empty(),
-          ),
-          recommendationForTomorrow: tomorrowRecommendationResult.getOrElse(
-            () => RecommendationModel.empty(),
-          ),
+    if (todayResult.isLeft() ||
+        tomorrowResult.isLeft() ||
+        summaryResult.isLeft()) {
+      emit(const BerandaError('Gagal memuat data beranda.'));
+      return;
+    }
+
+    emit(
+      BerandaLoaded(
+        family: currentState.family,
+        currentUser: newMember,
+        recommendationForToday: todayResult.getOrElse(
+          () => RecommendationModel.empty(),
         ),
-      );
+        recommendationForTomorrow: tomorrowResult.getOrElse(
+          () => RecommendationModel.empty(),
+        ),
+        weeklySummary: summaryResult.getOrElse(() => throw Exception()),
+      ),
+    );
+  }
+
+  Future<void> refreshBeranda() async {
+    if (state is! BerandaLoading) {
+      await loadBerandaData();
     }
   }
 }

@@ -8,8 +8,7 @@ import '../../data/models/weekly_summary_model.dart';
 abstract class NutritionRepository {
   Future<Either<Failure, WeeklySummaryModel>> getWeeklySummary({
     required dynamic member,
-    required DateTime endDate,
-    required Duration duration,
+    required DateTime targetDate,
   });
 
   Future<Either<Failure, List<WeeklyIntake>>> getMonthlyTrend({

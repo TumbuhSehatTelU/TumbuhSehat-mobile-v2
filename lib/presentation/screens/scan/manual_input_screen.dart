@@ -6,6 +6,7 @@ import '../../../core/theme/ts_text_style.dart';
 import '../../../data/models/child_model.dart';
 import '../../../data/models/parent_model.dart';
 import '../../../injection_container.dart';
+import '../../cubit/beranda/beranda_cubit.dart';
 import '../../cubit/meal_analysis/meal_analysis_cubit.dart';
 import '../../widgets/meal_analysis/food_input_card.dart';
 import '../../widgets/common/ts_button.dart';
@@ -41,6 +42,7 @@ class _ManualInputScreenState extends State<ManualInputScreen> {
               builder: (_) => const Center(child: CircularProgressIndicator()),
             );
           } else if (state.status == MealAnalysisStatus.success) {
+            context.read<BerandaCubit>().refreshBeranda();
             Navigator.of(context).pop();
             showTSSuccessModal(
               context: context,
