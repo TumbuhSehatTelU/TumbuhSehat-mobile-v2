@@ -83,4 +83,36 @@ class BerandaCubit extends Cubit<BerandaState> {
       ),
     );
   }
+
+  Future<void> changeMember(dynamic newMember) async {
+    if (state is! BerandaLoaded) return;
+    final currentState = state as BerandaLoaded;
+
+    if (currentState.currentUser.name == newMember.name) return;
+
+    final recommendationResult = await recommendationRepository
+        .getMealRecommendation(member: newMember, forDate: DateTime.now());
+
+    final tomorrowRecommendationResult = await recommendationRepository
+        .getMealRecommendation(
+          member: newMember,
+          forDate: DateTime.now().add(const Duration(days: 1)),
+        );
+
+    if (recommendationResult.isRight() &&
+        tomorrowRecommendationResult.isRight()) {
+      emit(
+        BerandaLoaded(
+          family: currentState.family,
+          currentUser: newMember,
+          recommendationForToday: recommendationResult.getOrElse(
+            () => RecommendationModel.empty(),
+          ),
+          recommendationForTomorrow: tomorrowRecommendationResult.getOrElse(
+            () => RecommendationModel.empty(),
+          ),
+        ),
+      );
+    }
+  }
 }

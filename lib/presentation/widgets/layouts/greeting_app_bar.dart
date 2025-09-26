@@ -6,9 +6,14 @@ import '../../../core/theme/ts_text_style.dart';
 import '../../../data/models/parent_model.dart';
 
 class GreetingAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final ParentModel currentUser;
+  final ParentModel loggedInUser;
+  final dynamic displayedMember;
 
-  const GreetingAppBar({super.key, required this.currentUser});
+  const GreetingAppBar({
+    super.key,
+    required this.loggedInUser,
+    required this.displayedMember,
+  });
 
   String get _greeting {
     final hour = DateTime.now().hour;
@@ -24,13 +29,13 @@ class GreetingAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   String get _displayName {
-    switch (currentUser.role) {
+    switch (loggedInUser.role) {
       case ParentRole.ibu:
-        return 'Ibu ${currentUser.name.split(' ').first}';
+        return 'Ibu ${loggedInUser.name.split(' ').first}';
       case ParentRole.ayah:
-        return 'Ayah ${currentUser.name.split(' ').first}';
+        return 'Ayah ${loggedInUser.name.split(' ').first}';
       default:
-        return currentUser.name.split(' ').first;
+        return loggedInUser.name.split(' ').first;
     }
   }
 

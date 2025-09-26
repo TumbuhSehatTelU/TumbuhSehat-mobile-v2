@@ -13,7 +13,7 @@ class BerandaLoading extends BerandaState {}
 
 class BerandaLoaded extends BerandaState {
   final FamilyModel family;
-  final ParentModel currentUser;
+  final dynamic currentUser;
   final RecommendationModel recommendationForToday;
   final RecommendationModel recommendationForTomorrow;
 

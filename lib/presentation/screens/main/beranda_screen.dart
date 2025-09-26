@@ -57,9 +57,16 @@ class _BerandaScreenState extends State<BerandaScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: context.watch<BerandaCubit>().state is BerandaLoaded
+          // Dapatkan currentUser yang sedang login (selalu Parent) dan member yang ditampilkan
           ? GreetingAppBar(
-              currentUser: (context.read<BerandaCubit>().state as BerandaLoaded)
-                  .currentUser,
+              loggedInUser:
+                  (context.read<BerandaCubit>().state as BerandaLoaded)
+                      .family
+                      .parents
+                      .first, // Asumsi user yg login ada di state
+              displayedMember:
+                  (context.read<BerandaCubit>().state as BerandaLoaded)
+                      .currentUser,
             )
           : null,
       body: BlocConsumer<BerandaCubit, BerandaState>(
@@ -132,9 +139,15 @@ class _BerandaScreenState extends State<BerandaScreen> {
                       members: _allMembers,
                       pageController: _pageController,
                       onPageChanged: (index) {
+                        final memberIndex = index % _allMembers.length;
+
                         setState(() {
-                          _currentPageIndex = index;
+                          _currentPageIndex = memberIndex;
                         });
+
+                        context.read<BerandaCubit>().changeMember(
+                          _allMembers[memberIndex],
+                        );
                       },
                     ),
                   ),
