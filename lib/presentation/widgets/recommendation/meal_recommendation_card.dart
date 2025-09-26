@@ -196,10 +196,8 @@ class _RecommendedFoodItem extends StatelessWidget {
                 children: [
                   Text(
                     'Pilih Pengganti untuk ${recommendedFood.food.name}',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TSFont.getStyle(context, TSFont.bold.h3),
+                    textAlign: TextAlign.center,
                   ),
                   const Divider(height: 24),
                   Expanded(
@@ -218,12 +216,17 @@ class _RecommendedFoodItem extends StatelessWidget {
                                   children: [
                                     Text(
                                       altRec.food.name,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
+                                      style: TSFont.getStyle(
+                                        context,
+                                        TSFont.bold.body,
                                       ),
                                     ),
                                     Text(
                                       '${altRec.quantity.toStringAsFixed(1)} ${altRec.urt.urtName}',
+                                      style: TSFont.getStyle(
+                                        context,
+                                        TSFont.regular.body,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -258,10 +261,17 @@ class _RecommendedFoodItem extends StatelessWidget {
                                   Navigator.of(context).pop();
                                 },
                                 text: 'Pilih',
+                                textStyle: TSFont.getStyle(
+                                  context,
+                                  TSFont.bold.body.withColor(
+                                    TSColor.monochrome.pureWhite,
+                                  ),
+                                ),
                                 size: ButtonSize.small,
-                                backgroundColor: Colors.green,
-                                contentColor: Colors.white,
+                                backgroundColor: TSColor.additionalColor.green,
+                                contentColor: TSColor.monochrome.pureWhite,
                                 borderColor: Colors.transparent,
+                                customBorderRadius: 240,
                               ),
                             ],
                           ),
@@ -270,13 +280,19 @@ class _RecommendedFoodItem extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                   TSButton(
                     onPressed: () => Navigator.of(context).pop(),
                     text: 'Batal',
-                    backgroundColor: Colors.red,
-                    contentColor: Colors.white,
+                    textStyle: TSFont.getStyle(
+                      context,
+                      TSFont.bold.h3.withColor(TSColor.monochrome.pureWhite),
+                    ),
+                    size: ButtonSize.large,
+                    backgroundColor: TSColor.additionalColor.red,
+                    contentColor: TSColor.monochrome.pureWhite,
                     borderColor: Colors.transparent,
+                    customBorderRadius: 240,
                     width: double.infinity,
                   ),
                 ],
