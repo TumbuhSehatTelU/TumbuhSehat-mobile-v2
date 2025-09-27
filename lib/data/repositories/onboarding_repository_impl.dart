@@ -157,7 +157,7 @@ class OnboardingRepositoryImpl implements OnboardingRepository {
       }
       try {
         final family = await localDataSource.getCachedFamily();
-        
+
         if (family.phoneNumber != phoneNumber) {
           return const Left(
             CacheFailure(
@@ -181,6 +181,26 @@ class OnboardingRepositoryImpl implements OnboardingRepository {
       } on CacheException catch (e) {
         return Left(CacheFailure(e.message));
       }
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> clearAllLocalData() async {
+    try {
+      await localDataSource.clearAllData();
+      return const Right(null);
+    } catch (e) {
+      return Left(CacheFailure('Gagal membersihkan semua data: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> clearNonFamilyData() async {
+    try {
+      await localDataSource.clearHistoryAndOverrides();
+      return const Right(null);
+    } catch (e) {
+      return Left(CacheFailure('Gagal membersihkan riwayat: $e'));
     }
   }
 }

@@ -25,6 +25,7 @@ import 'presentation/cubit/food_prediction/food_prediction_cubit.dart';
 import 'presentation/cubit/login/login_cubit.dart';
 import 'presentation/cubit/meal_analysis/meal_analysis_cubit.dart';
 import 'presentation/cubit/onboarding/onboarding_cubit.dart';
+import 'presentation/cubit/profile/profile_cubit.dart';
 import 'presentation/cubit/recommendation/recommendation_cubit.dart';
 import 'presentation/cubit/scan/scan_cubit.dart';
 import 'presentation/cubit/splash/splash_cubit.dart';
@@ -131,4 +132,7 @@ Future<void> init() async {
     ),
   );
   sl.registerFactory(() => FoodPredictionCubit(remoteDataSource: sl()));
+  sl.registerFactory(
+    () => ProfileCubit(onboardingRepository: sl(), databaseHelper: sl()),
+  );
 }

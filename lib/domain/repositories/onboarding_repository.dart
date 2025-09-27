@@ -23,4 +23,6 @@ abstract class OnboardingRepository {
     String? uniqueCode,
     String? phoneNumber,
   });
+  Future<Either<Failure, void>> clearAllLocalData();
+  Future<Either<Failure, void>> clearNonFamilyData();
 }

@@ -276,4 +276,24 @@ class DatabaseHelper {
       for (var foodMap in foodNutrientMaps) foodMap['name'] as String: foodMap,
     };
   }
+
+  Future<void> reseedDatabase() async {
+    final db = await database;
+    print('[DB_HELPER] Reseeding database...');
+    // Hapus data lama dari tabel statis
+    await db.delete('foods');
+    await db.delete('urt_conversions');
+    await db.delete('food_serving_options');
+    await db.delete('akg_standards');
+    await db.delete('who_haz_boys');
+    await db.delete('who_haz_girls');
+    await db.delete('who_whz_boys_0_2_years');
+    await db.delete('who_whz_boys_2_5_years');
+    await db.delete('who_whz_girls_0_2_years');
+    await db.delete('who_whz_girls_2_5_years');
+
+    // Panggil ulang seeder
+    await _seedDatabase(db);
+    print('[DB_HELPER] Reseeding complete.');
+  }
 }

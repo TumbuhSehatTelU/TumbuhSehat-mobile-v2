@@ -3,6 +3,7 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/error/exceptions.dart';
+import '../../../presentation/cubit/login/login_cubit.dart';
 import '../../models/family_model.dart';
 
 abstract class OnboardingLocalDataSource {
@@ -10,6 +11,8 @@ abstract class OnboardingLocalDataSource {
   Future<FamilyModel> getCachedFamily();
   Future<FamilyModel> loginOffline(String name, String password);
   Future<void> clearCachedFamily();
+  Future<void> clearAllData();
+  Future<void> clearHistoryAndOverrides();
 }
 
 const String CACHED_FAMILY = 'CACHED_FAMILY';
@@ -73,5 +76,20 @@ class OnboardingLocalDataSourceImpl implements OnboardingLocalDataSource {
   @override
   Future<void> clearCachedFamily() {
     return sharedPreferences.remove(CACHED_FAMILY);
+  }
+
+   @override
+  Future<void> clearAllData() async {
+    await sharedPreferences.clear();
+  }
+
+  @override
+  Future<void> clearHistoryAndOverrides() async {
+    final allKeys = sharedPreferences.getKeys();
+    for (final key in allKeys) {
+      if (key != CACHED_FAMILY && key != LOGGED_IN_USER_NAME_KEY) {
+        await sharedPreferences.remove(key);
+      }
+    }
   }
 }
