@@ -66,4 +66,14 @@ class FoodRepositoryImpl implements FoodRepository {
       return Left(CacheFailure('Gagal mendapatkan URT: $e'));
     }
   }
+
+  @override
+  Future<Either<Failure, FoodModel?>> findFoodByAlias(String aliasName) async {
+    try {
+      final food = await localDataSource.findFoodByAlias(aliasName);
+      return Right(food);
+    } catch (e) {
+      return Left(CacheFailure('Gagal mencari makanan berdasarkan alias: $e'));
+    }
+  }
 }

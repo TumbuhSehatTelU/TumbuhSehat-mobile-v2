@@ -14,6 +14,7 @@ abstract class FoodRepository {
   });
   Future<Either<Failure, List<FoodModel>>> searchFoods(String query);
   Future<Either<Failure, List<UrtModel>>> getUrtsForFood(int foodId);
+  Future<Either<Failure, FoodModel?>> findFoodByAlias(String aliasName);
 }
 
 // KONTRAK BE FOOD HISTORY

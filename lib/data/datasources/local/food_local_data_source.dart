@@ -22,6 +22,7 @@ abstract class FoodLocalDataSource {
     Map<String, int> overrides,
   );
   Future<Map<String, int>> getRecommendationOverrides(String key);
+  Future<FoodModel?> findFoodByAlias(String aliasName);
 }
 
 class FoodLocalDataSourceImpl implements FoodLocalDataSource {
@@ -122,5 +123,24 @@ class FoodLocalDataSourceImpl implements FoodLocalDataSource {
       return decodedMap.map((key, value) => MapEntry(key, value as int));
     }
     return {};
+  }
+
+  @override
+  Future<FoodModel?> findFoodByAlias(String aliasName) async {
+    final db = await dbHelper.database;
+    final List<Map<String, dynamic>> maps = await db.rawQuery(
+      '''
+      SELECT T2.*
+      FROM food_aliases AS T1
+      INNER JOIN foods AS T2 ON T1.food_id = T2.id
+      WHERE T1.alias_name = ?
+    ''',
+      [aliasName],
+    );
+
+    if (maps.isNotEmpty) {
+      return FoodModel.fromMap(maps.first);
+    }
+    return null;
   }
 }

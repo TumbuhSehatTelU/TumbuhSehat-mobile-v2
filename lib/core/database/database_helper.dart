@@ -166,6 +166,15 @@ class DatabaseHelper {
         S REAL NOT NULL
       )
     ''');
+
+    await db.execute('''
+        CREATE TABLE food_aliases (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          alias_name TEXT NOT NULL UNIQUE,
+          food_id INTEGER,
+          FOREIGN KEY (food_id) REFERENCES foods(id)
+        )
+    ''');
   }
 
   Future<void> _seedDatabase(Database db) async {
@@ -220,6 +229,11 @@ class DatabaseHelper {
       db: db,
       tableName: 'who_whz_girls_2_5_years',
       csvPath: 'assets/db/who_whz_girls_2_5_years.csv',
+    );
+    await _seedTableFromCSV(
+      db: db,
+      tableName: 'food_aliases',
+      csvPath: 'assets/db/food_aliases.csv',
     );
   }
 
