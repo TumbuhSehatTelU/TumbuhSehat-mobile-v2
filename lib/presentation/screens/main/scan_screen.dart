@@ -60,7 +60,10 @@ class _ScanScreenState extends State<ScanScreen> {
         );
         break;
       case AnalysisType.photo:
-        destination = const PhotoScanScreen();
+        destination = PhotoScanScreen(
+          selectedParents: _selectedParents,
+          selectedChildren: _selectedChildren,
+        );
         break;
       case AnalysisType.video:
         destination = const VideoScanScreen();
@@ -96,12 +99,12 @@ class _ScanScreenState extends State<ScanScreen> {
             isSelected: _selectedType == AnalysisType.photo,
             onTap: () => setState(() => _selectedType = AnalysisType.photo),
           ),
-          AnalysisCard(
-            assetPath: Assets.icons.videoMakanan.path,
-            text: 'Video Makanan',
-            isSelected: _selectedType == AnalysisType.video,
-            onTap: () => setState(() => _selectedType = AnalysisType.video),
-          ),
+          // AnalysisCard(
+          //   assetPath: Assets.icons.videoMakanan.path,
+          //   text: 'Video Makanan',
+          //   isSelected: _selectedType == AnalysisType.video,
+          //   onTap: () => setState(() => _selectedType = AnalysisType.video),
+          // ),
           const Divider(height: 48),
           FamilyExpansionTile<ParentModel>(
             title: 'Orang Tua',

@@ -17,11 +17,13 @@ import '../main/main_screen.dart';
 class ManualInputScreen extends StatefulWidget {
   final Set<ParentModel> selectedParents;
   final Set<ChildModel> selectedChildren;
+  final bool isReviewMode;
 
   const ManualInputScreen({
     super.key,
     required this.selectedParents,
     required this.selectedChildren,
+    this.isReviewMode = false,
   });
 
   @override
@@ -67,7 +69,7 @@ class _ManualInputScreenState extends State<ManualInputScreen> {
         },
         builder: (context, state) {
           return TSPageScaffold(
-            title: 'Input Manual',
+            title: widget.isReviewMode ? 'Tinjau Hasil Scan' : 'Input Manual',
             body: Column(
               children: [
                 const SizedBox(height: 24),

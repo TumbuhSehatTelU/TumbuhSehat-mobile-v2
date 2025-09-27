@@ -4,8 +4,19 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../data/models/child_model.dart';
+import '../../../data/models/parent_model.dart';
+import '../main/prediction_loading_screen.dart';
+
 class PhotoScanScreen extends StatefulWidget {
-  const PhotoScanScreen({super.key});
+  final Set<ParentModel> selectedParents;
+  final Set<ChildModel> selectedChildren;
+
+  const PhotoScanScreen({
+    super.key,
+    required this.selectedParents,
+    required this.selectedChildren,
+  });
 
   @override
   State<PhotoScanScreen> createState() => _PhotoScanScreenState();
@@ -55,13 +66,22 @@ class _PhotoScanScreenState extends State<PhotoScanScreen> {
   }
 
   Future<void> _onCapturePressed() async {
-    if (_controller == null || !_controller!.value.isInitialized) {
-      return;
-    }
+    if (_controller == null || !_controller!.value.isInitialized) return;
     try {
       final XFile imageFile = await _controller!.takePicture();
-      // TODO: Proses imageFile (kirim ke API, crop, dll.)
-      print('Image saved to ${imageFile.path}');
+      // Navigasi ke loading screen
+      if (mounted) {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => PredictionLoadingScreen(
+              imageFile: imageFile,
+              // Teruskan data member
+              selectedParents: widget.selectedParents,
+              selectedChildren: widget.selectedChildren,
+            ),
+          ),
+        );
+      }
     } catch (e) {
       print('Error taking picture: $e');
     }
@@ -72,9 +92,17 @@ class _PhotoScanScreenState extends State<PhotoScanScreen> {
       final XFile? imageFile = await _picker.pickImage(
         source: ImageSource.gallery,
       );
-      if (imageFile != null) {
-        // TODO: Proses imageFile (sama seperti hasil capture)
-        print('Image selected from gallery: ${imageFile.path}');
+      if (imageFile != null && mounted) {
+        // Navigasi ke loading screen
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => PredictionLoadingScreen(
+              imageFile: imageFile,
+              selectedParents: widget.selectedParents,
+              selectedChildren: widget.selectedChildren,
+            ),
+          ),
+        );
       }
     } catch (e) {
       print('Error picking image: $e');
