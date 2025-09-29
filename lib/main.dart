@@ -19,6 +19,7 @@ Future<void> main() async {
   NetworkInfoImpl.setForceOffline(true);
   Bloc.observer = SimpleBlocObserver();
   //test
+  //aduh
   runApp(const MyApp());
 }
 
