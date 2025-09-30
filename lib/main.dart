@@ -20,6 +20,7 @@ Future<void> main() async {
   Bloc.observer = SimpleBlocObserver();
   //test
   //aduh
+  //coba aja
   runApp(const MyApp());
 }
 
