@@ -78,7 +78,7 @@ class OnboardingLocalDataSourceImpl implements OnboardingLocalDataSource {
     return sharedPreferences.remove(CACHED_FAMILY);
   }
 
-   @override
+  @override
   Future<void> clearAllData() async {
     await sharedPreferences.clear();
   }

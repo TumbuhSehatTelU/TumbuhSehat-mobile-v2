@@ -54,7 +54,7 @@ class _ChildFormCardState extends State<ChildFormCard> {
         borderRadius: BorderRadius.circular(24.0),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.all(12.0),
         child: Form(
           key: widget.formData.formKey,
           child: Column(
