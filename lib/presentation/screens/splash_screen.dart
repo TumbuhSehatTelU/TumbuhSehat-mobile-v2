@@ -14,6 +14,7 @@ import '../widgets/common/ts_button.dart';
 import '../widgets/layouts/ts_page_scaffold.dart';
 import 'main/main_screen.dart';
 import 'onboarding/join_or_create_screen.dart';
+import 'onboarding/parent_registration_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -26,7 +27,10 @@ class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   Timer? _timer;
-  Widget _destinationScreen = const JoinOrCreateScreen();
+  // TODO: nanti di ganti ke JoinOrCreateScreen, setelah demo posyandu selesai
+  Widget _destinationScreen = const ParentRegistrationScreen(
+    isJoiningFamily: false,
+  );
 
   @override
   void initState() {
@@ -67,7 +71,9 @@ class _SplashScreenState extends State<SplashScreen>
           });
         } else if (state is SplashUnauthenticated) {
           setState(() {
-            _destinationScreen = const JoinOrCreateScreen();
+            _destinationScreen = const ParentRegistrationScreen(
+              isJoiningFamily: false,
+            );
           });
         }
       },

@@ -6,6 +6,12 @@ version: 0.1.0
 environment:
   sdk: ^3.8.1
 
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icons/app_icon.png"
+  min_sdk_android: 21
+
 dependencies:
   animated_bottom_navigation_bar: ^1.4.0
   camera: ^0.11.2
