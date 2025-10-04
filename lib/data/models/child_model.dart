@@ -24,4 +24,20 @@ class ChildModel {
       _$ChildModelFromJson(json);
 
   Map<String, dynamic> toJson() => _$ChildModelToJson(this);
+
+  ChildModel copyWith({
+    String? name,
+    Gender? gender,
+    DateTime? dateOfBirth,
+    double? height,
+    double? weight,
+  }) {
+    return ChildModel(
+      name: name ?? this.name,
+      gender: gender ?? this.gender,
+      dateOfBirth: dateOfBirth ?? this.dateOfBirth,
+      height: height ?? this.height,
+      weight: weight ?? this.weight,
+    );
+  }
 }

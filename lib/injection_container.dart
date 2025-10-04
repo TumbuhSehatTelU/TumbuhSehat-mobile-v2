@@ -133,6 +133,6 @@ Future<void> init() async {
   );
   sl.registerFactory(() => FoodPredictionCubit(remoteDataSource: sl()));
   sl.registerFactory(
-    () => ProfileCubit(onboardingRepository: sl(), databaseHelper: sl()),
+    () => ProfileCubit(onboardingRepository: sl(), sharedPreferences: sl()),
   );
 }

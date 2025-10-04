@@ -2,133 +2,135 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/theme/ts_color.dart';
-import '../../../injection_container.dart';
-import '../../cubit/beranda/beranda_cubit.dart';
 import '../../cubit/profile/profile_cubit.dart';
 import '../../widgets/common/ts_button.dart';
-import '../../widgets/dialogs_and_modals/ts_success_modal.dart';
-import '../../widgets/layouts/ts_page_scaffold.dart';
-import '../splash_screen.dart';
+import '../../widgets/profile/profile_menu_item.dart';
+import '../onboarding/login_screen.dart';
+import '../../../gen/assets.gen.dart';
 
-class ProfilScreen extends StatelessWidget {
+
+class ProfilScreen extends StatefulWidget {
   const ProfilScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => sl<ProfileCubit>(),
-      child: TSPageScaffold(
-        title: "Riwayat Kalori",
-        body: BlocListener<ProfileCubit, ProfileState>(
-          listener: (context, state) {
-            // Tutup dialog loading jika ada
-            if (state is! ProfileLoading &&
-                Navigator.of(context, rootNavigator: true).canPop()) {
-              Navigator.of(context, rootNavigator: true).pop();
-            }
+  State<ProfilScreen> createState() => _ProfilScreenState();
+}
 
-            if (state is ProfileLoading) {
-              showDialog(
-                context: context,
-                barrierDismissible: false,
-                builder: (_) => Center(
-                  child: Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const CircularProgressIndicator(),
-                        const SizedBox(height: 16),
-                        Text(
-                          state.message,
-                          style: const TextStyle(
-                            decoration: TextDecoration.none,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            } else if (state is ProfileSuccess) {
-              // Jika sukses menghapus semua data
-              if (state.message.contains('Semua data')) {
-                showTSSuccessModal(
-                  context: context,
-                  message: state.message,
-                  autoClose: true,
-                  duration: const Duration(seconds: 2),
-                  onClosed: () {
-                    Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(builder: (_) => const SplashScreen()),
-                      (route) => false,
-                    );
-                  },
-                );
-              }
-              // Jika sukses menghapus riwayat atau reseed
-              else {
-                showTSSuccessModal(
-                  context: context,
-                  message: state.message,
-                  autoClose: true,
-                  duration: const Duration(seconds: 2),
-                  onClosed: () {
-                    // Muat ulang data Beranda
-                    context.read<BerandaCubit>().refreshBeranda();
-                  },
-                );
-              }
-            } else if (state is ProfileError) {
-              ScaffoldMessenger.of(context)
-                ..hideCurrentSnackBar()
-                ..showSnackBar(
-                  SnackBar(
-                    content: Text(state.message),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-            }
-          },
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 24.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                TSButton(
-                  onPressed: () => context.read<ProfileCubit>().deleteAllData(),
-                  text: 'Hapus Seluruh Data Lokal',
-                  backgroundColor: TSColor.additionalColor.red,
-                  borderColor: Colors.transparent,
-                  contentColor: Colors.white,
-                ),
-                const SizedBox(height: 16),
-                TSButton(
-                  onPressed: () =>
-                      context.read<ProfileCubit>().deleteHistoryData(),
-                  text: 'Hapus Riwayat & Cache',
-                  backgroundColor: TSColor.additionalColor.orange,
-                  borderColor: Colors.transparent,
-                  contentColor: Colors.white,
-                ),
-                const SizedBox(height: 16),
-                TSButton(
-                  onPressed: () =>
-                      context.read<ProfileCubit>().reseedDatabase(),
-                  text: 'Muat Ulang Data Makanan',
-                  backgroundColor: TSColor.additionalColor.blue,
-                  borderColor: Colors.transparent,
-                  contentColor: Colors.white,
-                ),
-              ],
+class _ProfilScreenState extends State<ProfilScreen> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<ProfileCubit>().loadProfileData();
+  }
+
+  void _showLogoutConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Konfirmasi Keluar'),
+        content: const Text('Apakah Anda yakin ingin keluar dari akun ini?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('Batal'),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+              context.read<ProfileCubit>().logout();
+            },
+            child: const Text('Ya, Keluar'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.grey[50],
+      appBar: AppBar(title: const Text('Profil Saya')),
+      body: BlocConsumer<ProfileCubit, ProfileState>(
+        listener: (context, state) {
+          if (state is ProfileLogoutSuccess) {
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (_) => const LoginScreen()),
+              (route) => false,
+            );
+          }
+        },
+        builder: (context, state) {
+          if (state is ProfileLoading && state.message == null) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (state is ProfileError) {
+            return Center(child: Text(state.message));
+          }
+          if (state is ProfileLoaded) {
+            return _buildProfileContent(state);
+          }
+          // Default fallback (jika state lain)
+          return const Center(child: Text('Memuat data profil...'));
+        },
+      ),
+    );
+  }
+
+  Widget _buildProfileContent(ProfileLoaded state) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        children: [
+          // Header
+          CircleAvatar(
+            radius: 50,
+            child: Text(
+              state.currentUser.name[0],
+              style: const TextStyle(fontSize: 40),
             ),
           ),
-        ),
+          const SizedBox(height: 16),
+          Text(
+            state.currentUser.name,
+            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 16),
+          TSButton(
+            onPressed: () {
+              // TODO: Navigasi ke EditProfileScreen
+            },
+            text: 'Edit Profil',
+            backgroundColor: TSColor.secondaryGreen.primary,
+            borderColor: Colors.transparent,
+            contentColor: Colors.black,
+          ),
+          const SizedBox(height: 32),
+
+          // Menu Items
+          ProfileMenuItem(
+            svgIconPath: Assets.icons.profilGantiPassword.path,
+            title: 'Ganti Password',
+            onTap: () {
+              // TODO: Navigasi ke ChangePasswordScreen
+            },
+          ),
+          const SizedBox(height: 16),
+          ProfileMenuItem(
+            svgIconPath: Assets.icons.profilDataKeluarga.path,
+            title: 'Data Keluarga',
+            onTap: () {
+              // TODO: Navigasi ke FamilyDataScreen
+            },
+          ),
+          const SizedBox(height: 16),
+          ProfileMenuItem(
+            svgIconPath: Assets.icons.profilKeluar.path,
+            title: 'Keluar',
+            color: Colors.red,
+            onTap: _showLogoutConfirmationDialog,
+          ),
+        ],
       ),
     );
   }

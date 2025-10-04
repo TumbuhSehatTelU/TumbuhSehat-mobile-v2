@@ -25,4 +25,12 @@ abstract class OnboardingRepository {
   });
   Future<Either<Failure, void>> clearAllLocalData();
   Future<Either<Failure, void>> clearNonFamilyData();
+  Future<Either<Failure, void>> updateParentInCache(ParentModel updatedParent);
+  Future<Either<Failure, void>> updateChildInCache(ChildModel updatedChild);
+  Future<Either<Failure, void>> changePasswordInCache({
+    required String userName,
+    required String oldPassword,
+    required String newPassword,
+  });
+  Future<Either<Failure, void>> logout();
 }

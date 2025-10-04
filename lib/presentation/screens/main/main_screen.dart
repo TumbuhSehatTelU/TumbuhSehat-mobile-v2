@@ -10,6 +10,7 @@ import '../../../core/theme/ts_text_style.dart';
 import '../../../gen/assets.gen.dart';
 import '../../../injection_container.dart' as di;
 import '../../cubit/beranda/beranda_cubit.dart';
+import '../../cubit/profile/profile_cubit.dart';
 import 'beranda_screen.dart';
 import 'chatbot_screen.dart';
 import 'komunitas_screen.dart';
@@ -38,11 +39,14 @@ class _MainScreenContent extends StatefulWidget {
 class __MainScreenContentState extends State<_MainScreenContent> {
   int _activeIndex = 0;
 
-  final List<Widget> _pages = const [
-    BerandaScreen(),
+  final List<Widget> _pages = [
+    const BerandaScreen(),
     // ChatbotScreen(),
     // KomunitasScreen(),
-    ProfilScreen(),
+    BlocProvider(
+      create: (_) => di.sl<ProfileCubit>(),
+      child: const ProfilScreen(),
+    ),
   ];
 
   final List<String> _iconNames = [

@@ -203,4 +203,86 @@ class OnboardingRepositoryImpl implements OnboardingRepository {
       return Left(CacheFailure('Gagal membersihkan riwayat: $e'));
     }
   }
+
+  @override
+  Future<Either<Failure, void>> updateParentInCache(
+    ParentModel updatedParent,
+  ) async {
+    try {
+      final family = await localDataSource.getCachedFamily();
+      final parentIndex = family.parents.indexWhere(
+        (p) => p.name == updatedParent.name,
+      );
+      if (parentIndex != -1) {
+        final updatedParents = List<ParentModel>.from(family.parents);
+        updatedParents[parentIndex] = updatedParent;
+        final updatedFamily = family.copyWith(parents: updatedParents);
+        await localDataSource.cacheFamily(updatedFamily);
+        return const Right(null);
+      }
+      return Left(CacheFailure('Parent tidak ditemukan untuk diupdate.'));
+    } on CacheException catch (e) {
+      return Left(CacheFailure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> updateChildInCache(
+    ChildModel updatedChild,
+  ) async {
+    try {
+      final family = await localDataSource.getCachedFamily();
+      // Asumsi nama anak unik
+      final childIndex = family.children.indexWhere(
+        (c) => c.name == updatedChild.name,
+      );
+      if (childIndex != -1) {
+        final updatedChildren = List<ChildModel>.from(family.children);
+        updatedChildren[childIndex] = updatedChild;
+        final updatedFamily = family.copyWith(children: updatedChildren);
+        await localDataSource.cacheFamily(updatedFamily);
+        return const Right(null);
+      }
+      return Left(CacheFailure('Anak tidak ditemukan untuk diupdate.'));
+    } on CacheException catch (e) {
+      return Left(CacheFailure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> changePasswordInCache({
+    required String userName,
+    required String oldPassword,
+    required String newPassword,
+  }) async {
+    try {
+      final family = await localDataSource.getCachedFamily();
+      final parentIndex = family.parents.indexWhere((p) => p.name == userName);
+      if (parentIndex != -1) {
+        final parent = family.parents[parentIndex];
+        if (parent.password != oldPassword) {
+          return Left(CacheFailure('Password lama salah.'));
+        }
+        final updatedParent = parent.copyWith(password: newPassword);
+        final updatedParents = List<ParentModel>.from(family.parents);
+        updatedParents[parentIndex] = updatedParent;
+        final updatedFamily = family.copyWith(parents: updatedParents);
+        await localDataSource.cacheFamily(updatedFamily);
+        return const Right(null);
+      }
+      return Left(CacheFailure('Pengguna tidak ditemukan.'));
+    } on CacheException catch (e) {
+      return Left(CacheFailure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> logout() async {
+    try {
+      await localDataSource.clearAllData();
+      return const Right(null);
+    } catch (e) {
+      return Left(CacheFailure('Gagal melakukan logout: $e'));
+    }
+  }
 }

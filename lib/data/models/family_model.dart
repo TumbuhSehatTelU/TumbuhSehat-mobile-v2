@@ -22,4 +22,18 @@ class FamilyModel {
       _$FamilyModelFromJson(json);
 
   Map<String, dynamic> toJson() => _$FamilyModelToJson(this);
+
+  FamilyModel copyWith({
+    String? phoneNumber,
+    String? uniqueCode,
+    List<ParentModel>? parents,
+    List<ChildModel>? children,
+  }) {
+    return FamilyModel(
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      uniqueCode: uniqueCode ?? this.uniqueCode,
+      parents: parents ?? this.parents,
+      children: children ?? this.children,
+    );
+  }
 }
