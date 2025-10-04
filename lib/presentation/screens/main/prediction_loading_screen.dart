@@ -6,7 +6,7 @@ import '../../../data/models/child_model.dart';
 import '../../../data/models/parent_model.dart';
 import '../../../injection_container.dart';
 import '../../cubit/food_prediction/food_prediction_cubit.dart';
-import 'prediction_review_screen.dart';
+import '../scan/manual_input_screen.dart';
 
 class PredictionLoadingScreen extends StatefulWidget {
   final XFile imageFile;
@@ -38,12 +38,10 @@ class _PredictionLoadingScreenState extends State<PredictionLoadingScreen> {
             if (state is FoodPredictionLoaded) {
               Navigator.of(context).pushReplacement(
                 MaterialPageRoute(
-                          builder: (_) => PredictionReviewScreen(
+                  builder: (_) => ManualInputScreen(
                     predictionResult: state.result,
-                    selectedMembers: {
-                      ...widget.selectedParents,
-                      ...widget.selectedChildren,
-                    },
+                    selectedParents: widget.selectedParents,
+                    selectedChildren: widget.selectedChildren,
                   ),
                 ),
               );

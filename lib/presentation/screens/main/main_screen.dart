@@ -22,9 +22,7 @@ class MainScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (context) => di.sl<BerandaCubit>()),
-      ],
+      providers: [BlocProvider(create: (context) => di.sl<BerandaCubit>())],
       child: const _MainScreenContent(),
     );
   }
@@ -42,12 +40,17 @@ class __MainScreenContentState extends State<_MainScreenContent> {
 
   final List<Widget> _pages = const [
     BerandaScreen(),
-    ChatbotScreen(),
-    KomunitasScreen(),
+    // ChatbotScreen(),
+    // KomunitasScreen(),
     ProfilScreen(),
   ];
 
-  final List<String> _iconNames = ['Beranda', 'Chatbot', 'Komunitas', 'Profil'];
+  final List<String> _iconNames = [
+    'Beranda', 
+    // 'Chatbot', 
+    // 'Komunitas', 
+    'Profil'
+    ];
 
   void _onScanPressed() {
     Navigator.of(

@@ -5,6 +5,9 @@ import '../../../core/theme/ts_color.dart';
 import '../../../core/theme/ts_text_style.dart';
 import '../../../data/models/child_model.dart';
 import '../../../data/models/parent_model.dart';
+import '../../../data/models/prediction_model.dart';
+import '../../../data/models/urt_model.dart';
+import '../../../domain/repositories/food_repository.dart';
 import '../../../injection_container.dart';
 import '../../cubit/beranda/beranda_cubit.dart';
 import '../../cubit/meal_analysis/meal_analysis_cubit.dart';
@@ -17,13 +20,13 @@ import '../main/main_screen.dart';
 class ManualInputScreen extends StatefulWidget {
   final Set<ParentModel> selectedParents;
   final Set<ChildModel> selectedChildren;
-  final bool isReviewMode;
+  final PredictionResponseModel? predictionResult;
 
   const ManualInputScreen({
     super.key,
     required this.selectedParents,
     required this.selectedChildren,
-    this.isReviewMode = false,
+    this.predictionResult,
   });
 
   @override
@@ -31,10 +34,89 @@ class ManualInputScreen extends StatefulWidget {
 }
 
 class _ManualInputScreenState extends State<ManualInputScreen> {
+  bool _isProcessingPrediction = false;
+  late final MealAnalysisCubit _mealAnalysisCubit;
+
+  @override
+  void initState() {
+    super.initState();
+    _mealAnalysisCubit = sl<MealAnalysisCubit>();
+
+    if (widget.predictionResult != null) {
+      _isProcessingPrediction = true;
+      _processPredictions();
+    } else {
+      _mealAnalysisCubit.addFoodComponent();
+    }
+  }
+
+  ({UrtModel urt, double quantity}) _findBestUrt(
+    double massInGrams,
+    List<UrtModel> urts,
+  ) {
+    if (urts.isEmpty) throw Exception('URT list cannot be empty');
+    UrtModel bestUrt = urts.first;
+    double smallestDifference = double.infinity;
+
+    for (final urt in urts) {
+      if (urt.grams <= 0) continue;
+      final quantity = massInGrams / urt.grams;
+      final difference = (quantity < 1)
+          ? 1 - quantity
+          : (quantity - quantity.round()).abs();
+      if (difference < smallestDifference) {
+        smallestDifference = difference;
+        bestUrt = urt;
+      }
+    }
+    final finalQuantity = massInGrams / bestUrt.grams;
+    final roundedQuantity = (finalQuantity * 2).round() / 2.0;
+    return (
+      urt: bestUrt,
+      quantity: roundedQuantity < 0.5 ? 0.5 : roundedQuantity,
+    );
+  }
+
+  Future<void> _processPredictions() async {
+    final foodRepo = sl<FoodRepository>();
+
+    for (final component in widget.predictionResult!.components) {
+      if (component.confidence < 0.5) continue;
+
+      final foodResult = await foodRepo.findFoodByAlias(component.label);
+      await foodResult.fold((failure) async {}, (food) async {
+        if (food != null) {
+          final urtResult = await foodRepo.getUrtsForFood(food.id);
+          urtResult.fold((failure) {}, (availableUrts) {
+            if (availableUrts.isNotEmpty) {
+              final bestMatch = _findBestUrt(component.massG, availableUrts);
+              _mealAnalysisCubit.addFoodComponent();
+              final newCardId = _mealAnalysisCubit.state.foodCards.last.id;
+
+              _mealAnalysisCubit.updateFoodCard(
+                cardId: newCardId,
+                selectedFood: food,
+                selectedUrt: bestMatch.urt,
+                quantity: bestMatch.quantity.toString(),
+              );
+            }
+          });
+        }
+      });
+    }
+    if (_mealAnalysisCubit.state.foodCards.isEmpty) {
+      _mealAnalysisCubit.addFoodComponent();
+    }
+
+    if (mounted) {
+      setState(() => _isProcessingPrediction = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => sl<MealAnalysisCubit>()..addFoodComponent(),
+    return BlocProvider.value(
+      value: _mealAnalysisCubit,
       child: BlocConsumer<MealAnalysisCubit, MealAnalysisState>(
         listener: (context, state) {
           if (state.status == MealAnalysisStatus.saving) {
@@ -69,47 +151,64 @@ class _ManualInputScreenState extends State<ManualInputScreen> {
         },
         builder: (context, state) {
           return TSPageScaffold(
-            title: widget.isReviewMode ? 'Tinjau Hasil Scan' : 'Input Manual',
-            body: Column(
-              children: [
-                const SizedBox(height: 24),
-                _buildTotalCalories(state),
-                Expanded(
-                  child: ListView.separated(
-                    padding: const EdgeInsets.only(top: 16),
-                    itemCount: state.foodCards.length,
-                    itemBuilder: (context, index) {
-                      final cardData = state.foodCards[index];
-                      final cubit = context.read<MealAnalysisCubit>();
-                      return FoodInputCard(
-                        cardData: cardData,
-                        onRemove: () => cubit.removeFoodComponent(cardData.id),
-                        onSearch: (query) => cubit.foodRepository
-                            .searchFoods(query)
-                            .then((result) => result.fold((l) => [], (r) => r)),
-                        onFoodSelected: (food) => cubit.updateFoodCard(
-                          cardId: cardData.id,
-                          selectedFood: food,
-                        ),
-                        onUrtSelected: (urt) => cubit.updateFoodCard(
-                          cardId: cardData.id,
-                          selectedUrt: urt,
-                        ),
-                        onQuantityChanged: (qty) => cubit.updateFoodCard(
-                          cardId: cardData.id,
-                          quantity: qty,
-                        ),
-                      );
-                    },
+            title: widget.predictionResult != null
+                ? 'Tinjau Hasil Scan'
+                : 'Input Manual',
+            body: _isProcessingPrediction
+                ? const Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircularProgressIndicator(),
+                        SizedBox(height: 16),
+                        Text('Memproses hasil scan...'),
+                      ],
+                    ),
+                  )
+                : Column(
+                    children: [
+                      const SizedBox(height: 24),
+                      _buildTotalCalories(state),
+                      Expanded(
+                        child: ListView.separated(
+                          padding: const EdgeInsets.only(top: 16),
+                          itemCount: state.foodCards.length,
+                          itemBuilder: (context, index) {
+                            final cardData = state.foodCards[index];
+                            final cubit = context.read<MealAnalysisCubit>();
+                            return FoodInputCard(
+                              cardData: cardData,
+                              onRemove: () =>
+                                  cubit.removeFoodComponent(cardData.id),
+                              onSearch: (query) => cubit.foodRepository
+                                  .searchFoods(query)
+                                  .then(
+                                    (result) =>
+                                        result.fold((l) => [], (r) => r),
+                                  ),
+                              onFoodSelected: (food) => cubit.updateFoodCard(
+                                cardId: cardData.id,
+                                selectedFood: food,
+                              ),
+                              onUrtSelected: (urt) => cubit.updateFoodCard(
+                                cardId: cardData.id,
+                                selectedUrt: urt,
+                              ),
+                              onQuantityChanged: (qty) => cubit.updateFoodCard(
+                                cardId: cardData.id,
+                                quantity: qty,
+                              ),
+                            );
+                          },
 
-                    separatorBuilder: (context, index) {
-                      return const SizedBox(height: 28);
-                    },
+                          separatorBuilder: (context, index) {
+                            return const SizedBox(height: 28);
+                          },
+                        ),
+                      ),
+                      _buildActionButtons(context),
+                    ],
                   ),
-                ),
-                _buildActionButtons(context),
-              ],
-            ),
           );
         },
       ),

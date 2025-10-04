@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mobile_tumbuh_sehat_v2/core/utils/debug_utils.dart';
+// import 'package:mobile_tumbuh_sehat_v2/core/utils/debug_utils.dart';
 import 'core/bloc/bloc_observer.dart';
 import 'core/database/database_helper.dart';
 import 'core/network/network_info.dart';
@@ -16,8 +16,8 @@ import 'package:intl/date_symbol_data_local.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await clearTumbuhSehatPreferencesOnDebug();
-  await deleteDatabaseOnDebug();
+  // await clearTumbuhSehatPreferencesOnDebug();
+  // await deleteDatabaseOnDebug();
   final dbHelper = DatabaseHelper.instance;
   await dbHelper.database;
   await di.init();
