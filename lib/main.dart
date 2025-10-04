@@ -24,9 +24,6 @@ Future<void> main() async {
   await initializeDateFormatting('id_ID', null);
   NetworkInfoImpl.setForceOffline(true);
   Bloc.observer = SimpleBlocObserver();
-  //test
-  //aduh
-  //coba aja
   runApp(const MyApp());
 }
 
