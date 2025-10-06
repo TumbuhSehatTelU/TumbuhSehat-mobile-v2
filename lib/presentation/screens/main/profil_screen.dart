@@ -7,7 +7,9 @@ import '../../widgets/common/ts_button.dart';
 import '../../widgets/profile/profile_menu_item.dart';
 import '../onboarding/login_screen.dart';
 import '../../../gen/assets.gen.dart';
-
+import '../profile/change_password_screen.dart';
+import '../profile/edit_profile_screen.dart';
+import '../profile/family_data_screen.dart';
 
 class ProfilScreen extends StatefulWidget {
   const ProfilScreen({super.key});
@@ -98,7 +100,14 @@ class _ProfilScreenState extends State<ProfilScreen> {
           const SizedBox(height: 16),
           TSButton(
             onPressed: () {
-              // TODO: Navigasi ke EditProfileScreen
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => BlocProvider.value(
+                    value: context.read<ProfileCubit>(),
+                    child: EditProfileScreen(currentUser: state.currentUser),
+                  ),
+                ),
+              );
             },
             text: 'Edit Profil',
             backgroundColor: TSColor.secondaryGreen.primary,
@@ -112,7 +121,14 @@ class _ProfilScreenState extends State<ProfilScreen> {
             svgIconPath: Assets.icons.profilGantiPassword.path,
             title: 'Ganti Password',
             onTap: () {
-              // TODO: Navigasi ke ChangePasswordScreen
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => BlocProvider.value(
+                    value: context.read<ProfileCubit>(),
+                    child: const ChangePasswordScreen(),
+                  ),
+                ),
+              );
             },
           ),
           const SizedBox(height: 16),
@@ -120,7 +136,18 @@ class _ProfilScreenState extends State<ProfilScreen> {
             svgIconPath: Assets.icons.profilDataKeluarga.path,
             title: 'Data Keluarga',
             onTap: () {
-              // TODO: Navigasi ke FamilyDataScreen
+              // Navigasi ke FamilyDataScreen
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => BlocProvider.value(
+                    value: context.read<ProfileCubit>(),
+                    child: FamilyDataScreen(
+                      parents: state.family.parents,
+                      children: state.family.children,
+                    ),
+                  ),
+                ),
+              );
             },
           ),
           const SizedBox(height: 16),

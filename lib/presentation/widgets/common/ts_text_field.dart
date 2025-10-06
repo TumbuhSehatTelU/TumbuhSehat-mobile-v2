@@ -27,7 +27,7 @@ class TSTextField extends FormField<String> {
   TSTextField({
     super.key,
     this.controller,
-    required String placeholder,
+    String? placeholder,
     required Color backgroundColor,
     Color borderColor = Colors.transparent,
     required bool isPassword,
@@ -63,7 +63,7 @@ class TSTextField extends FormField<String> {
 class _InnerTSTextField extends StatefulWidget {
   final FormFieldState<String> field;
   final TextEditingController? controller;
-  final String placeholder;
+  final String? placeholder;
   final Color backgroundColor;
   final Color borderColor;
   final bool isPassword;
@@ -77,7 +77,7 @@ class _InnerTSTextField extends StatefulWidget {
   const _InnerTSTextField({
     required this.field,
     this.controller,
-    required this.placeholder,
+    this.placeholder,
     required this.backgroundColor,
     this.borderColor = Colors.transparent,
     required this.isPassword,
