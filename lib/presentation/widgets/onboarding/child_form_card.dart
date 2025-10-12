@@ -152,15 +152,15 @@ class _ChildFormCardState extends State<ChildFormCard> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildSectionHeader(context, "Tinggi Badan (cm)"),
+                        _buildSectionHeader(context, "Berat Badan (kg)"),
                         TSTextField(
-                          controller: widget.formData.heightController,
-                          placeholder: 'Contoh: 156.0',
+                          controller: widget.formData.weightController,
+                          placeholder: 'Contoh: 56.5',
                           keyboardType: const TextInputType.numberWithOptions(
                             decimal: true,
                           ),
                           validator: (val) => (val?.isEmpty ?? true)
-                              ? 'Tinggi harus diisi'
+                              ? 'Berat harus diisi'
                               : null,
                           isPassword: false,
                           backgroundColor: TSColor.monochrome.pureWhite,
@@ -175,15 +175,15 @@ class _ChildFormCardState extends State<ChildFormCard> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildSectionHeader(context, "Berat Badan (kg)"),
+                        _buildSectionHeader(context, "Tinggi Badan (cm)"),
                         TSTextField(
-                          controller: widget.formData.weightController,
-                          placeholder: 'Contoh: 56.5',
+                          controller: widget.formData.heightController,
+                          placeholder: 'Contoh: 156.0',
                           keyboardType: const TextInputType.numberWithOptions(
                             decimal: true,
                           ),
                           validator: (val) => (val?.isEmpty ?? true)
-                              ? 'Berat harus diisi'
+                              ? 'Tinggi harus diisi'
                               : null,
                           isPassword: false,
                           backgroundColor: TSColor.monochrome.pureWhite,

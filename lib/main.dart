@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'core/bloc/bloc_observer.dart';
 import 'core/database/database_helper.dart';
 import 'core/network/network_info.dart';
+import 'core/theme/text_scale_wrapper.dart';
 import 'core/theme/ts_color.dart';
 import 'injection_container.dart' as di;
 import 'presentation/cubit/beranda/beranda_cubit.dart';
@@ -65,6 +66,9 @@ class MyApp extends StatelessWidget {
             ),
           ),
         ),
+        builder: (context, child) {
+          return TextScaleWrapper(child: child ?? const SizedBox.shrink());
+        },
         home: const SplashScreen(),
       ),
     );

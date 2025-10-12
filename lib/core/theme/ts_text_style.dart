@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../utils/responsive_helper.dart';
+import '../utils/text_scale_calculator.dart';
 
 // Extension untuk TextStyle
 extension TextStyleExtension on TextStyle {
@@ -36,19 +36,18 @@ class TSFont {
   static Bold bold = Bold();
   static ExtraBold extraBold = ExtraBold();
 
+  /// Get scaled text style based on screen size
+  /// This method now uses the new TextScaleCalculator for precise scaling
   static TextStyle getStyle(BuildContext context, TextStyle standardStyle) {
-    final helper = ResponsiveHelper(context);
+    // Get base font size
+    final double baseFontSize = standardStyle.fontSize ?? 14.0;
 
-    final double scaleFactor = helper.value(
-      small: 0.9,
-      standard: 1.0,
-      large: 1.1,
-      tablet: 1.25,
+    // Calculate final scaled font size using new calculator
+    final double finalFontSize = TextScaleCalculator.calculateFinalFontSize(
+      context: context,
+      baseFontSize: baseFontSize,
     );
-
-    return standardStyle.copyWith(
-      fontSize: standardStyle.fontSize! * scaleFactor,
-    );
+    return standardStyle.copyWith(fontSize: finalFontSize);
   }
 }
 
