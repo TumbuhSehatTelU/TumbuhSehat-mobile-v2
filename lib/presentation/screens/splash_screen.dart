@@ -13,7 +13,7 @@ import '../widgets/onboarding/ts_auth_header.dart';
 import '../widgets/common/ts_button.dart';
 import '../widgets/layouts/ts_page_scaffold.dart';
 import 'main/main_screen.dart';
-import 'onboarding/join_or_create_screen.dart';
+// import 'onboarding/join_or_create_screen.dart';
 import 'onboarding/parent_registration_screen.dart';
 
 class SplashScreen extends StatefulWidget {
