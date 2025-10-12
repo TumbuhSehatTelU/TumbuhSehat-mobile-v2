@@ -8,18 +8,22 @@ import 'core/utils/constants.dart';
 import 'data/datasources/local/food_local_data_source.dart';
 import 'data/datasources/local/onboarding_local_data_source.dart';
 import 'data/datasources/remote/analysis_remote_datasource.dart';
+import 'data/datasources/remote/chatbot_remote_datasource.dart';
 import 'data/datasources/remote/food_remote_data_source.dart';
 import 'data/datasources/remote/onboarding_remote_data_source.dart';
+import 'data/repositories/chatbot_repository_impl.dart';
 import 'data/repositories/food_repository_impl.dart';
 import 'data/repositories/nutrition_repository_impl.dart';
 import 'data/repositories/onboarding_repository_impl.dart';
 import 'data/repositories/recommendation_repository_impl.dart';
+import 'domain/repositories/chatbot_repository.dart';
 import 'domain/repositories/food_repository.dart';
 import 'domain/repositories/nutrition_repository.dart';
 import 'domain/repositories/onboarding_repository.dart';
 import 'domain/repositories/recommendation_repository.dart';
 import 'presentation/cubit/beranda/beranda_cubit.dart';
 import 'presentation/cubit/calory_history/calory_history_cubit.dart';
+import 'presentation/cubit/chatbot/chatbot_cubit.dart';
 import 'presentation/cubit/daily_detail/daily_detail_cubit.dart';
 import 'presentation/cubit/food_prediction/food_prediction_cubit.dart';
 import 'presentation/cubit/login/login_cubit.dart';
@@ -68,6 +72,9 @@ Future<void> init() async {
   sl.registerLazySingleton<AnalysisRemoteDataSource>(
     () => AnalysisRemoteDataSourceImpl(client: sl()),
   );
+  sl.registerLazySingleton<ChatbotRemoteDataSource>(
+    () => ChatbotRemoteDataSourceImpl(client: sl()),
+  );
 
   // Repository
   sl.registerLazySingleton<OnboardingRepository>(
@@ -94,6 +101,9 @@ Future<void> init() async {
       nutritionRepository: sl(),
       localDataSource: sl(),
     ),
+  );
+  sl.registerLazySingleton<ChatbotRepository>(
+    () => ChatbotRepositoryImpl(remoteDataSource: sl()),
   );
 
   // FEATURES
@@ -135,4 +145,5 @@ Future<void> init() async {
   sl.registerFactory(
     () => ProfileCubit(onboardingRepository: sl(), sharedPreferences: sl()),
   );
+  sl.registerFactory(() => ChatbotCubit(chatbotRepository: sl()));
 }
