@@ -67,6 +67,7 @@ flutter:
     - assets/lottie/
     - assets/icons/
     - assets/db/
+    - .env
 
   fonts:
     - family: OpenSans

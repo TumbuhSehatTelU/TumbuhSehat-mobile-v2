@@ -41,20 +41,15 @@ class __MainScreenContentState extends State<_MainScreenContent> {
 
   final List<Widget> _pages = [
     const BerandaScreen(),
-    // ChatbotScreen(),
-    // KomunitasScreen(),
+    ChatbotScreen(),
+    KomunitasScreen(),
     BlocProvider(
       create: (_) => di.sl<ProfileCubit>(),
       child: const ProfilScreen(),
     ),
   ];
 
-  final List<String> _iconNames = [
-    'Beranda', 
-    // 'Chatbot', 
-    // 'Komunitas', 
-    'Profil'
-    ];
+  final List<String> _iconNames = ['Beranda', 'Chatbot', 'Komunitas', 'Profil'];
 
   void _onScanPressed() {
     Navigator.of(

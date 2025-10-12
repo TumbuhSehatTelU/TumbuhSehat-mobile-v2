@@ -24,7 +24,7 @@ class AnalysisRemoteDataSourceImpl implements AnalysisRemoteDataSource {
           imageFile.path,
           filename: fileName,
         ),
-        'plate_cm': '26.0', 
+        'plate_cm': '26.0',
       });
 
       final response = await client.post(

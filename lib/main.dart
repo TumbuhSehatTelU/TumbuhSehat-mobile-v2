@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 // import 'package:mobile_tumbuh_sehat_v2/core/utils/debug_utils.dart';
 import 'core/bloc/bloc_observer.dart';
 import 'core/database/database_helper.dart';
@@ -17,6 +18,7 @@ import 'package:intl/date_symbol_data_local.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
   // await clearTumbuhSehatPreferencesOnDebug();
   // await deleteDatabaseOnDebug();
   final dbHelper = DatabaseHelper.instance;
