@@ -93,7 +93,11 @@ Future<void> init() async {
   );
 
   sl.registerLazySingleton<NutritionRepository>(
-    () => NutritionRepositoryImpl(dbHelper: sl()),
+    () => NutritionRepositoryImpl(
+      dbHelper: sl(),
+      onboardingRepository: sl(),
+      foodLocalDataSource: sl(),
+    ),
   );
   sl.registerLazySingleton<RecommendationRepository>(
     () => RecommendationRepositoryImpl(
@@ -143,7 +147,11 @@ Future<void> init() async {
   );
   sl.registerFactory(() => FoodPredictionCubit(remoteDataSource: sl()));
   sl.registerFactory(
-    () => ProfileCubit(onboardingRepository: sl(), sharedPreferences: sl()),
+    () => ProfileCubit(
+      onboardingRepository: sl(),
+      sharedPreferences: sl(),
+      nutritionRepository: sl(),
+    ),
   );
   sl.registerFactory(() => ChatbotCubit(chatbotRepository: sl()));
 }

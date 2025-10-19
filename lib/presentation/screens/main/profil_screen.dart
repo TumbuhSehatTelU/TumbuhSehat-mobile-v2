@@ -157,6 +157,15 @@ class _ProfilScreenState extends State<ProfilScreen> {
             color: Colors.red,
             onTap: _showLogoutConfirmationDialog,
           ),
+          const SizedBox(height: 16),
+
+          ProfileMenuItem(
+            svgIconPath: Assets.icons.scan.path,
+            title: 'Generate Data Dummy',
+            onTap: () {
+              context.read<ProfileCubit>().generateDummyData();
+            },
+          ),
         ],
       ),
     );

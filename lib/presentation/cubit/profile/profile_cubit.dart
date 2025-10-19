@@ -1,6 +1,6 @@
-
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mobile_tumbuh_sehat_v2/domain/repositories/nutrition_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // import '../../../core/database/database_helper.dart';
@@ -15,10 +15,12 @@ part 'profile_state.dart';
 class ProfileCubit extends Cubit<ProfileState> {
   final OnboardingRepository onboardingRepository;
   final SharedPreferences sharedPreferences;
+  final NutritionRepository nutritionRepository;
 
   ProfileCubit({
     required this.onboardingRepository,
     required this.sharedPreferences,
+    required this.nutritionRepository,
   }) : super(ProfileInitial());
 
   Future<void> loadProfileData() async {
@@ -88,6 +90,15 @@ class ProfileCubit extends Cubit<ProfileState> {
     result.fold(
       (failure) => emit(ProfileError(failure.message)),
       (_) => emit(ProfileLogoutSuccess()),
+    );
+  }
+
+  Future<void> generateDummyData() async {
+    emit(const ProfileLoading(message: 'Membuat data dummy...'));
+    final result = await nutritionRepository.generateDummyHistory();
+    result.fold(
+      (failure) => emit(ProfileError(failure.message)),
+      (_) => emit(const ProfileSuccess('Data dummy berhasil dibuat.')),
     );
   }
 }

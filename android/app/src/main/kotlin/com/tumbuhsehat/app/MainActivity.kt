@@ -1,4 +1,4 @@
-package com.example.mobile_tumbuh_sehat_v2
+package com.tumbuhsehat.app
 
 import io.flutter.embedding.android.FlutterActivity
 

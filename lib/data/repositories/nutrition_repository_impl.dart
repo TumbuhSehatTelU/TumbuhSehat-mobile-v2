@@ -1,6 +1,11 @@
 import 'dart:math';
 
 import 'package:dartz/dartz.dart';
+import 'package:mobile_tumbuh_sehat_v2/data/datasources/local/food_local_data_source.dart';
+import 'package:mobile_tumbuh_sehat_v2/data/models/food_model.dart';
+import 'package:mobile_tumbuh_sehat_v2/data/models/meal_history_model.dart';
+import 'package:mobile_tumbuh_sehat_v2/data/models/urt_model.dart';
+import 'package:mobile_tumbuh_sehat_v2/domain/repositories/onboarding_repository.dart';
 import '../../core/database/database_helper.dart';
 import '../../core/error/failures.dart';
 import '../../domain/repositories/nutrition_repository.dart';
@@ -12,10 +17,18 @@ import '../models/parent_model.dart';
 import '../models/weekly_intake_model.dart';
 import '../models/weekly_summary_model.dart';
 
+
+
 class NutritionRepositoryImpl implements NutritionRepository {
   final DatabaseHelper dbHelper;
+  final OnboardingRepository onboardingRepository;
+  final FoodLocalDataSource foodLocalDataSource;
 
-  NutritionRepositoryImpl({required this.dbHelper});
+  NutritionRepositoryImpl({
+    required this.dbHelper,
+    required this.onboardingRepository,
+    required this.foodLocalDataSource,
+  });
 
   @override
   Future<Either<Failure, WeeklySummaryModel>> getWeeklySummary({
@@ -318,6 +331,119 @@ class NutritionRepositoryImpl implements NutritionRepository {
     }
 
     return AkgModel.fromMap(maps.first);
+  }
+
+  @override
+  Future<Either<Failure, void>> generateDummyHistory() async {
+    try {
+      final db = await dbHelper.database;
+      final random = Random();
+
+      // Langkah A: Persiapan
+      final familyResult = await onboardingRepository.getCachedFamily();
+      if (familyResult.isLeft()) {
+        return Left(CacheFailure('Keluarga tidak ditemukan.'));
+      }
+      final family = familyResult.getOrElse(() => throw Exception());
+      final allMembers = [...family.children, ...family.parents];
+
+      final foodData = await db.query(
+        'foods',
+        where: 'id = ?',
+        whereArgs: [1006],
+      );
+      if (foodData.isEmpty) {
+        return Left(CacheFailure('Makanan (ID: 1006) tidak ditemukan.'));
+      }
+      final nasiPutih = FoodModel.fromMap(foodData.first);
+
+      final urtData = await db.query(
+        'urt_conversions',
+        where: 'id = ?',
+        whereArgs: [6],
+      );
+      if (urtData.isEmpty) {
+        return Left(CacheFailure('URT (ID: 6) tidak ditemukan.'));
+      }
+      final centong = UrtModel.fromMap(urtData.first);
+
+      // Langkah B: Hapus data 6 hari terakhir
+      final sixDaysAgo = DateTime.now().subtract(const Duration(days: 6));
+      final startDate = DateTime(
+        sixDaysAgo.year,
+        sixDaysAgo.month,
+        sixDaysAgo.day,
+      );
+      await db.delete(
+        'meal_histories',
+        where: 'timestamp >= ?',
+        whereArgs: [startDate.millisecondsSinceEpoch],
+      );
+
+      // Langkah C: Loop & Generate
+      for (final member in allMembers) {
+        final akg = await getAkgForMember(member);
+        if (akg == null) continue;
+
+        for (int i = 1; i <= 6; i++) {
+          final date = DateTime.now().subtract(Duration(days: i));
+
+          final randomPercentage =
+              0.5 + (random.nextDouble() * 0.6); // 0.5 to 1.1
+          final targetCalories = akg.calories * randomPercentage;
+
+          if (nasiPutih.calories <= 0) continue;
+          final requiredGrams = (targetCalories / nasiPutih.calories) * 100.0;
+          final quantity = requiredGrams / centong.grams;
+
+          if (quantity <= 0) continue;
+
+          // Buat 3 entri makan (Sarapan, Siang, Malam)
+          final meals = [
+            {'hour': 8, 'portion': 0.3},
+            {'hour': 13, 'portion': 0.4},
+            {'hour': 19, 'portion': 0.3},
+          ];
+
+          for (final meal in meals) {
+            final mealQuantity = quantity * meal['portion']!;
+            final mealGrams = requiredGrams * meal['portion']!;
+            final timestamp = DateTime(
+              date.year,
+              date.month,
+              date.day,
+              meal['hour'] as int,
+              random.nextInt(60),
+            );
+
+            final history = MealHistoryModel(
+              timestamp: timestamp.millisecondsSinceEpoch,
+              eaters: EatersModel(
+                parentNames: [],
+                childNames: [],
+              ), // Diisi oleh saveMealHistory
+              components: [
+                MealComponentModel(
+                  foodName: nasiPutih.name,
+                  quantity: mealQuantity,
+                  urtName: centong.urtName,
+                  totalGrams: mealGrams,
+                ),
+              ],
+            );
+
+            await foodLocalDataSource.saveMealHistory(
+              history,
+              member is ParentModel ? [member] : [],
+              member is ChildModel ? [member] : [],
+            );
+          }
+        }
+      }
+      return const Right(null);
+    } catch (e) {
+      return Left(CacheFailure('Gagal membuat data dummy: $e'));
+    }
   }
 
   // HELPER
