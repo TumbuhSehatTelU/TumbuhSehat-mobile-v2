@@ -33,6 +33,7 @@ import 'presentation/cubit/onboarding/onboarding_cubit.dart';
 import 'presentation/cubit/profile/profile_cubit.dart';
 import 'presentation/cubit/recommendation/recommendation_cubit.dart';
 import 'presentation/cubit/scan/scan_cubit.dart';
+import 'presentation/cubit/scan_analysis/scan_analysis_cubit.dart';
 import 'presentation/cubit/splash/splash_cubit.dart';
 import 'core/database/database_helper.dart';
 
@@ -159,4 +160,7 @@ Future<void> init() async {
     ),
   );
   sl.registerFactory(() => ChatbotCubit(chatbotRepository: sl()));
+  sl.registerFactory(
+    () => ScanAnalysisCubit(nutritionRepository: sl(), foodRepository: sl()),
+  );
 }
