@@ -8,7 +8,9 @@ import '../../../core/theme/ts_shadow.dart';
 import '../../../core/theme/ts_text_style.dart';
 import '../../../data/models/daily_detail_model.dart';
 import '../../../data/models/recommendation_model.dart';
+import '../../../data/models/weekly_summary_model.dart';
 import '../../cubit/beranda/beranda_cubit.dart';
+import '../../widgets/home/daily_calory_gauge.dart';
 import '../../widgets/home/skeletons/recommendation_card_skeleton.dart';
 import '../../widgets/home/skeletons/weekly_chart_skeleton.dart';
 import '../../widgets/home/weekly_calory_chart.dart';
@@ -101,6 +103,21 @@ class _BerandaScreenState extends State<BerandaScreen> {
             if (_pageController == null) {
               return const Center(child: CircularProgressIndicator());
             }
+            final now = DateTime.now();
+            final today = DateTime(now.year, now.month, now.day);
+            final consumedToday = state.weeklySummary.dailyIntakes
+                .firstWhere(
+                  (d) =>
+                      d.date.year == today.year &&
+                      d.date.month == today.month &&
+                      d.date.day == today.day,
+                  orElse: () =>
+                      DailyCaloryIntake(date: today, totalCalories: 0),
+                )
+                .totalCalories;
+
+            final targetDaily = state.weeklySummary.akgStandard.calories;
+
             final hour = DateTime.now().hour;
             String title;
             RecommendationModel recommendationToShow;
@@ -154,6 +171,19 @@ class _BerandaScreenState extends State<BerandaScreen> {
                   else
                     Column(
                       children: [
+                        Text(
+                          "Kebutuhan Kalori Harian",
+                          style: TSFont.getStyle(
+                            context,
+                            TSFont.bold.h2.withColor(TSColor.monochrome.black),
+                          ),
+                        ),
+                        const SizedBox(height: 36),
+                        DailyCaloryGauge(
+                          consumedCalories: consumedToday,
+                          targetCalories: targetDaily,
+                        ),
+                        const SizedBox(height: 24),
                         _buildWeeklyHistorySection(
                           context: context,
                           title: 'Kebutuhan Kalori Mingguan',
