@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
 import 'core/network/network_info.dart';
+import 'core/services/notification_service.dart';
 import 'core/utils/constants.dart';
 import 'data/datasources/local/food_local_data_source.dart';
 import 'data/datasources/local/onboarding_local_data_source.dart';
@@ -110,6 +111,9 @@ Future<void> init() async {
     () => ChatbotRepositoryImpl(remoteDataSource: sl()),
   );
 
+  // SERVICE
+  sl.registerLazySingleton(() => NotificationService.instance);
+
   // FEATURES
   // Cubit
   sl.registerFactory(
@@ -151,6 +155,7 @@ Future<void> init() async {
       onboardingRepository: sl(),
       sharedPreferences: sl(),
       nutritionRepository: sl(),
+      notificationService: sl(),
     ),
   );
   sl.registerFactory(() => ChatbotCubit(chatbotRepository: sl()));

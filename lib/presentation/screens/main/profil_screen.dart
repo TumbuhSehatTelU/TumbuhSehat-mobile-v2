@@ -158,6 +158,14 @@ class _ProfilScreenState extends State<ProfilScreen> {
             onTap: _showLogoutConfirmationDialog,
           ),
           const SizedBox(height: 16),
+          ProfileMenuItem(
+            svgIconPath: Assets.icons.scan.path,
+            title: 'Trigger Notifikasi',
+            onTap: () {
+              context.read<ProfileCubit>().triggerTestNotification();
+            },
+          ),
+          const SizedBox(height: 16),
 
           ProfileMenuItem(
             svgIconPath: Assets.icons.scan.path,

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:timezone/data/latest.dart' as tz;
 // import 'package:mobile_tumbuh_sehat_v2/core/utils/debug_utils.dart';
 import 'core/bloc/bloc_observer.dart';
 import 'core/database/database_helper.dart';
 import 'core/network/network_info.dart';
+import 'core/services/notification_service.dart';
 import 'core/theme/text_scale_wrapper.dart';
 import 'core/theme/ts_color.dart';
 import 'injection_container.dart' as di;
@@ -16,6 +18,8 @@ import 'presentation/cubit/splash/splash_cubit.dart';
 import 'presentation/screens/splash_screen.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
@@ -23,6 +27,8 @@ Future<void> main() async {
   // await deleteDatabaseOnDebug();
   final dbHelper = DatabaseHelper.instance;
   await dbHelper.database;
+  tz.initializeTimeZones();
+  await NotificationService.instance.init(navigatorKey);
   await di.init();
   await initializeDateFormatting('id_ID', null);
   NetworkInfoImpl.setForceOffline(true);
@@ -45,6 +51,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
+        navigatorKey: navigatorKey,
         title: 'Tumbuh Sehat',
         theme: ThemeData(
           useMaterial3: true,
